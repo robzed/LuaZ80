@@ -50,13 +50,16 @@ function Z80_Assembler:initialize()
 end
 
 function Z80_Assembler:__serialize()
+--[[
 	return {
 		messages = self.messages, 
 		_errors = self._errors, 
 		_pc = self._pc,
 		-- really need several entires to display this... 
 		--last_instruction = self.instr[#self.instr]
-		}
+	}
+--]]
+	return self
 end
 
 function Z80_Assembler:set_compile_address(value)
