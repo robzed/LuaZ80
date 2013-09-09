@@ -59,8 +59,52 @@ local CLEOL = "\x1b[K"
 local CLL = "\x1b[2K"
 local CLS = "\x1b[2J"
 local Home = "\x1b[H"	-- home cursor vt100
-local Hi = "\x1b[1m"
+
+
+local Hi = "\x1b[1m"		-- also 'bright'
 local NormAttr = "\x1b[m"
+
+-- 
+-- Sets multiple display attribute settings. The following lists standard attributes:
+-- From http://www.termsys.demon.co.uk/vtansi.htm#colors
+local ANSI_attrib = {
+	Reset_all = 0,
+	Bright = 1,
+	Dim = 2,
+	Underscore = 4,
+	Blink = 5,
+	Reverse = 7,
+	Hidden = 8,
+
+	-- Foreground Colours
+	FG_Black = 30,
+	FG_Red = 31,
+	FG_Green = 32,
+	FG_Yellow = 33,
+	FG_Blue = 34,
+	FG_Magenta = 35,
+	FG_Cyan = 36,
+	FG_White = 37,
+
+	-- Background Colours
+	BG_Black = 40,
+	BG_Red = 41,
+	BG_Green = 42,
+	BG_Yellow = 43,
+	BG_Blue = 44,
+	BG_Magenta = 45,
+	BG_Cyan = 46,
+	BG_White = 47,
+	}
+
+---
+-- io_write_attr()
+-- Set Attribute Mode	<ESC>[{attr1};...;{attrn}m
+function set_ANSI_colour(...)
+	local s = '\x1b[' .. table.concat({...}, ';') .. 'm'
+	io.write(s)
+end
+
 
 local debug_precode = " jit.debug_obj:_debug_step(0x%x) "
 
