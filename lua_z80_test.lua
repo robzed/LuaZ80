@@ -35,15 +35,16 @@ require("lua_z80")
 require("z80_ss_debug")
 require("Z80_assembler")
 
+Z80_debugger_enabled = true
+
 function lua_z80_test()
-	local debugger_enabled = true
 	--run_code(lua_basic_test(), debugger_enabled, "force instruction block size")
 	local code = lua_memory_invalidate_test()
 	if code then
-		run_code(code, debugger_enabled, "writable")
+		run_code(code, Z80_debugger_enabled, "writable")
 	end
 end
-
+ 
 function lua_memory_invalidate_test()
 	local z = Z80_Assembler:new()
 	z:set_compile_address(0)
