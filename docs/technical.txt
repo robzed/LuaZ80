@@ -1,0 +1,161 @@
+LuaZ80 Technical Information
+=============================
+Rob Probin - Started: Sept 2013 - Last Updated: Sept 2013
+
+History
+-------
+Initially this started as prototype to evaluate how practical such a project is.
+
+TERMS
+-----
+'lump' - this a small section or block of Z80 code that has been 'cross-compiled' to Lua instructions/commands/code. 
+
+
+Approach
+========
+
+Conceptually the _normal_ approach is to emulation is as per the following steps:
+ - read each instruction op-code 
+ - decode it 
+ - dispatch it via something like a switch statement or table
+ - execute the code that does the function requested
+
+Whilst this is the simplest approach, it's also a bit slow because the first three steps have to be done again and again. A better approach might be to use a JIT compiler model, where the code is processed ahead of time into some 'native' format, thereby only doing steps 1-3 once per sequence of instructions. 
+
+Problems:
+ - If memory with code is changed, then the JIT compiled code is invalid. How do we detect this? (Self modifying code - see below).
+ - Jumping in machine code can be into instruction streams of previously compiled code.
+ - It doesn't optimise step 4 - which can alter the performance dramatically.
+
+
+If we ignore the first problem for the moment, we can have a Lua function that generates (or 'compiles') Lua code for a number of instructions. If the code jumps into the middle of code, then we start creating Lua in from that point (generating a new sequence). We might want to stop when we get to a branch, as per QEMU (sort of). But let's see how it goes.
+
+
+Future
+======
+This project may do two things ultimately:
+1. Emulates a Z80 .
+2. Uses that CPU to emulate a very crude ZX81 or ZX Spectrum - mostly for testing purposes. I don't (at the moment) see this project as a complete emulator, just as a Z80 emulator that can be embedded in other projects. There are other people who have done an excellent job, and a good emulator is vastly more than a CPU emulator!
+
+
+Why Z80?
+========
+
+How would one run a ZX81/ZX Spectrum/other-old-computer without one?!?!
+Also, I've a good amount of experience in it.
+
+
+Why Lua?
+========
+
+Because of the amazing jsLinux.  (http://bellard.org/jslinux/)
+Because of QEMU.  (http://wiki.qemu.org/Main_Page)
+Because there appeared to be a few Python Z80 interpreters.
+Plenty of native/C interpreters.
+A few Java interpreters.
+Even a Visual Basic ZX81 emulator.
+Because someone had made a CPU in Minecraft blocks.
+
+But very little using Lua for emulators (that I could find) although several people have discussed it.
+
+The only Lua processor emulator I could find was inside Garryboy which is a Game Boy processor emulator inside Garryboy. Garryboy is a Game Boy emulator for Garry's Mod. The Game Boy processor isn't a Z80, but an 8080-derived processor with some Z80 instructions added (CB prefix) as well as unique auto-increment/decrement addressing modes (wikipedia). Garryboy is a traditional read-decode-execute emulator.
+
+Most Python, Perl and C emulators are traditional read-decode-execute emulators.
+
+The only non-traditional high-level language emulators I'm aware of are jsLinux and LuaZ80. LuaZ80 doesn't share any code with jsLinux, and I haven't studied jsLinux, so I'm not aware if there are any techniques in common. I could probably learn a few things :-)
+
+No, but REALLY why Lua?
+=======================
+
+Apart from the 'because it hadn't been done' reasons, there are reasonable technical reasons [1].
+
+ - Lua appears to be a reasonably fast interpreter.
+ - Lua, like many interpreted languages, can create code on the fly, so allows some JIT to Lua ability.
+ - Lua is easy to embed into projects. 
+ - Might be interested to provide a game with these sort of features (0x10c sort of), but without a fixed interpreter.
+ - It's supported by lots of add-ons to extend functionality, and cool frameworks like Löve2D.
+ - There is a good JIT compiler (LuaJIT).
+
+
+[1] = assuming one can put aside the raw processing speed of native code, either hand-coded assembler or a slower language ;) like C, C++ or even Java.
+
+
+Why Lua 5.2, Doesn't the world use 5.1 and 5.2 is evil, etc., etc.
+==================================================================
+
+I like 5.2. It's built in bitwise operators made me use it on an ARM7 project I was working on. Also hex escape sequences in strings. And GC fixes. 
+
+
+Early thoughts on Self Modifying Code
+=====================================
+
+When a byte is written to RAM, then there is a chance the current running 'lump of code' or another lump of code is affected.
+
+The hardest case is the current lump of code. We can invalidate all other lumps of code at the end of the current run.
+
+QEMU looks like it has precise and inprecise self-modifying code support, and also uses page protection to detect writes to the currently executed page.
+
+Maybe we should first do as much checking as possible when compiling Z80 to Lua as to whether the write affects the current block being executed. We might be able to infer whether other blocks are affected.
+
+In any case, we might not be able to detect all writes - so after a write it might be necessary to check an array which has a marker to say if this block has been affected (e.g. have 1 in it when the current block is affected). This might reduce any benefit to checking during the compile process, except if we transform SMC into none-self-modifying code. This will stop recompiles and make things work much smoother.
+
+In regards to other compiled pages, we could have a string array or table that says whether the current byte being written has code associated with it. In that way we can tell whether we need to do further processing when we finish executing the current compiled lump.
+
+Other references for Self-modifying mode
+ - http://qemu.weilnetz.de/qemu-tech.html#Self_002dmodifying-code-and-translated-code-invalidation
+ - http://static.usenix.org/event/usenix05/tech/freenix/full_papers/bellard/bellard.pdf
+ - http://lists.gnu.org/archive/html/qemu-devel/2011-11/msg00556.html
+
+
+
+
+
+What to call this technology
+============================
+
+I'm not entirely sure to call something that translates/compiles from Z80 machine code into Lua comamnds, piecemeal, when they are required.
+
+Dynamic (binary) translator is probably the closest. 
+
+Some other options:
+
+ - dynamic compilation
+ - incremental compilation
+ - jit-in-time compilation
+ - Self-modifying code
+
+And some references:
+
+http://en.wikipedia.org/wiki/Binary_translation
+http://en.wikipedia.org/wiki/Just-in-time_compilation
+
+
+Speculation
+===========
+
+This section speculates about various aspects of the work in progress and possible directions for improving the speed of the emulator.
+
+Why isn't this as fast as native Lua?
+-------------------------------------
+At the moment, the issue I'm most worried about (but don't have measured times for) is translating data as instructions into a 'lump' of code, then invalidating the current block when that data is changed. Invalidating the current block will immediately cause the current lump to exit and be recompiled = a relatively slow process.
+
+We therefore will need to add more complication to the compile routine to try to avoid compiling bytes that are not in the intruction path, thereby avoiding compiling data.
+
+Other factors in speed
+-----------------------
+There are likely to be other factors which limit the speed.
+
+ - Some instructions require us to exit the current lump. Although with most indirect jumps this is somewhat inevitable, but maybe we can reduce this for some intructions without adding too much Lua code to decide (and offset any benefits we gain).
+ 
+ - I expect flag colculations on a lot of Z80 instructions are very costly - especially where we can't just pull the value out of a table. One approach might be to defer the calculation of flags until they are used. Perhaps in this way we can just use the last update of the flags and the others would be thown away? One possible method would be to pass a flag generation function. We also need to consider how to pass the parameters. And this has to be faster than calculating the flags.
+
+ - Checking for writes dangerious at compile time would be nice. This might avoid a write check on any write instruction. But it might be impossible for most cases. 
+
+
+Will this ever be as fast a C or C++ Z80 emulator?
+--------------------------------------------------
+It's probably unlikely but the dynamic re-compilation gives it an edge a standard C interpreting emulator would probably not have. Couple this with LuaJIT (which LuaZ80 hasn't yet been tested with) and it could get quite nippy. However, the various features we use, like garbage collected dynamic memory are likely to slow us down. 
+
+However, until it's more complete and we can time the code, we will just have to speculate.
+
+
