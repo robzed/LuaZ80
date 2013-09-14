@@ -32,38 +32,64 @@
 
 require("third_party/strict")
 
-local function decode_operands(instruction, memory, start)
+local function decode_operands(instruction, memory, start, size_so_far)
 	-- Decodes operands, specifically:
 	-- !nn!
 	-- !n!
 	-- !r!
+	-- !d!
 	local byte1 = memory[start] or 0
 	local byte2 = memory[((start+1)%65536)] or 0
 
+	-- 2's completement displacement for IX and IY ... is occurs before other offsets
+	local mstart, mend = instruction:find("!d!")
+	if mstart then
+		local sign = "+"
+		if byte1 >= 128 then
+			byte1 = 256-byte1	-- 255 = 1, 254 = 2
+			sign = "-"
+		end
+		instruction = string.format("%s%s%02XH%s",
+			instruction:sub(1,mstart-1),
+			sign,
+			byte1,
+			instruction:sub(mend+1))
+		
+		start = start + 1
+		size_so_far = size_so_far + 1
+		byte1 = memory[start] or 0
+		byte2 = memory[((start+1)%65536)] or 0
+	end
+	-- 16 bit immediate operand
 	local mstart, mend = instruction:find("!nn!")
 	if mstart then
-		instruction = string.format("%s%02x%02xH%s",
+		instruction = string.format("%s%02X%02xH%s",
 			instruction:sub(1,mstart-1),
 			byte2, byte1,
 			instruction:sub(mend+1))
+		size_so_far = size_so_far + 2
 	end
+	-- 8 bit immediate operand
 	mstart, mend = instruction:find("!n!")
 	if mstart then
-		instruction = string.format("%s%02xH%s",
+		instruction = string.format("%s%02XH%s",
 			instruction:sub(1,mstart-1),
 			byte1,
 			instruction:sub(mend+1))
+		size_so_far = size_so_far + 1
 	end
+	-- 8 bit relative address offset
 	mstart, mend = instruction:find("!r!")
 	if mstart then
 		if byte1 > 127 then byte1 = byte1-256 end
 		local address = ((start+1+byte1)%65536)
-		instruction = string.format("%s%04xH%s",
+		instruction = string.format("%s%04XH%s",
 			instruction:sub(1,mstart-1),
 			address,
 			instruction:sub(mend+1))
+		size_so_far = size_so_far + 1
 	end
-	return instruction
+	return instruction, size_so_far
 end
 
 local CB_Z80_table = {
@@ -326,7 +352,7 @@ local CB_Z80_table = {
 }
 
 local function CB_instruction_decoder(memory, start)
-	return CB_Z80_table[memory[start] or 0]
+	return CB_Z80_table[memory[start] or 0], 2
 end
 
 local ED_Z80_table = {
@@ -410,6 +436,7 @@ local ED_Z80_table = {
 [0xB9] = "CPDR",
 [0xBA] = "INDR",
 [0xBB] = "OTDR",
+[0xED] = "LuaZ80_Print",
 }
 
 local function ED_instruction_decoder(memory, start)
@@ -417,18 +444,418 @@ local function ED_instruction_decoder(memory, start)
 	local instruction = ED_Z80_table[value]
 
 	if instruction == nil then
-		return string.format("[ED%02X Unknown]", value)
+		return string.format("[ED%02X Unknown]", value), 2
 	end
 
-	return decode_operands(instruction, memory, (start+1)%65536)
+	return decode_operands(instruction, memory, (start+1)%65536, 2)
 end
 
+-- Apparently the undocumented instructions here can do three things
+-- 1. rotates/shifts/bit ops
+-- 2. access low/high of IX/IY
+-- 3. or they just affect indexed byte and nothing else
+-- See Z80oplist.txt by J.G.Harston for more details
+local DD_CB_Z80_table = {
+[0] = "? rlc (IX!d!)->b",
+"? rlc (IX!d!)->c",
+"? rlc (IX!d!)->d",
+"? rlc (IX!d!)->e",
+"? rlc (IX!d!)->h or rlc IXH",
+"? rlc (IX!d!)->l or rlc IXL",
+"RLC  (IX!d!)",
+"? rlc (IX!d!)->a",
+"? rrc (IX!d!)->b",
+"? rrc (IX!d!)->c",
+"? rrc (IX!d!)->d",
+"? rrc (IX!d!)->e",
+"? rrc (IX!d!)->h or rrc IXH",
+"? rrc (IX!d!)->l or rrc IXL",
+"RRC  (IX!d!)",
+"? rrc (IX!d!)->a",
+"? rl  (IX!d!)->b",
+"? rl  (IX!d!)->c",
+"? rl  (IX!d!)->d",
+"? rl  (IX!d!)->e",
+"? rl  (IX!d!)->h or rl IXH",
+"? rl  (IX!d!)->l or rl IXL",
+"RL   (IX!d!)",
+"? rl  (IX!d!)->a",
+"? rr  (IX!d!)->b",
+"? rr  (IX!d!)->c",
+"? rr  (IX!d!)->d",
+"? rr  (IX!d!)->e",
+"? rr  (IX!d!)->h or rr IXH",
+"? rr  (IX!d!)->l or rr IXL",
+"RR   (IX!d!)",
+"? rr  (IX!d!)->a",
+"? sla (IX!d!)->b",
+"? sla (IX!d!)->c",
+"? sla (IX!d!)->d",
+"? sla (IX!d!)->e",
+"? sla (IX!d!)->h or sla IXH",
+"? sla (IX!d!)->l or sla IXL",
+"SLA  (IX!d!)",
+"? sla (IX!d!)->a",
+"? sra (IX!d!)->b",
+"? sra (IX!d!)->c",
+"? sra (IX!d!)->d",
+"? sra (IX!d!)->e",
+"? sra (IX!d!)->h or sra IXH",
+"? sra (IX!d!)->l or sra IXL",
+"SRA  (IX!d!)",
+"? sra (IX!d!)->a",
+"? sls (IX!d!)->b",
+"? sls (IX!d!)->c",
+"? sls (IX!d!)->d",
+"? sls (IX!d!)->e",
+"? sls (IX!d!)->h or sls IXH",
+"? sls (IX!d!)->l or sls IXL",
+"SLS  (IX!d!)",
+"? sls (IX!d!)->a",
+"? srl (IX!d!)->b",
+"? srl (IX!d!)->c",
+"? srl (IX!d!)->d",
+"? srl (IX!d!)->e",
+"? srl (IX!d!)->h or sls IXH",
+"? srl (IX!d!)->l or sls IXL",
+"SRL  (IX!d!)",
+"? srl (IX!d!)->a",
+"? bit 0,(IX!d!)->b",
+"? bit 0,(IX!d!)->c",
+"? bit 0,(IX!d!)->d",
+"? bit 0,(IX!d!)->e",
+"? bit 0,(IX!d!)->h",
+"? bit 0,(IX!d!)->l",
+"BIT  0,(IX!d!)",
+"? bit 0,(IX!d!)->a",
+"? bit 1,(IX!d!)->b",
+"? bit 1,(IX!d!)->c",
+"? bit 1,(IX!d!)->d",
+"? bit 1,(IX!d!)->e",
+"? bit 1,(IX!d!)->h",
+"? bit 1,(IX!d!)->l",
+"BIT  1,(IX!d!)",
+"? bit 1,(IX!d!)->a",
+"? bit 2,(IX!d!)->b",
+"? bit 2,(IX!d!)->c",
+"? bit 2,(IX!d!)->d",
+"? bit 2,(IX!d!)->e",
+"? bit 2,(IX!d!)->h",
+"? bit 2,(IX!d!)->l",
+"BIT  2,(IX!d!)",
+"? bit 2,(IX!d!)->a",
+"? bit 3,(IX!d!)->b",
+"? bit 3,(IX!d!)->c",
+"? bit 3,(IX!d!)->d",
+"? bit 3,(IX!d!)->e",
+"? bit 3,(IX!d!)->h",
+"? bit 3,(IX!d!)->l",
+"BIT  3,(IX!d!)",
+"? bit 3,(IX!d!)->a",
+"? bit 4,(IX!d!)->b",
+"? bit 4,(IX!d!)->c",
+"? bit 4,(IX!d!)->d",
+"? bit 4,(IX!d!)->e",
+"? bit 4,(IX!d!)->h",
+"? bit 4,(IX!d!)->l",
+"BIT  4,(IX!d!)",
+"? bit 4,(IX!d!)->a",
+"? bit 5,(IX!d!)->b",
+"? bit 5,(IX!d!)->c",
+"? bit 5,(IX!d!)->d",
+"? bit 5,(IX!d!)->e",
+"? bit 5,(IX!d!)->h",
+"? bit 5,(IX!d!)->l",
+"BIT  5,(IX!d!)",
+"? bit 5,(IX!d!)->a",
+"? bit 6,(IX!d!)->b",
+"? bit 6,(IX!d!)->c",
+"? bit 6,(IX!d!)->d",
+"? bit 6,(IX!d!)->e",
+"? bit 6,(IX!d!)->h",
+"? bit 6,(IX!d!)->l",
+"BIT  6,(IX!d!)",
+"? bit 6,(IX!d!)->a",
+"? bit 7,(IX!d!)->b",
+"? bit 7,(IX!d!)->c",
+"? bit 7,(IX!d!)->d",
+"? bit 7,(IX!d!)->e",
+"? bit 7,(IX!d!)->h",
+"? bit 7,(IX!d!)->l",
+"BIT  7,(IX!d!)",
+"? bit 7,(IX!d!)->a",
+"? res 0,(IX!d!)->b",
+"? res 0,(IX!d!)->c",
+"? res 0,(IX!d!)->d",
+"? res 0,(IX!d!)->e",
+"? res 0,(IX!d!)->h",
+"? res 0,(IX!d!)->l",
+"RES  0,(IX!d!)",
+"? res 0,(IX!d!)->a",
+"? res 1,(IX!d!)->b",
+"? res 1,(IX!d!)->c",
+"? res 1,(IX!d!)->d",
+"? res 1,(IX!d!)->e",
+"? res 1,(IX!d!)->h",
+"? res 1,(IX!d!)->l",
+"RES  1,(IX!d!)",
+"? res 1,(IX!d!)->a",
+"? res 2,(IX!d!)->b",
+"? res 2,(IX!d!)->c",
+"? res 2,(IX!d!)->d",
+"? res 2,(IX!d!)->e",
+"? res 2,(IX!d!)->h",
+"? res 2,(IX!d!)->l",
+"RES  2,(IX!d!)",
+"? res 2,(IX!d!)->a",
+"? res 3,(IX!d!)->b",
+"? res 3,(IX!d!)->c",
+"? res 3,(IX!d!)->d",
+"? res 3,(IX!d!)->e",
+"? res 3,(IX!d!)->h",
+"? res 3,(IX!d!)->l",
+"RES  3,(IX!d!)",
+"? res 3,(IX!d!)->a",
+"? res 4,(IX!d!)->b",
+"? res 4,(IX!d!)->c",
+"? res 4,(IX!d!)->d",
+"? res 4,(IX!d!)->e",
+"? res 4,(IX!d!)->h",
+"? res 4,(IX!d!)->l",
+"RES  4,(IX!d!)",
+"? res 4,(IX!d!)->a",
+"? res 5,(IX!d!)->b",
+"? res 5,(IX!d!)->c",
+"? res 5,(IX!d!)->d",
+"? res 5,(IX!d!)->e",
+"? res 5,(IX!d!)->h",
+"? res 5,(IX!d!)->l",
+"RES  5,(IX!d!)",
+"? res 5,(IX!d!)->a",
+"? res 6,(IX!d!)->b",
+"? res 6,(IX!d!)->c",
+"? res 6,(IX!d!)->d",
+"? res 6,(IX!d!)->e",
+"? res 6,(IX!d!)->h",
+"? res 6,(IX!d!)->l",
+"RES  6,(IX!d!)",
+"? res 6,(IX!d!)->a",
+"? res 7,(IX!d!)->b",
+"? res 7,(IX!d!)->c",
+"? res 7,(IX!d!)->d",
+"? res 7,(IX!d!)->e",
+"? res 7,(IX!d!)->h",
+"? res 7,(IX!d!)->l",
+"RES  7,(IX!d!)",
+"? res 7,(IX!d!)->a",
+"? set 0,(IX!d!)->b",
+"? set 0,(IX!d!)->c",
+"? set 0,(IX!d!)->d",
+"? set 0,(IX!d!)->e",
+"? set 0,(IX!d!)->h",
+"? set 0,(IX!d!)->l",
+"SET  0,(IX!d!)",
+"? set 0,(IX!d!)->a",
+"? set 1,(IX!d!)->b",
+"? set 1,(IX!d!)->c",
+"? set 1,(IX!d!)->d",
+"? set 1,(IX!d!)->e",
+"? set 1,(IX!d!)->h",
+"? set 1,(IX!d!)->l",
+"SET  1,(IX!d!)",
+"? set 1,(IX!d!)->a",
+"? set 2,(IX!d!)->b",
+"? set 2,(IX!d!)->c",
+"? set 2,(IX!d!)->d",
+"? set 2,(IX!d!)->e",
+"? set 2,(IX!d!)->h",
+"? set 2,(IX!d!)->l",
+"SET  2,(IX!d!)",
+"? set 2,(IX!d!)->a",
+"? set 3,(IX!d!)->b",
+"? set 3,(IX!d!)->c",
+"? set 3,(IX!d!)->d",
+"? set 3,(IX!d!)->e",
+"? set 3,(IX!d!)->h",
+"? set 3,(IX!d!)->l",
+"SET  3,(IX!d!)",
+"? set 3,(IX!d!)->a",
+"? set 4,(IX!d!)->b",
+"? set 4,(IX!d!)->c",
+"? set 4,(IX!d!)->d",
+"? set 4,(IX!d!)->e",
+"? set 4,(IX!d!)->h",
+"? set 4,(IX!d!)->l",
+"SET  4,(IX!d!)",
+"? set 4,(IX!d!)->a",
+"? set 5,(IX!d!)->b",
+"? set 5,(IX!d!)->c",
+"? set 5,(IX!d!)->d",
+"? set 5,(IX!d!)->e",
+"? set 5,(IX!d!)->h",
+"? set 5,(IX!d!)->l",
+"SET  5,(IX!d!)",
+"? set 5,(IX!d!)->a",
+"? set 6,(IX!d!)->b",
+"? set 6,(IX!d!)->c",
+"? set 6,(IX!d!)->d",
+"? set 6,(IX!d!)->e",
+"? set 6,(IX!d!)->h",
+"? set 6,(IX!d!)->l",
+"SET  6,(IX!d!)",
+"? set 6,(IX!d!)->a",
+"? set 7,(IX!d!)->b",
+"? set 7,(IX!d!)->c",
+"? set 7,(IX!d!)->d",
+"? set 7,(IX!d!)->e",
+"? set 7,(IX!d!)->h",
+"? set 7,(IX!d!)->l",
+"SET  7,(IX!d!)",
+"? set 7,(IX!d!)->a",
+}
+
+-- decode FDCB or DDCD. 
+-- Note, we can't use the FD_DD_instruction_decoder with a table change
+-- because of the displacement is in the 3rd byte not fourth.
+local function FD_DD_CB_instruction_decoder(memory, start, opcode_str, register, size_so_far)
+	local opcode = (start+1)%65536
+	local value = memory[opcode] or 0
+	local instruction = DD_CB_Z80_table[value]
+	size_so_far = size_so_far + 1
+	
+	if instruction == nil then
+		return string.format("[%s%02X %s Unknown]", opcode_str, value, register), size_so_far
+	end
+	
+	-- assume it's a string
+	
+	-- do a replacement of IX with IY, if necessary
+	if register ~= "IX" then
+		instruction = instruction:gsub("IX", register)
+	end
+
+	return decode_operands(instruction, memory, start, size_so_far)
+end
+
+local DD_Z80_table = {
+[0x09] = "ADD  IX,BC",
+[0x19] = "ADD  IX,DE",
+[0x21] = "LD   IX,!nn!",
+[0x22] = "LD  (!nn!),IX",
+[0x23] = "INC  IX",
+[0x24] = "INC  IXH",
+[0x25] = "DEC  IXH",
+[0x26] = "LD   IXH,!n!",
+[0x29] = "ADD  IX,IX",
+[0x2A] = "LD  IX,(!nn!)",
+[0x2B] = "DEC  IX",
+[0x2C] = "INC  IXL",
+[0x2D] = "DEC  IXL",
+[0x2E] = "LD   IXL,!n!",
+[0x34] = "INC  (IX!d!)",
+[0x35] = "DEC  (IX!d!)",
+[0x36] = "LD  (IX!d!),!n!",
+[0x39] = "ADD  IX,SP",
+[0x44] = "LD   B,IXH",
+[0x45] = "LD   B,IXL",
+[0x46] = "LD   B,(IX!d!)",
+[0x4C] = "LD   C,IXH",
+[0x4D] = "LD   C,IXL",
+[0x4E] = "LD   C,(IX!d!)",
+[0x54] = "LD   D,IXH",
+[0x55] = "LD   D,IXL",    
+[0x56] = "LD   D,(IX!d!)", 
+[0x5C] = "LD   E,IXH",    
+[0x5D] = "LD   E,IXL",    
+[0x5E] = "LD   E,(IX!d!)", 
+[0x60] = "LD   IXH,B",    
+[0x61] = "LD   IXH,C",    
+[0x62] = "LD   IXH,D",    
+[0x63] = "LD   IXH,E",    
+[0x64] = "LD   IXH,IXH",  
+[0x65] = "LD   IXH,IXL",  
+[0x66] = "LD   H,(IX!d!)", 
+[0x67] = "LD   IXH,A",    
+[0x68] = "LD   IXL,B",    
+[0x69] = "LD   IXL,C",    
+[0x6A] = "LD   IXL,D",    
+[0x6B] = "LD   IXL,E",    
+[0x6C] = "LD   IXL,IXH",  
+[0x6D] = "LD   IXL,IXL",  
+[0x6E] = "LD   L,(IX!d!)", 
+[0x6F] = "LD   IXL,A",    
+[0x70] = "LD   (IX!d!),B", 
+[0x71] = "LD   (IX!d!),C", 
+[0x72] = "LD   (IX!d!),D", 
+[0x73] = "LD   (IX!d!),E", 
+[0x74] = "LD   (IX!d!),H", 
+[0x75] = "LD   (IX!d!),L", 
+[0x77] = "LD   (IX!d!),A", 
+[0x7C] = "LD   A,IXH",    
+[0x7D] = "LD   A,IXL",    
+[0x7E] = "LD   A,(IX!d!)", 
+[0x84] = "ADD  A,IXH",    
+[0x85] = "ADD  A,IXL",    
+[0x86] = "ADD  A,(IX!d!)", 
+[0x8C] = "ADC  A,IXH",    
+[0x8D] = "ADC  A,IXL",    
+[0x8E] = "ADC  A,(IX!d!)", 
+[0x94] = "SUB  A,IXH",    
+[0x95] = "SUB  A,IXL",    
+[0x96] = "SUB  A,(IX!d!)", 
+[0x9C] = "SBC  A,IXH",    
+[0x9D] = "SBC  A,IXL",    
+[0x9E] = "SBC  A,(IX!d!)", 
+[0xA4] = "AND  IXH",      
+[0xA5] = "AND  IXL",      
+[0xA6] = "AND  (IX!d!)",   
+[0xAC] = "XOR  IXH",      
+[0xAD] = "XOR  IXL",      
+[0xAE] = "XOR  (IX!d!)",   
+[0xB4] = "OR   IXH",      
+[0xB5] = "OR   IXL",      
+[0xB6] = "OR   (IX!d!)",   
+[0xBC] = "CP   IXH",      
+[0xBD] = "CP   IXL",      
+[0xBE] = "CP   (IX!d!)",
+[0xCB] = FD_DD_CB_instruction_decoder,
+[0xE1] = "POP  IX",       
+[0xE3] = "EX   (SP),IX",  
+[0xE5] = "PUSH IX",       
+[0xE9] = "JP   (IX)",     
+}
+
+
+-- This decoder is common to DD and FD decoders
+local function FD_DD_instruction_decoder(memory, start, opcode_str, register, size_so_far)
+	local value = memory[start] or 0
+	local instruction = DD_Z80_table[value]
+
+	if instruction == nil then
+		return string.format("[%s%02X %s Unknown]", opcode_str, value, register), size_so_far
+	end
+	
+	if type(instruction) == "function" then
+		return instruction(memory, (start+1)%65536, string.format("%s%02X", opcode_str, value), register, size_so_far)
+	end
+	-- assume it's a string
+	
+	-- do a replacement of IX with IY, if necessary
+	if register ~= "IX" then
+		instruction = instruction:gsub("IX", register)
+	end
+
+	return decode_operands(instruction, memory, (start+1)%65536, size_so_far)
+end
+
+-- This decoder deals with IX instructions
 local function DD_instruction_decoder(memory, start)
-	return "IX instruction"
+	return FD_DD_instruction_decoder(memory, start, "DD", "IX", 2)
 end
 
+-- This decoder deals with IY instructions
 local function FD_instruction_decoder(memory, start)
-	return "IY instruction"
+	return FD_DD_instruction_decoder(memory, start, "FD", "IY", 2)
 end
 
 local basic_Z80_table = {
@@ -696,13 +1123,77 @@ function single_Z80_disassemble(memory, start)
 	local instruction = basic_Z80_table[memory[start] or 0]
 
 	if type(instruction) == "string" then
-		return decode_operands(instruction, memory, (start+1)%65536)
+		return decode_operands(instruction, memory, (start+1)%65536, 1)
 	elseif type(instruction) == "function" then
 		return instruction(memory, (start+1)%65536)
 	else
-		return tostring(instruction)
+		return tostring(instruction), 1
 	end
 end
+
+-- We don't use this currently.
+-- Making a different function that was a range of bytes would be trivial
+-- NOTE: Bad instructions might result in misalignment of subsequent instructions.
+function multiple_Z80_disassemble(memory, start, number_of_instructions)
+	local instructions = {}
+	for i = 1, number_of_instructions do
+		local instruction, size = single_Z80_disassemble(memory, start)
+		table.insert(instructions, instruction)
+		start = start + size
+	end
+	return instructions, start
+end
+
+--[[
+	print()
+	print("Simple instructions")
+	print(single_Z80_disassemble({ [0]=0x00 }, 0))
+	print(single_Z80_disassemble({ [0]=0x3e, 0x33 }, 0))
+	print(single_Z80_disassemble({ [0]=0x01, 0x34, 0x12 }, 0))
+	print(single_Z80_disassemble({ [0]=0x06, 0x99 }, 0))
+	print(single_Z80_disassemble({ [0]=0xDB, 0x88 }, 0))
+	print()
+	print("ED instructions")
+	print(single_Z80_disassemble({ [0]=0xED, 0x40 }, 0))
+	print(single_Z80_disassemble({ [0]=0xED, 0x44 }, 0))
+	print(single_Z80_disassemble({ [0]=0xED, 0x46 }, 0))
+	print(single_Z80_disassemble({ [0]=0xED, 0x4B, 0x34, 0x12 }, 0))
+	print(single_Z80_disassemble({ [0]=0xED, 0x53, 0x34, 0x12 }, 0))
+	print(single_Z80_disassemble({ [0]=0xED, 0x00 }, 0))
+	print()
+	print("CB instructions")
+	print(single_Z80_disassemble({ [0]=0xCB, 0x00 }, 0))
+	print(single_Z80_disassemble({ [0]=0xCB, 0x01 }, 0))
+	print(single_Z80_disassemble({ [0]=0xCB, 0xFF }, 0))
+	print()
+	print("IX/IY instructions")
+	print(single_Z80_disassemble({ [0]=0xDD, 0x36, 0xF1, 0x21 }, 0))
+	print(single_Z80_disassemble({ [0]=0xDD, 0x09 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0x09 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0x22, 0x34, 0x12 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0x34, 0x77 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0x36, 0x44, 0xAB, 0xFF }, 0))
+	print()
+	print("IX/IY CB instructions")
+	print(single_Z80_disassemble({ [0]=0xDD, 0xCB, 0x20, 0x06 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x20, 0x06 }, 0))
+	print(single_Z80_disassemble({ [0]=0xDD, 0xCB, 0x06, 0x12 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x06, 0x12 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x00, 0xFE }, 0))
+
+	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0xFF, 0x00 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0xFE, 0x00 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x80, 0x00 }, 0))
+	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x7F, 0x00 }, 0))
+	
+	print()
+	local result, nextaddr = multiple_Z80_disassemble({[0]=0x3E, 0x33, 0xD7, 0xC9, 0xDD, 0xCB, 0x20, 0x06 }, 0, 4)
+	print("Multiple test")
+	for _,i in ipairs(result) do
+		print(i)
+	end
+	print("Next address=", nextaddr);
+--]]
 
 
 return single_Z80_disassemble
