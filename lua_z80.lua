@@ -1199,7 +1199,8 @@ function Z80JIT:service_interrupts()
 end
 
 function Z80JIT:run_z80(our_z80_cpu, address, optional_pre_code)
-	local status, success
+	local status
+	local success = true
 	our_z80_cpu.PC = address
 	repeat
 		self:service_interrupts()
@@ -1208,9 +1209,9 @@ function Z80JIT:run_z80(our_z80_cpu, address, optional_pre_code)
 		-- if compiled code for this location doesn't exist, make some...
 		if not self._compiled_code[address] then
 			self._compiled_code[address] = z80_compile(self._memory, address, self._instructions_per_block_max, optional_pre_code)
-      if self._compiled_code[address].code then
-            self:mark_lump_as_code(self._compiled_code[address])
-      end
+			if self._compiled_code[address].code then
+				self:mark_lump_as_code(self._compiled_code[address])
+			end
 		end
     
 		--
@@ -1222,7 +1223,8 @@ function Z80JIT:run_z80(our_z80_cpu, address, optional_pre_code)
       --
 			-- execute z80 lump
 			--
-			-- We use pcall at the moment
+			-- We use pcall at the moment, but alternatively we can call directly 
+			-- by switching the comments of these two lines.
 			--status = self.current_lump.code(our_z80_cpu, self)
 			success, status = pcall(self.current_lump.code, our_z80_cpu, self)
 			if not success then
@@ -1246,9 +1248,11 @@ function Z80JIT:run_z80(our_z80_cpu, address, optional_pre_code)
 		self.current_lump = nil			-- we shouldn't have a current lump any more
 		self:remove_invalidated_lumps()		-- remove any lumps that got invalidated
 
-		-- not return what to do with undefined and other erros... 
+		-- not return what to do with undefined and other errors... 
 		-- leave to the caller
-	until status ~= "ok"
+		-- invalidate we've taken care of already, so just loop and do more code :-)
+	until status ~= "ok" and status ~= "invalidate"
+	-- other returns are 'undefined', 'halt', 'Execute fail' and "Compile fail"
 	return status
 end
 
