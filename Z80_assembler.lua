@@ -49,7 +49,7 @@ function Z80_Assembler:initialize()
 	--self._last_instruction_index = nil
 end
 
-getmetatable(Z80_Assembler).__tostring = nil
+--getmetatable(Z80_Assembler).__tostring = nil
 
 function Z80_Assembler:__serialize()
 --[[
