@@ -216,6 +216,10 @@ function Z80CPU:get_F()
 	return F
 end
 
+function Z80CPU:__serialize()
+	return self
+end
+
 -- A lump is the container for a block of code that represents a compiled Lia set
 -- of instructions for a current set of memory addresses. It also contains self-write 
 -- detection in order to invalidate the lump.
@@ -229,6 +233,9 @@ function Z80Lump:initialize(start_address)
 	--self.deleted = false
 end
 
+function Z80Lump:__serialize()
+	return self
+end
 
 
 ----------------------------------------------------------------------------
@@ -1112,8 +1119,8 @@ end
 
 function Z80JIT:select_writable(address, length, is_writable)
 	if type(is_writable) == "boolean" then
-		for i = address,address+length do
-			self.write_allowed[address] = is_writable
+		for ptr = address,address+length do
+			self.write_allowed[ptr] = is_writable
 		end
 	end
 end
@@ -1461,6 +1468,11 @@ function Z80JIT:invalidate_all()
 	self._compiled_code = {}
 	self.codemap = {}			-- table where index is address and contents are nil or table of 'lumps'.
 	self.invalidated = {}		-- list of lumps invalidated
+end
+
+
+function Z80JIT:__serialize()
+	return self
 end
 
 
