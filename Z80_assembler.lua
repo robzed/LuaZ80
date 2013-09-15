@@ -44,9 +44,8 @@ Z80_Assembler = class("Z80_Assembler")
 function Z80_Assembler:initialize()
 	self._errors = false
 	self._pc = 0
-	--self.instr = {}
+	self.memory = {}
 	self.messages = {}
-	--self._last_instruction_index = nil
 end
 
 --getmetatable(Z80_Assembler).__tostring = nil
@@ -56,9 +55,7 @@ function Z80_Assembler:__serialize()
 	return {
 		messages = self.messages, 
 		_errors = self._errors, 
-		_pc = self._pc,
-		-- really need several entires to display this... 
-		--last_instruction = self.instr[#self.instr]
+		_pc = self._pc
 	}
 --]]
 	return self
@@ -79,10 +76,6 @@ end
 function Z80_Assembler:any_errors_or_warnings()
 	return #self.message ~= 0
 end
-
---function Z80_Assembler:get_code_string()
---	return table.concat(self.instr)
---end
 
 function Z80_Assembler:get_code()
 	return self.memory
@@ -122,12 +115,10 @@ function Z80_Assembler:DS(...)
 		if type(a_string) ~= "string"then
 			self:set_warning("DS ignoring non-string")
 		else
-			--table.insert(self.instr, string)
 			for i = 1, #a_string do
 				self.memory[self._pc] = a_string:byte(i)
-				self._pc = self._pc + 1
+				self._pc = (self._pc + 1) % 65536
 			end
-			--self._pc = self._pc + #string
 		end
 	end
 end
@@ -138,9 +129,9 @@ function Z80_Assembler:DB(...)
 			self:set_warning("DB ignoring non-number")
 		else
 			byte = self:_byte_check(byte, "LD A value truncated")
-			--table.insert(self.instr, string.char(byte))
+			
 			self.memory[self._pc] = byte
-			self._pc = self._pc + 1
+			self._pc = (self._pc + 1) % 65536
 		end
 	end
 end
@@ -160,11 +151,28 @@ function Z80_Assembler:INC_indirect_HL()
 end
 
 function Z80_Assembler:LD_HL(value)
-	local high = value / 256
+	local high = math.floor(value / 256)
 	local low = value % 256
 	high = self:_byte_check(high, "LD HL high byte truncated")
 	low = self:_byte_check(low, "LD HL low byte truncated")
 	self:DB(0x21, low, high)
+end
+
+function Z80_Assembler:write_int16(address, value)
+	if address >= 0 and address <= 65535 then
+		value = math.max(math.min(value, 255), 0)
+		local high = math.floor(value / 256)
+		local low = value % 256
+		self.memory[address] = low
+		self.memory[(address+1)%65536] = high
+	end
+end
+
+function Z80_Assembler:write_int8(address, value)
+	if address >= 0 and address <= 65535 then
+		value = math.floor(math.max(math.min(value, 255), 0))
+		self.memory[address] = value
+	end
 end
 
 --[[

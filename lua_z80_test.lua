@@ -48,20 +48,26 @@ end
 function lua_memory_invalidate_test()
 	local z = Z80_Assembler:new()
 	z:set_compile_address(0)
-	--local hl_address = z:get_compile_address() + 1
-	z:LD_HL(5)	-- address of LD A immediate operand
+	
+	-- will be address of LD A immediate operand
+	local hl_address = z:get_compile_address() + 1
+	z:LD_HL(0)
 	z:INC_indirect_HL()
-	--local replacement_address = z:get_compile_address() + 1
+	
+	local target_address = z:get_compile_address() + 1
 	z:LD_A(65)	-- the character 'A"
 	z:DB(0xED, 0xED)	-- internal lua_z80 print-to-console instruction
 	z:HALT()
 	--z:patch_address()
 	z:DS("Hello")
 	
+	-- patch up the address
+	z:write_int16(hl_address, target_address)
+	
 	local code
 	if not z:any_errors() then
 		local jit = Z80JIT:new()
-		code = z:get_code_string()
+		code = z:get_code()
 
 	else
 		print("FAIL: didn't assemble")

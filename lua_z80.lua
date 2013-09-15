@@ -1098,22 +1098,44 @@ end
 --
 -- Load a section of memory
 --
-function Z80JIT:load_memory(data_as_string, address, is_writable)
-	local end_addr = address + data_as_string:len()
-	if end_addr >= self._total_memory_length then
-		local length_over = end_addr - self._total_memory_length
-		data_as_string = data_as_string:sub(1, -length_over)
-	end
-	local length = data_as_string:len()
-	self:code_invalidate_block(address, length)
-	self:remove_invalidated_lumps()
+function Z80JIT:load_memory(data, address, is_writable)
+	local data_type = type(data)
+	if data_type == "string" then
+		local data_as_string	= data
+		
+		local end_addr = address + data_as_string:len()
+		if end_addr >= self._total_memory_length then
+			local length_over = end_addr - self._total_memory_length
+			data_as_string = data_as_string:sub(1, -length_over)
+		end
+		local length = data_as_string:len()
+		self:code_invalidate_block(address, length)
+		self:remove_invalidated_lumps()
 
-	self:select_writable(address, length, is_writable)
+		self:select_writable(address, length, is_writable)
 
-	for i = 1, length do
-		self._memory[address] = data_as_string:byte(i)
-		--print(string.format("load memory ~ %x %x", address, self._memory[address]))
-		address = address + 1
+		for i = 1, length do
+			self._memory[address] = data_as_string:byte(i)
+			--print(string.format("load memory ~ %x %x", address, self._memory[address]))
+			address = address + 1
+		end
+
+	elseif data_type == "table" then
+		for address, value in pairs(data) do
+			if type(address) == "number" and type(value) == "number" and 
+				address >= 0 and address <= 65535 then
+				
+				value = math.floor(value)
+				value = math.max(math.min(value, 255), 0)
+				
+				self:code_invalidate_block(address, 1)
+				self:select_writable(address, 1, is_writable)
+				
+				self._memory[address] = value
+			end
+			self:remove_invalidated_lumps()
+		end
+		
 	end
 end
 
