@@ -36,9 +36,9 @@ require("z80_ss_debug")
 require("Z80_assembler")
 
 Z80_debugger_enabled = true
-
 function lua_z80_test()
-	--run_code(lua_basic_test(), debugger_enabled, "force instruction block size")
+	--run_code(lua_basic_test(), Z80_debugger_enabled, "force instruction block size")
+	
 	local code = lua_memory_invalidate_test()
 	if code then
 		run_code(code, Z80_debugger_enabled, "writable")
@@ -52,7 +52,7 @@ function lua_memory_invalidate_test()
 	z:LD_HL(5)	-- address of LD A immediate operand
 	z:INC_indirect_HL()
 	--local replacement_address = z:get_compile_address() + 1
-	z:LD_A(65)
+	z:LD_A(65)	-- the character 'A"
 	z:DB(0xED, 0xED)	-- internal lua_z80 print-to-console instruction
 	z:HALT()
 	--z:patch_address()

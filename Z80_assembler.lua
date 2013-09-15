@@ -44,7 +44,7 @@ Z80_Assembler = class("Z80_Assembler")
 function Z80_Assembler:initialize()
 	self._errors = false
 	self._pc = 0
-	self.instr = {}
+	--self.instr = {}
 	self.messages = {}
 	--self._last_instruction_index = nil
 end
@@ -80,8 +80,12 @@ function Z80_Assembler:any_errors_or_warnings()
 	return #self.message ~= 0
 end
 
-function Z80_Assembler:get_code_string()
-	return table.concat(self.instr)
+--function Z80_Assembler:get_code_string()
+--	return table.concat(self.instr)
+--end
+
+function Z80_Assembler:get_code()
+	return self.memory
 end
 
 function Z80_Assembler:get_error_and_warning_messages()
@@ -114,12 +118,16 @@ function Z80_Assembler:_byte_check(value, warning_string)
 end
 
 function Z80_Assembler:DS(...)
-	for _, string in ipairs{...} do
-		if type(string) ~= "string"then
+	for _, a_string in ipairs{...} do
+		if type(a_string) ~= "string"then
 			self:set_warning("DS ignoring non-string")
 		else
-			table.insert(self.instr, string)
-			self._pc = self._pc + #string
+			--table.insert(self.instr, string)
+			for i = 1, #a_string do
+				self.memory[self._pc] = a_string:byte(i)
+				self._pc = self._pc + 1
+			end
+			--self._pc = self._pc + #string
 		end
 	end
 end
@@ -130,7 +138,8 @@ function Z80_Assembler:DB(...)
 			self:set_warning("DB ignoring non-number")
 		else
 			byte = self:_byte_check(byte, "LD A value truncated")
-			table.insert(self.instr, string.char(byte))
+			--table.insert(self.instr, string.char(byte))
+			self.memory[self._pc] = byte
 			self._pc = self._pc + 1
 		end
 	end
