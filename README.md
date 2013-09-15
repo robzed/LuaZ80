@@ -35,6 +35,9 @@ If you have a Lua debugger (say the one in the excellent [ZeroBrane Studio][1] o
 
 More information
 ================
+
+Source can be found here http://github.com/robzed/LuaZ80
+
 Technical information can be found in docs/technical.txt
 
 My site http://robprobin.com has some more information on the LuaZ80 and other 
@@ -43,7 +46,9 @@ some notes on a few other Z80 emulators on the LuaZ80 page.
 Authors, Copyright and Licensing
 =================================
 Written by Rob Probin. Started June 2013. (All original work.)
+
 Copyright (c) 2013 Rob Probin
+
 For licensing see individual Lua files and LICENSE. 
 
 
