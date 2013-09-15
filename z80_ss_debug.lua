@@ -97,6 +97,13 @@ local ANSI_attrib = {
 	BG_White = 47,
 	}
 
+local write_allowed_colour = ANSI_attrib.FG_White
+local write_protected_colour = ANSI_attrib.FG_Magenta
+local background_colour = ANSI_attrib.BG_Black
+
+function string_ANSI_colour(...)
+	return '\x1b[' .. table.concat({...}, ';') .. 'm'
+end
 ---
 -- io_write_attr()
 -- Set Attribute Mode	<ESC>[{attr1};...;{attrn}m
@@ -132,16 +139,28 @@ function Z80_SS_DEBUG:get_smem(addr)
 	return string.format("%02X", m)
 end
 
+function Z80_SS_DEBUG:_colour_for_write_allowed(address)
+	local addr = (address)%65536
+	local colour
+	if self.jit.write_allowed[addr] then
+		colour = string_ANSI_colour(background_colour, write_allowed_colour)
+	else
+		colour = string_ANSI_colour(background_colour, write_protected_colour)
+	end
+	return colour
+end
+
 function Z80_SS_DEBUG:get_bytes(addr, len)
-	return string.format("%s %s %s %s %s %s %s %s",
-		self:get_smem(addr),
-		self:get_smem(addr+1),
-		self:get_smem(addr+2),
-		self:get_smem(addr+3),
-		self:get_smem(addr+4),
-		self:get_smem(addr+5),
-		self:get_smem(addr+6),
-		self:get_smem(addr+7)
+	return string.format("%s%s %s%s %s%s %s%s %s%s %s%s %s%s %s%s%s",
+		self:_colour_for_write_allowed(addr), self:get_smem(addr),
+		self:_colour_for_write_allowed(addr+1), self:get_smem(addr+1),
+		self:_colour_for_write_allowed(addr+2), self:get_smem(addr+2),
+		self:_colour_for_write_allowed(addr+3), self:get_smem(addr+3),
+		self:_colour_for_write_allowed(addr+4), self:get_smem(addr+4),
+		self:_colour_for_write_allowed(addr+5), self:get_smem(addr+5),
+		self:_colour_for_write_allowed(addr+6), self:get_smem(addr+6),
+		self:_colour_for_write_allowed(addr+7), self:get_smem(addr+7),
+		string_ANSI_colour(ANSI_attrib.Reset_all)
 		)
 end
 
@@ -262,14 +281,26 @@ function Z80_SS_DEBUG:display()
 	--io.write(CLL) print(string.format("Lua:%s", "???"))
 end
 
+function Z80_SS_DEBUG:_get_mem(address, length)
+	local str = ""
+	for i = 0, length-1 do
+		local addr = (address+i)%65536
+		local val = self.jit._memory[addr] or 0
+		local colour = self:_colour_for_write_allowed(addr)
+		str = str .. string.format("%s%02X ", colour, val)
+	end
+	str = str .. string_ANSI_colour(ANSI_attrib.Reset_all)
+	return str
+end
+
 function Z80_SS_DEBUG:do_command()
 	io.write(CLL) local line = io.read("*line")
 	if line == '?' or line == 'help' then
 		print("s or step => step")
 		print("q or quit or exit => quit")
-		print("list n => show Lua source around line")
+		--print("list n => show Lua source around line")
 		print("mem address => show memory at address")
-		
+		print("lua text => execute text as lua")
 	elseif line == 's' or line == 'step' then
 		return true
 	elseif line:sub(1,4) == 'list' then
@@ -289,7 +320,7 @@ function Z80_SS_DEBUG:do_command()
 		if address then			
 			io.write(CLS)
 			for addr = address, address+256, 16 do
-				print(string.format("0x%04x: Not implemented yet", addr))
+				print(string.format("0x%04x: %s", addr, self:_get_mem(addr, 16)))
 			end
 			print()
 			print("Hit enter")
@@ -298,6 +329,8 @@ function Z80_SS_DEBUG:do_command()
 		else
 			print("No line supplied")
 		end
+	--elseif line:sub(1,3) == 'lua' then
+		
 	elseif line == 'q' or line == 'quit' or line == 'exit' then
 		os.exit(0)
 	else
@@ -324,7 +357,7 @@ end
 
 --[[
 
-There are two methods for debugging:
+There are two possible methods for debugging:
 
 1. Compiling only single instructions into lumps. This has the advantage
 of not affecting the compiler. But the problem is that a lot of jumps will be 
