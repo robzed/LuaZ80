@@ -1225,8 +1225,8 @@ function Z80JIT:run_z80(our_z80_cpu, address, optional_pre_code)
 			--
 			-- We use pcall at the moment, but alternatively we can call directly 
 			-- by switching the comments of these two lines.
-			--status = self.current_lump.code(our_z80_cpu, self)
-			success, status = pcall(self.current_lump.code, our_z80_cpu, self)
+			status = self.current_lump.code(our_z80_cpu, self)
+			--success, status = pcall(self.current_lump.code, our_z80_cpu, self)
 			if not success then
 				print(status)
 				self.current_lump.error = status
