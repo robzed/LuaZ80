@@ -100,6 +100,8 @@ local ANSI_attrib = {
 local write_allowed_colour = ANSI_attrib.FG_White
 local write_protected_colour = ANSI_attrib.FG_Magenta
 local background_colour = ANSI_attrib.BG_Black
+local changed_colour = ANSI_attrib.Underscore
+
 
 function string_ANSI_colour(...)
 	return '\x1b[' .. table.concat({...}, ';') .. 'm'
@@ -119,6 +121,15 @@ function Z80_SS_DEBUG:initialize(cpu, jit)
 	self.cpu = cpu
 	self.jit = jit
 	self.last_status = "ok"
+	
+	self.record_sp = 0
+	self.record_iy = 0
+	self.record_ix = 0
+	self.record_hl = 0
+	self.record_de = 0
+	self.record_bc = 0
+	self.record_af = 0
+
 end
 
 function Z80_SS_DEBUG:get_smem(addr)
@@ -150,6 +161,7 @@ function Z80_SS_DEBUG:_colour_for_write_allowed(address)
 	return colour
 end
 
+
 function Z80_SS_DEBUG:get_bytes(addr, len)
 	return string.format("%s%s %s%s %s%s %s%s %s%s %s%s %s%s %s%s%s",
 		self:_colour_for_write_allowed(addr), self:get_smem(addr),
@@ -180,13 +192,25 @@ function Z80_SS_DEBUG:disp_PC()
 	end
 end
 
-function Z80_SS_DEBUG:disp16_reg(reg)
-	print(string.format("%s %04X %s", reg, self.cpu[reg], self:get_bytes(self.cpu[reg]), 8))
+function Z80_SS_DEBUG:_disp_reg_common(reg, old_value, new_value)
+	local colour = ""
+	if old_value ~= new_value then
+		colour = string_ANSI_colour(changed_colour)
+	end
+
+	print(string.format("%s %s%04X%s %s", reg, colour, new_value, NormAttr, self:get_bytes(new_value), 8))
 end
 
-function Z80_SS_DEBUG:disp88_reg(reg)
-	local value = self.cpu[reg:sub(1,1)]*256+self.cpu[reg:sub(2,2)]
-	print(string.format("%s %04X %s", reg, value, self:get_bytes(value, 8)))
+function Z80_SS_DEBUG:disp16_reg(reg, old_value)
+	local new_value = self.cpu[reg]
+	self:_disp_reg_common(reg, old_value, new_value)
+	return new_value
+end
+
+function Z80_SS_DEBUG:disp88_reg(reg, old_value)
+	local new_value = self.cpu[reg:sub(1,1)]*256+self.cpu[reg:sub(2,2)]
+	self:_disp_reg_common(reg, old_value, new_value)
+	return new_value
 end
 
 function Z80_SS_DEBUG:flag_decode(f)
@@ -228,15 +252,32 @@ function Z80_SS_DEBUG:flag_decode(f)
 	return s
 end
 
-function Z80_SS_DEBUG:dispAF_reg()
+function Z80_SS_DEBUG:dispAF_reg(old_value)
 	local raw_F = self.cpu._F
+	local colour_A = ""
+	if math.floor(old_value/65536) ~= self.cpu.A then
+		colour_A = string_ANSI_colour(changed_colour)
+	end
+	local colour_raw_F = ""
+	if (old_value % 256) ~= raw_F then
+		colour_raw_F = string_ANSI_colour(changed_colour)
+	end
+	
 	if raw_F then
-		print(string.format("AF %02X%02X %s (raw _F) CPU.Carry = %x", self.cpu.A, raw_F, self:flag_decode(raw_F), self.cpu.Carry))
+		print(string.format("AF %s%02X%s%s%02X%s %s (raw _F) CPU.Carry = %x", colour_A, self.cpu.A, NormAttr, colour_raw_F, raw_F, NormAttr, self:flag_decode(raw_F), self.cpu.Carry))
 	else
-		print(string.format("AF %02X?? %s (raw _F) CPU.Carry = %x", self.cpu.A, self:flag_decode(0), self.cpu.Carry))
+		print(string.format("AF %s%02X%s?? %s (raw _F) CPU.Carry = %x", colour_A, self.cpu.A, NormAttr, self:flag_decode(0), self.cpu.Carry))
 	end
 	local get_F = self.cpu:get_F()
-	print(string.format("AF %02X%02X %s (get_F)", self.cpu.A, get_F, self:flag_decode(get_F)))
+	local colour_get_F = ""
+	if (math.floor(old_value/256) % 256) ~= get_F then
+		colour_get_F = string_ANSI_colour(changed_colour)
+	end
+	
+	print(string.format("AF %s%02X%s%s%02X%s %s (get_F)", colour_A, self.cpu.A, NormAttr, colour_get_F, get_F, NormAttr, self:flag_decode(get_F)))
+	
+	local new_value = (self.cpu.A*65536) + (get_F*256) + (raw_F or 0)
+	return new_value
 end
 
 function Z80_SS_DEBUG:calculate_line_address()
@@ -262,13 +303,13 @@ end
 function Z80_SS_DEBUG:display()
 	io.write(Home)
 	self:disp_PC() -- PC is special
-	self:disp16_reg("SP")
-	self:disp16_reg("IY")
-	self:disp16_reg("IX")
-	self:disp88_reg("HL")
-	self:disp88_reg("DE")
-	self:disp88_reg("BC")
-	self:dispAF_reg()
+	self.record_sp = self:disp16_reg("SP", self.record_sp)
+	self.record_iy = self:disp16_reg("IY", self.record_sp)
+	self.record_ix = self:disp16_reg("IX", self.record_ix)
+	self.record_hl = self:disp88_reg("HL", self.record_hl)
+	self.record_de = self:disp88_reg("DE", self.record_de)
+	self.record_bc = self:disp88_reg("BC", self.record_bc)
+	self.record_af = self:dispAF_reg(self.record_af)
 	print()
 	io.write(CLL) print(string.format("PC Disassembly = %s", single_Z80_disassemble(self.jit._memory, self:get_PC()) ))
 	print()
