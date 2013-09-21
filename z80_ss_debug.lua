@@ -122,14 +122,17 @@ function Z80_SS_DEBUG:initialize(cpu, jit)
 	self.jit = jit
 	self.last_status = "ok"
 	
+	self.record_pc = 0
 	self.record_sp = 0
 	self.record_iy = 0
 	self.record_ix = 0
 	self.record_hl = 0
 	self.record_de = 0
 	self.record_bc = 0
-	self.record_af = 0
-
+	self.record_af = 0	-- special, contains two F registers
+	
+	self._has_changed = {}
+	self._changed_addr_store = {}
 end
 
 function Z80_SS_DEBUG:get_smem(addr)
@@ -150,28 +153,34 @@ function Z80_SS_DEBUG:get_smem(addr)
 	return string.format("%02X", m)
 end
 
-function Z80_SS_DEBUG:_colour_for_write_allowed(address)
+function Z80_SS_DEBUG:_colour_for_memory_status(address, mark_change)
 	local addr = (address)%65536
-	local colour
+	local write_colour
 	if self.jit.write_allowed[addr] then
-		colour = string_ANSI_colour(background_colour, write_allowed_colour)
+		write_colour = write_allowed_colour
 	else
-		colour = string_ANSI_colour(background_colour, write_protected_colour)
+		write_colour = write_protected_colour
 	end
-	return colour
+	local colour_str
+	if mark_change and self._has_changed[addr] then
+		colour_str = string_ANSI_colour(background_colour, write_colour, changed_colour)
+	else
+		colour_str = string_ANSI_colour(ANSI_attrib.Reset_all, background_colour, write_colour)
+	end
+	return colour_str
 end
 
 
-function Z80_SS_DEBUG:get_bytes(addr, len)
+function Z80_SS_DEBUG:get_bytes(addr, len, mark_change)
 	return string.format("%s%s %s%s %s%s %s%s %s%s %s%s %s%s %s%s%s",
-		self:_colour_for_write_allowed(addr), self:get_smem(addr),
-		self:_colour_for_write_allowed(addr+1), self:get_smem(addr+1),
-		self:_colour_for_write_allowed(addr+2), self:get_smem(addr+2),
-		self:_colour_for_write_allowed(addr+3), self:get_smem(addr+3),
-		self:_colour_for_write_allowed(addr+4), self:get_smem(addr+4),
-		self:_colour_for_write_allowed(addr+5), self:get_smem(addr+5),
-		self:_colour_for_write_allowed(addr+6), self:get_smem(addr+6),
-		self:_colour_for_write_allowed(addr+7), self:get_smem(addr+7),
+		self:_colour_for_memory_status(addr, mark_change), self:get_smem(addr),
+		self:_colour_for_memory_status(addr+1, mark_change), self:get_smem(addr+1),
+		self:_colour_for_memory_status(addr+2, mark_change), self:get_smem(addr+2),
+		self:_colour_for_memory_status(addr+3, mark_change), self:get_smem(addr+3),
+		self:_colour_for_memory_status(addr+4, mark_change), self:get_smem(addr+4),
+		self:_colour_for_memory_status(addr+5, mark_change), self:get_smem(addr+5),
+		self:_colour_for_memory_status(addr+6, mark_change), self:get_smem(addr+6),
+		self:_colour_for_memory_status(addr+7, mark_change), self:get_smem(addr+7),
 		string_ANSI_colour(ANSI_attrib.Reset_all)
 		)
 end
@@ -186,10 +195,11 @@ end
 function Z80_SS_DEBUG:disp_PC()
  	local reg = "PC"
 	if self.PC == nil then
-		self:disp16_reg(reg)
+		self:disp16_reg(reg, true)
 	else
-		print(string.format("%s*%04X %s", reg, self.PC, self:get_bytes(self.PC), 8))
+		print(string.format("%s*%04X %s", reg, self.PC, self:get_bytes(self.PC, 8, true)))
 	end
+	return self.PC
 end
 
 function Z80_SS_DEBUG:_disp_reg_common(reg, old_value, new_value)
@@ -198,7 +208,7 @@ function Z80_SS_DEBUG:_disp_reg_common(reg, old_value, new_value)
 		colour = string_ANSI_colour(changed_colour)
 	end
 
-	print(string.format("%s %s%04X%s %s", reg, colour, new_value, NormAttr, self:get_bytes(new_value), 8))
+	print(string.format("%s %s%04X%s %s", reg, colour, new_value, NormAttr, self:get_bytes(new_value, 8, true)))
 end
 
 function Z80_SS_DEBUG:disp16_reg(reg, old_value)
@@ -302,7 +312,7 @@ end
 
 function Z80_SS_DEBUG:display()
 	io.write(Home)
-	self:disp_PC() -- PC is special
+	self.record_pc = self:disp_PC() -- PC is special
 	self.record_sp = self:disp16_reg("SP", self.record_sp)
 	self.record_iy = self:disp16_reg("IY", self.record_sp)
 	self.record_ix = self:disp16_reg("IX", self.record_ix)
@@ -327,7 +337,7 @@ function Z80_SS_DEBUG:_get_mem(address, length)
 	for i = 0, length-1 do
 		local addr = (address+i)%65536
 		local val = self.jit._memory[addr] or 0
-		local colour = self:_colour_for_write_allowed(addr)
+		local colour = self:_colour_for_memory_status(addr)
 		str = str .. string.format("%s%02X ", colour, val)
 	end
 	str = str .. string_ANSI_colour(ANSI_attrib.Reset_all)
@@ -380,10 +390,40 @@ function Z80_SS_DEBUG:do_command()
 	return false
 end
 
+function Z80_SS_DEBUG:_calculate_has_changed()
+	self._has_changed = {}
+	for addr, old_value in pairs(self._changed_addr_store) do
+		local new_value = self.jit._memory[addr]
+		if new_value ~= old_value then
+			self._has_changed[addr] = true
+		end
+	end
+end
+
+function Z80_SS_DEBUG:_mark_change_monitor_addresses(start, length)
+	start = start % 65536
+	for addr = start, start+length do	
+		self._changed_addr_store[addr] = self.jit._memory[addr]
+	end
+end
+
+function Z80_SS_DEBUG:_update_change_monitor_addresses()
+	self._changed_addr_store = {}
+	self:_mark_change_monitor_addresses(self.record_pc - 2, 22)
+	self:_mark_change_monitor_addresses(self.record_sp - 2, 22)
+	self:_mark_change_monitor_addresses(self.record_iy - 2, 22)
+	self:_mark_change_monitor_addresses(self.record_ix - 2, 22)
+	self:_mark_change_monitor_addresses(self.record_hl - 2, 22)
+	self:_mark_change_monitor_addresses(self.record_de - 2, 22)
+	self:_mark_change_monitor_addresses(self.record_bc - 2, 22)
+end
+
 function Z80_SS_DEBUG:_debug_step(PC)
 	self.PC = PC
 	repeat
+		self:_calculate_has_changed()
 		self:display()
+		self:_update_change_monitor_addresses()
 	until self:do_command()
 end
 
