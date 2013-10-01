@@ -302,7 +302,7 @@ local function call_code_string(return_addr, target)
 			math.floor(return_addr/256), return_addr%256, target, target, target)
 end
 
-local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2)
+local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc)
 	return string.format(
 	-- we only do write_checks for invalid if the write was allowed. 
 	-- we return after both writes have been attempted.
@@ -310,18 +310,18 @@ local function write_2bytes_to_address_command_string(source1, source2, dest_add
 	if jit:code_write_check(addr) then addr = nil end end
 	addr2=%s if jit.write_allowed[addr2] then memory[addr2]=%s
 	if jit:code_write_check(addr2) then addr = nil end end
-	if addr == nil then return 'invalidate' end ]], 
-	dest_address1, source1, dest_address2, source2)
+	if addr == nil then CPU.PC = 0x%x return 'invalidate' end ]], 
+	dest_address1, source1, dest_address2, source2, next_pc)
 end
 
-local function write_to_address_command_string(source, dest_address, optional_flag_check_code)
+local function write_to_address_command_string(source, dest_address, optional_flag_check_code, next_pc)
 	-- e.g. dest_address = CPU.H*256+CPU.L
 	-- e.g. source = CPU.A
 	optional_flag_check_code = optional_flag_check_code or ""
 	return string.format(
 	[[ addr=%s %sif jit.write_allowed[addr] then memory[addr]=%s  
-	if jit:code_write_check(addr) then return 'invalidate' end end]], 
-	dest_address, optional_flag_check_code, source)
+	if jit:code_write_check(addr) then CPU.PC = 0x%x return 'invalidate' end end]], 
+	dest_address, optional_flag_check_code, source, next_pc)
 end
 
 local decode_instruction
@@ -401,23 +401,23 @@ local decode_first_byte = {
 
 	-- 02 = LD (BC) , A
 	[0x02] = function(memory, iaddr)
-			return write_to_address_command_string("CPU.A", "CPU.B*256+CPU.C"), iaddr
+			return write_to_address_command_string("CPU.A", "CPU.B*256+CPU.C", iaddr), iaddr
 		end,
 	-- 12 = LD (DE), A
 	[0x12] = function(memory, iaddr)
-			return write_to_address_command_string("CPU.A", "CPU.D*256+CPU.E"), iaddr
+			return write_to_address_command_string("CPU.A", "CPU.D*256+CPU.E", iaddr), iaddr
 		end,
 	-- 22 = LD (xxxx), HL
 	[0x22] = function(memory, iaddr)
 			local addr = memory[iaddr]; iaddr = inc_address(iaddr);
 			addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
-			return write_2bytes_to_address_command_string("CPU.L", "CPU.H", string.format("memory[0x%x]", addr), string.format("memory[0x%x]", addr+1)), iaddr
+			return write_2bytes_to_address_command_string("CPU.L", "CPU.H", string.format("memory[0x%x]", addr), string.format("memory[0x%x]", addr+1, iaddr)), iaddr
 		end,
 	-- 32 = LD (xxxx), A
 	[0x32] = function(memory, iaddr)
 			local addr = memory[iaddr]; iaddr = inc_address(iaddr);
 			addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
-			return write_to_address_command_string("CPU.A", string.format("memory[0x%x]", addr)), iaddr
+			return write_to_address_command_string("CPU.A", string.format("memory[0x%x]", addr), iaddr), iaddr
 		end,
 
 	-- 03 = INC BC
@@ -624,9 +624,11 @@ for i = 0x40, 0x7f do
 		-- no memory write check for single reg write
 		decode_first_byte[i] = string.format("%s=%s", to_reg, from_reg)
 	else
-		decode_first_byte[i] = string.format(
-		[[addr = CPU.H*256+CPU.L;if jit.write_allowed[addr] then memory[addr]=%s 
-		if jit:code_write_check(addr) then return 'invalidate' end end]], from_reg)
+		-- LD (HL), r
+		decode_first_byte[i] = function(memory, iaddr)
+				return string.format([[addr = CPU.H*256+CPU.L;if jit.write_allowed[addr] then memory[addr]=%s 
+				if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], from_reg, iaddr), iaddr			
+			end
 	end
 end
 
@@ -747,9 +749,11 @@ for i = 0, 7 do
 	else
 		-- inc(HL)
 		decode_first_byte[4+(8*i)] = 
-			write_to_address_command_string("result", "CPU.H*256+CPU.L", 
-			"result = (memory[addr]+1)%256 " .. 
-			string.format(inc_flag_calc, "result", "result", "result"))
+			function(memory, iaddr)
+				return write_to_address_command_string("result", "CPU.H*256+CPU.L", 
+				"result = (memory[addr]+1)%256 " .. 
+				string.format(inc_flag_calc, "result", "result", "result"), iaddr ), iaddr
+			end
 	end
 	if _is_single_reg(reg) then
 		-- dec reg
@@ -758,9 +762,11 @@ for i = 0, 7 do
 	else
 		-- dec(HL)
 		decode_first_byte[5+(8*i)] = 
-			write_to_address_command_string("result", "CPU.H*256+CPU.L",
-			"result = (memory[addr]-1)%256" ..
-			string.format(dec_flag_calc, "result", "result", "result"))
+			function(memory, iaddr)
+				return write_to_address_command_string("result", "CPU.H*256+CPU.L",
+				"result = (memory[addr]-1)%256" ..
+				string.format(dec_flag_calc, "result", "result", "result"), iaddr), iaddr
+			end
 	end
 	if _is_single_reg(reg) then
 		--ld reg, &00
@@ -772,7 +778,7 @@ for i = 0, 7 do
 		--ld (HL), &00
 		decode_first_byte[6+(8*i)] = function(memory, iaddr)
 			local byte1 = memory[iaddr]; iaddr = inc_address(iaddr);
-			return write_to_address_command_string(byte1, "CPU.H*256+CPU.L"), iaddr
+			return write_to_address_command_string(byte1, "CPU.H*256+CPU.L", iaddr), iaddr
 		end
 	end
 
@@ -1003,7 +1009,7 @@ function z80_compile(memory, address, number_number_instructions_to_compile, pre
 		end
 	end
 	
-	table.insert(codetext_table, "::finished:: return 'ok'")
+	table.insert(codetext_table, string.format("::finished:: CPU.PC = 0x%x; return 'ok'", next_address))
 	local source = table.concat(codetext_table, "\n")
 	if Z80_SOURCE_DEBUG then
 		newlump.source = source
