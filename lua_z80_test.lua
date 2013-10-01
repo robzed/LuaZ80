@@ -35,7 +35,7 @@ require("lua_z80")
 require("z80_ss_debug")
 require("Z80_assembler")
 
-Z80_debugger_enabled = true
+Z80_debugger_enabled = false
 function lua_z80_test()
 	--run_code(lua_basic_test(), Z80_debugger_enabled, "force instruction block size")
 	
@@ -57,6 +57,13 @@ function lua_memory_invalidate_test()
 	local target_address = z:get_compile_address() + 1
 	z:LD_A(65)	-- the character 'A"
 	z:DB(0xED, 0xED)	-- internal lua_z80 print-to-console instruction
+	
+	z:LD_A(string.byte("!"))
+	
+	-- test invalidation works for this load instruction
+	z:LD("(HL)", "A")		-- test that code is generated ok for a random register
+	z:LD("B", 66)
+	z:LD("(HL)", "B")		-- test that code is generated ok for a random register	
 	z:HALT()
 	--z:patch_address()
 	z:DS("Hello")
