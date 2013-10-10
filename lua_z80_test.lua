@@ -35,7 +35,7 @@ require("lua_z80")
 require("z80_ss_debug")
 require("Z80_assembler")
 
-Z80_debugger_enabled = false
+Z80_debugger_enabled = true
 function lua_z80_test()
 	--run_code(lua_basic_test(), Z80_debugger_enabled, "force instruction block size")
 	
@@ -65,6 +65,23 @@ function lua_memory_invalidate_test()
 	z:LD("B", 66)
 	z:LD("(HL)", "B")		-- test that code is generated ok for a random register	
 	z:HALT()
+	z:SET(7,"A")
+	z:RES(7,"A")
+	z:BIT(7,"A")
+	z:RLC("A")
+	z:RRC("A")
+	z:RL("A")
+	z:RR("A")
+	z:SLA("E")
+	z:SRA("E")
+	z:SLS("B")
+	z:SRL("B")
+	z:IM_0()
+	z:IM_1()
+	z:IM_2()
+	z:RETI()
+	z:RET()
+	
 	--z:patch_address()
 	z:DS("Hello")
 	

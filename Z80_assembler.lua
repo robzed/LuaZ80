@@ -430,7 +430,495 @@ local basic_Z80_table = {
 	["CP   !n!"] =       0xFE,
 	["RST  38H"] =       0xFF,
 }
--- @todo: we could make this table multiple op-code by making the result 16 bit
+
+
+
+local _CB_Z80_table = {
+[0]="RLC  B",
+"RLC  C",
+"RLC  D",
+"RLC  E",
+"RLC  H",
+"RLC  L",
+"RLC  (HL)",
+"RLC  A",
+"RRC  B",
+"RRC  C",
+"RRC  D",
+"RRC  E",
+"RRC  H",
+"RRC  L",
+"RRC  (HL)",
+"RRC  A",
+"RL   B",
+"RL   C",
+"RL   D",
+"RL   E",
+"RL   H",
+"RL   L",
+"RL   (HL)",
+"RL   A",
+"RR   B",
+"RR   C",
+"RR   D",
+"RR   E",
+"RR   H",
+"RR   L",
+"RR   (HL)",
+"RR   A",
+"SLA  B",
+"SLA  C",
+"SLA  D",
+"SLA  E",
+"SLA  H",
+"SLA  L",
+"SLA  (HL)",
+"SLA  A",
+"SRA  B",
+"SRA  C",
+"SRA  D",
+"SRA  E",
+"SRA  H",
+"SRA  L",
+"SRA  (HL)",
+"SRA  A",
+"SLS  B",
+"SLS  C",
+"SLS  D",
+"SLS  E",
+"SLS  H",
+"SLS  L",
+"SLS  (HL)",
+"SLS  A",
+"SRL  B",
+"SRL  C",
+"SRL  D",
+"SRL  E",
+"SRL  H",
+"SRL  L",
+"SRL  (HL)",
+"SRL  A",
+"BIT  0,B",
+"BIT  0,C",
+"BIT  0,D",
+"BIT  0,E",
+"BIT  0,H",
+"BIT  0,L",
+"BIT  0,(HL)",
+"BIT  0,A",
+"BIT  1,B",
+"BIT  1,C",
+"BIT  1,D",
+"BIT  1,E",
+"BIT  1,H",
+"BIT  1,L",
+"BIT  1,(HL)",
+"BIT  1,A",
+"BIT  2,B",
+"BIT  2,C",
+"BIT  2,D",
+"BIT  2,E",
+"BIT  2,H",
+"BIT  2,L",
+"BIT  2,(HL)",
+"BIT  2,A",
+"BIT  3,B",
+"BIT  3,C",
+"BIT  3,D",
+"BIT  3,E",
+"BIT  3,H",
+"BIT  3,L",
+"BIT  3,(HL)",
+"BIT  3,A",
+"BIT  4,B",
+"BIT  4,C",
+"BIT  4,D",
+"BIT  4,E",
+"BIT  4,H",
+"BIT  4,L",
+"BIT  4,(HL)",
+"BIT  4,A",
+"BIT  5,B",
+"BIT  5,C",
+"BIT  5,D",
+"BIT  5,E",
+"BIT  5,H",
+"BIT  5,L",
+"BIT  5,(HL)",
+"BIT  5,A",
+"BIT  6,B",
+"BIT  6,C",
+"BIT  6,D",
+"BIT  6,E",
+"BIT  6,H",
+"BIT  6,L",
+"BIT  6,(HL)",
+"BIT  6,A",
+"BIT  7,B",
+"BIT  7,C",
+"BIT  7,D",
+"BIT  7,E",
+"BIT  7,H",
+"BIT  7,L",
+"BIT  7,(HL)",
+"BIT  7,A",
+"RES  0,B",
+"RES  0,C",
+"RES  0,D",
+"RES  0,E",
+"RES  0,H",
+"RES  0,L",
+"RES  0,(HL)",
+"RES  0,A",
+"RES  1,B",
+"RES  1,C",
+"RES  1,D",
+"RES  1,E",
+"RES  1,H",
+"RES  1,L",
+"RES  1,(HL)",
+"RES  1,A",
+"RES  2,B",
+"RES  2,C",
+"RES  2,D",
+"RES  2,E",
+"RES  2,H",
+"RES  2,L",
+"RES  2,(HL)",
+"RES  2,A",
+"RES  3,B",
+"RES  3,C",
+"RES  3,D",
+"RES  3,E",
+"RES  3,H",
+"RES  3,L",
+"RES  3,(HL)",
+"RES  3,A",
+"RES  4,B",
+"RES  4,C",
+"RES  4,D",
+"RES  4,E",
+"RES  4,H",
+"RES  4,L",
+"RES  4,(HL)",
+"RES  4,A",
+"RES  5,B",
+"RES  5,C",
+"RES  5,D",
+"RES  5,E",
+"RES  5,H",
+"RES  5,L",
+"RES  5,(HL)",
+"RES  5,A",
+"RES  6,B",
+"RES  6,C",
+"RES  6,D",
+"RES  6,E",
+"RES  6,H",
+"RES  6,L",
+"RES  6,(HL)",
+"RES  6,A",
+"RES  7,B",
+"RES  7,C",
+"RES  7,D",
+"RES  7,E",
+"RES  7,H",
+"RES  7,L",
+"RES  7,(HL)",
+"RES  7,A",
+"SET  0,B",
+"SET  0,C",
+"SET  0,D",
+"SET  0,E",
+"SET  0,H",
+"SET  0,L",
+"SET  0,(HL)",
+"SET  0,A",
+"SET  1,B",
+"SET  1,C",
+"SET  1,D",
+"SET  1,E",
+"SET  1,H",
+"SET  1,L",
+"SET  1,(HL)",
+"SET  1,A",
+"SET  2,B",
+"SET  2,C",
+"SET  2,D",
+"SET  2,E",
+"SET  2,H",
+"SET  2,L",
+"SET  2,(HL)",
+"SET  2,A",
+"SET  3,B",
+"SET  3,C",
+"SET  3,D",
+"SET  3,E",
+"SET  3,H",
+"SET  3,L",
+"SET  3,(HL)",
+"SET  3,A",
+"SET  4,B",
+"SET  4,C",
+"SET  4,D",
+"SET  4,E",
+"SET  4,H",
+"SET  4,L",
+"SET  4,(HL)",
+"SET  4,A",
+"SET  5,B",
+"SET  5,C",
+"SET  5,D",
+"SET  5,E",
+"SET  5,H",
+"SET  5,L",
+"SET  5,(HL)",
+"SET  5,A",
+"SET  6,B",
+"SET  6,C",
+"SET  6,D",
+"SET  6,E",
+"SET  6,H",
+"SET  6,L",
+"SET  6,(HL)",
+"SET  6,A",
+"SET  7,B",
+"SET  7,C",
+"SET  7,D",
+"SET  7,E",
+"SET  7,H",
+"SET  7,L",
+"SET  7,(HL)",
+"SET  7,A",
+}
+-- add in the CB values to the basic_Z80_table
+for k,v in pairs(_CB_Z80_table) do
+	basic_Z80_table[v] = 0xCB00 + k
+end
+
+
+local _ED_Z80_table = {
+[0x40] = "IN   B,(C)",
+[0x41] = "OUT  (C),B",
+[0x42] = "SBC  HL,BC",
+[0x43] = "LD   (!nn!),BC",
+[0x44] = "NEG",
+[0x45] = "RETN",
+[0x46] = "IM   0",
+[0x47] = "LD   I,A",
+[0x48] = "IN   C,(C)",
+[0x49] = "OUT  (C),C",
+[0x4A] = "ADC  HL,BC",
+[0x4B] = "LD   BC,(!nn!)",
+[0x4D] = "RETI",
+[0x4F] = "LD   R,A",
+[0x50] = "IN   D,(C)",
+[0x51] = "OUT  (C),D",
+[0x52] = "SBC  HL,DE",
+[0x53] = "LD   (!nn!),DE",
+[0x56] = "IM   1",
+[0x57] = "LD   A,I",
+[0x58] = "IN   E,(C)",
+[0x59] = "OUT  (C),E",
+[0x5A] = "ADC  HL,DE",
+[0x5B] = "LD   DE,(!nn!)",
+[0x5E] = "IM   2",
+[0x5F] = "LD   A,R",
+[0x60] = "IN   H,(C)",
+[0x61] = "OUT  (C),H",
+[0x62] = "SBC  HL,HL",
+[0x63] = "LD   (!nn!),HL",
+[0x67] = "RRD",
+[0x68] = "IN   L,(C)",
+[0x69] = "OUT  (C),L",
+[0x6A] = "ADC  HL,HL",
+[0x6B] = "LD   HL,(!nn!)",
+[0x6F] = "RLD",
+[0x70] = "IN   F,(C)",
+[0x71] = "OUT  (C),F",
+[0x72] = "SBC  HL,SP",
+[0x73] = "LD   (!nn!),SP",
+[0x78] = "IN   A,(C)",
+[0x79] = "OUT  (C),A",
+[0x7A] = "ADC  HL,SP",
+[0x7B] = "LD   SP,(!nn!)",
+[0xA0] = "LDI",
+[0xA1] = "CPI",
+[0xA2] = "INI",
+[0xA3] = "OTI",
+[0xA8] = "LDD",
+[0xA9] = "CPD",
+[0xAA] = "IND",
+[0xAB] = "OTD",
+[0xB0] = "LDIR",
+[0xB1] = "CPIR",
+[0xB2] = "INIR",
+[0xB3] = "OTIR",
+[0xB8] = "LDDR",
+[0xB9] = "CPDR",
+[0xBA] = "INDR",
+[0xBB] = "OTDR"
+}
+-- add in the ED values to the basic_Z80_table
+for k,v in pairs(_ED_Z80_table) do
+	basic_Z80_table[v] = 0xED00 + k
+end
+
+local _DD_CB_Z80_table = {
+[0x06] = "RLC  (IX!d!)",
+[0x0E] = "RRC  (IX!d!)",
+[0x16] = "RL   (IX!d!)",
+[0x1E] = "RR   (IX!d!)",
+[0x26] = "SLA  (IX!d!)",
+[0x2E] = "SRA  (IX!d!)",
+[0x36] = "SLS  (IX!d!)",
+[0x3E] = "SRL  (IX!d!)",
+[0x46] = "BIT  0,(IX!d!)",
+[0x4E] = "BIT  1,(IX!d!)",
+[0x56] = "BIT  2,(IX!d!)",
+[0x5E] = "BIT  3,(IX!d!)",
+[0x66] = "BIT  4,(IX!d!)",
+[0x6E] = "BIT  5,(IX!d!)",
+[0x76] = "BIT  6,(IX!d!)",
+[0x7E] = "BIT  7,(IX!d!)",
+[0x86] = "RES  0,(IX!d!)",
+[0x8E] = "RES  1,(IX!d!)",
+[0x96] = "RES  2,(IX!d!)",
+[0x9E] = "RES  3,(IX!d!)",
+[0xA6] = "RES  4,(IX!d!)",
+[0xAE] = "RES  5,(IX!d!)",
+[0xB6] = "RES  6,(IX!d!)",
+[0xBE] = "RES  7,(IX!d!)",
+[0xC6] = "SET  0,(IX!d!)",
+[0xCE] = "SET  1,(IX!d!)",
+[0xD6] = "SET  2,(IX!d!)",
+[0xDE] = "SET  3,(IX!d!)",
+[0xE6] = "SET  4,(IX!d!)",
+[0xEE] = "SET  5,(IX!d!)",
+[0xF6] = "SET  6,(IX!d!)",
+[0xFE] = "SET  7,(IX!d!)",
+}
+-- add in the DDCB or FDCB values to the basic_Z80_table
+for k,v in pairs(_DD_CB_Z80_table) do
+	-- create the IX version
+	basic_Z80_table[v] = 0xDDCB00 + k
+	
+	-- do the IY version as well
+	v = v:gsub("IX", "IY")
+	basic_Z80_table[v] = 0xFDCB00 + k
+end
+
+
+local _DD_Z80_table = {
+[0x09] = "ADD  IX,BC",
+[0x19] = "ADD  IX,DE",
+[0x21] = "LD   IX,!nn!",
+[0x22] = "LD  (!nn!),IX",
+[0x23] = "INC  IX",
+[0x24] = "INC  IXH",
+[0x25] = "DEC  IXH",
+[0x26] = "LD   IXH,!n!",
+[0x29] = "ADD  IX,IX",
+[0x2A] = "LD  IX,(!nn!)",
+[0x2B] = "DEC  IX",
+[0x2C] = "INC  IXL",
+[0x2D] = "DEC  IXL",
+[0x2E] = "LD   IXL,!n!",
+[0x34] = "INC  (IX!d!)",
+[0x35] = "DEC  (IX!d!)",
+[0x36] = "LD  (IX!d!),!n!",
+[0x39] = "ADD  IX,SP",
+[0x44] = "LD   B,IXH",
+[0x45] = "LD   B,IXL",
+[0x46] = "LD   B,(IX!d!)",
+[0x4C] = "LD   C,IXH",
+[0x4D] = "LD   C,IXL",
+[0x4E] = "LD   C,(IX!d!)",
+[0x54] = "LD   D,IXH",
+[0x55] = "LD   D,IXL",    
+[0x56] = "LD   D,(IX!d!)", 
+[0x5C] = "LD   E,IXH",    
+[0x5D] = "LD   E,IXL",    
+[0x5E] = "LD   E,(IX!d!)", 
+[0x60] = "LD   IXH,B",    
+[0x61] = "LD   IXH,C",    
+[0x62] = "LD   IXH,D",    
+[0x63] = "LD   IXH,E",    
+[0x64] = "LD   IXH,IXH",  
+[0x65] = "LD   IXH,IXL",  
+[0x66] = "LD   H,(IX!d!)", 
+[0x67] = "LD   IXH,A",    
+[0x68] = "LD   IXL,B",    
+[0x69] = "LD   IXL,C",    
+[0x6A] = "LD   IXL,D",    
+[0x6B] = "LD   IXL,E",    
+[0x6C] = "LD   IXL,IXH",  
+[0x6D] = "LD   IXL,IXL",  
+[0x6E] = "LD   L,(IX!d!)", 
+[0x6F] = "LD   IXL,A",    
+[0x70] = "LD   (IX!d!),B", 
+[0x71] = "LD   (IX!d!),C", 
+[0x72] = "LD   (IX!d!),D", 
+[0x73] = "LD   (IX!d!),E", 
+[0x74] = "LD   (IX!d!),H", 
+[0x75] = "LD   (IX!d!),L", 
+[0x77] = "LD   (IX!d!),A", 
+[0x7C] = "LD   A,IXH",    
+[0x7D] = "LD   A,IXL",    
+[0x7E] = "LD   A,(IX!d!)", 
+[0x84] = "ADD  A,IXH",    
+[0x85] = "ADD  A,IXL",    
+[0x86] = "ADD  A,(IX!d!)", 
+[0x8C] = "ADC  A,IXH",    
+[0x8D] = "ADC  A,IXL",    
+[0x8E] = "ADC  A,(IX!d!)", 
+[0x94] = "SUB  A,IXH",    
+[0x95] = "SUB  A,IXL",    
+[0x96] = "SUB  A,(IX!d!)", 
+[0x9C] = "SBC  A,IXH",    
+[0x9D] = "SBC  A,IXL",    
+[0x9E] = "SBC  A,(IX!d!)", 
+[0xA4] = "AND  IXH",      
+[0xA5] = "AND  IXL",      
+[0xA6] = "AND  (IX!d!)",   
+[0xAC] = "XOR  IXH",      
+[0xAD] = "XOR  IXL",      
+[0xAE] = "XOR  (IX!d!)",   
+[0xB4] = "OR   IXH",      
+[0xB5] = "OR   IXL",      
+[0xB6] = "OR   (IX!d!)",   
+[0xBC] = "CP   IXH",      
+[0xBD] = "CP   IXL",      
+[0xBE] = "CP   (IX!d!)",
+[0xE1] = "POP  IX",       
+[0xE3] = "EX   (SP),IX",  
+[0xE5] = "PUSH IX",       
+[0xE9] = "JP   (IX)",     
+}
+
+-- add in the DD or FD values to the basic_Z80_table
+for k,v in pairs(_DD_Z80_table) do
+	-- create the IX version
+	basic_Z80_table[v] = 0xDD00 + k
+	
+	-- do the IY version as well
+	v = v:gsub("IX", "IY")
+	basic_Z80_table[v] = 0xFD00 + k
+end
+
+
+function Z80_Assembler:_save_opcode(opcode)
+	if opcode < 256 then
+		self:DB(opcode)
+	elseif opcode < 65536 then
+		self:DB(math.floor(opcode/256), opcode%256)
+	elseif opcode <= 0xFFFFFF then
+		self:DB(math.floor(opcode/65536), (math.floor(opcode/256))%256, opcode%256)
+	else
+		self:set_error("opcode too long")
+	end
+end
+
 
 function Z80_Assembler:assemble(instruction, dest, source)
 	instruction = instruction:upper()
@@ -475,27 +963,31 @@ function Z80_Assembler:assemble(instruction, dest, source)
 			-- we've found the op code, generate the code!
 			if dest_op == "!n!" then
 				dest = self:_byte_check(dest, instruction .. " byte truncated")
-				self:DB(opcode, dest)
+				self:_save_opcode(opcode)
+				self:DB(dest)
 				
 			elseif dest_op == "!nn!" then
 				local high = math.floor(dest / 256)
 				local low = dest % 256
 				high = self:_byte_check(high, instruction .. " high byte truncated")
 				low = self:_byte_check(low, instruction .. " low byte truncated")
-				self:DB(opcode, low, high)
+				self:_save_opcode(opcode)
+				self:DB(low, high)
 			
 			elseif src_op == "!n!" then
 				source = self:_byte_check(source, instruction .. " byte truncated")
-				self:DB(opcode, source)
+				self:_save_opcode(opcode)
+				self:DB(source)
 			
 			elseif src_op == "!nn!" then
 				local high = math.floor(source / 256)
 				local low = source % 256
 				high = self:_byte_check(high, instruction .. " high byte truncated")
 				low = self:_byte_check(low, instruction .. " low byte truncated")
-				self:DB(opcode, low, high)
+				self:_save_opcode(opcode)
+				self:DB(low, high)
 			else
-				self:DB(opcode)
+				self:_save_opcode(opcode)
 			end
 			break
 		else
@@ -511,10 +1003,76 @@ function Z80_Assembler:assemble(instruction, dest, source)
 	end	
 end
 
+---
+-- Generic load instruction
 function Z80_Assembler:LD(dest, source)
 	self:assemble("LD", dest, source)
 end
 
+---
+-- Set a bit
+function Z80_Assembler:SET(bit, register)
+	if type(bit) == "number" then
+		bit = tostring(bit)
+	end
+	self:assemble("SET", bit, register)
+end
+
+function Z80_Assembler:BIT(bit, register)
+	if type(bit) == "number" then
+		bit = tostring(bit)
+	end
+	self:assemble("BIT", bit, register)
+end
+
+function Z80_Assembler:RES(bit, register)
+	if type(bit) == "number" then
+		bit = tostring(bit)
+	end
+	self:assemble("RES", bit, register)
+end
+
+function Z80_Assembler:RLC(register)
+	self:assemble("RLC", register)
+end
+function Z80_Assembler:RRC(register)
+	self:assemble("RRC", register)
+end
+function Z80_Assembler:RL(register)
+	self:assemble("RL", register)
+end
+function Z80_Assembler:RR(register)
+	self:assemble("RR", register)
+end
+function Z80_Assembler:SLA(register)
+	self:assemble("SLA", register)
+end
+function Z80_Assembler:SRA(register)
+	self:assemble("SRA", register)
+end
+function Z80_Assembler:SLS(register)
+	self:assemble("SLS", register)
+end
+function Z80_Assembler:SRL(register)
+	self:assemble("SRL", register)
+end
+---
+-- Interrupt routines
+function Z80_Assembler:IM_0()
+	self:assemble("IM", "0")
+end
+function Z80_Assembler:IM_1()
+	self:assemble("IM", "1")
+end
+function Z80_Assembler:IM_2()
+	self:assemble("IM", "1")
+end
+function Z80_Assembler:RETI()
+	self:assemble("RETI")
+end
+function Z80_Assembler:RET()
+	self:assemble("RET")
+end
 
 
 --[[
