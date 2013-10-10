@@ -344,14 +344,33 @@ function Z80_SS_DEBUG:_get_mem(address, length)
 	return str
 end
 
+function Z80_SS_DEBUG:_get_ascii(address, length)
+	local str = ""
+	for i = 0, length-1 do
+		local addr = (address+i)%65536
+		local val = self.jit._memory[addr] or 0
+		local colour = self:_colour_for_memory_status(addr)
+		if val >= 32 and val <= 127 then
+			str = str .. string.format("%s%s", colour, string.char(val))
+		else
+			str = str .. string.format("%s.", colour)
+		end
+	end
+	str = str .. string_ANSI_colour(ANSI_attrib.Reset_all)
+	return str
+end
+
 function Z80_SS_DEBUG:do_command()
 	io.write(CLL) local line = io.read("*line")
 	if line == '?' or line == 'help' then
 		print("s or step => step")
 		print("q or quit or exit => quit")
-		--print("list n => show Lua source around line")
+		print("list n => show Lua source around line")
 		print("mem address => show memory at address")
-		print("lua text => execute text as lua")
+		print("dis address => disassemble Z80 address")
+		print("cls => clear the screen")
+		--print("dis PC => disassemble Z80 from PC")
+		--print("lua text => execute text as lua")
 	elseif line == 's' or line == 'step' then
 		return true
 	elseif line:sub(1,4) == 'list' then
@@ -364,24 +383,34 @@ function Z80_SS_DEBUG:do_command()
 			io.read()
 			io.write(CLS)
 		else
-			print("No line supplied")
+			print("No line supplied   ")
 		end
-	elseif line:sub(1,3) == 'mem' then
+	elseif line:sub(1,3) == 'mem' or line:sub(1,3) == 'dis' then
 		local address = tonumber(line:sub(4))
 		if address then			
 			io.write(CLS)
-			for addr = address, address+256, 16 do
-				print(string.format("0x%04x: %s", addr, self:_get_mem(addr, 16)))
+			if line:sub(1,3) == 'mem' then
+				for addr = address, address+256, 16 do
+					print(string.format("0x%04x: %s  %s", addr, self:_get_mem(addr, 16), self:_get_ascii(addr, 16)))
+				end
+			else
+				local instructions = multiple_Z80_disassemble(self.jit._memory, address, 16)
+				print(string.format("Start Address = 0x%x", address))
+				print()
+				for _, instruction in ipairs(instructions) do
+					print(string.format("    %s", instruction))
+				end
 			end
 			print()
 			print("Hit enter")
 			io.read()
 			io.write(CLS)
 		else
-			print("No line supplied")
+			print("No address supplied    ")
 		end
 	--elseif line:sub(1,3) == 'lua' then
-		
+	elseif line == 'cls' then
+		io.write(CLS)
 	elseif line == 'q' or line == 'quit' or line == 'exit' then
 		os.exit(0)
 	else
