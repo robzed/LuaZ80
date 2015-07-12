@@ -1,6 +1,6 @@
 LuaZ80 Technical Information
 =============================
-Rob Probin - Started: Sept 2013 - Last Updated: Sept 2013
+Rob Probin - Started: Sept 2013 - Last Updated: July 2015
 
 History
 -------
