@@ -29,18 +29,23 @@ What works
 
 Nothing properly :-) I'm certainly after some more help - this is very much a side-side-side project for me. But bit-by-bit it will get better.
 
-I'll expand this section to be more accurate, but for now:
 
-- A few op-codes.
-- The debugger/monitor (similar to the old HiSoft DevPac Monitor in some ways)
+I'm creating a more up to date status in docs/status.md but in summary: 
+
+- Quite a few op-codes.
+- A basic debugger/monitor (similar to the old HiSoft DevPac Monitor in some ways)
 - The disassembler (but there might be bugs or gaps)
-- The parts of a crude assembler
+- The parts of a crude assembler that can be used to assemble Z80 mnemonics from Lua.
 
 All of this is written in pure Lua.
 
+
+
+
 Using it
 ========
-You'll need Lua 5.2. I assume you know how to run a file from lua - it's basically
+You'll need Lua 5.2. I assume you know how to run a file from lua - it's basically:
+
     lua filename.lua
 
 I suggest running 'lua_z80_test.lua'. This will create some standard code and run it via a simple Z80 debugger. (The Z80 debugger is used if Z80_debugger_enabled is set to true at the top of the file). NOTE: The Z80 debugger issues VT100/ANSI escape sequenes to position the cursor. You might want to change this for some platforms. For debugger help type ? or help in the debugger.
@@ -60,7 +65,7 @@ I'll add more information about how to do that at some point here.
 Documentation
 =============
 * This file!
-* Technical *background* information can be found in docs/technical.txt
+* Technical *background* information can be found in [docs/technical.txt][http:docs/technical.txt]
 * Current status information about what works and what doesn't can be found in docs/status.md
 * Some information on the debugger/monitor can be found in docs/debugger_manual.md
 * docs/basic_file_usage.md supplies some more information on the basic file information about each of the main Lua files in the project.

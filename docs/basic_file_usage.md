@@ -30,25 +30,25 @@ z80_ss_debug.lua
 ================
 Single Steps Z80 code via the translator.
 
-<<<add more information here>>>
+    <<<add more information here>>>
 
 
 lua_z80.lua
 ===========
 This is the main translator.
 
-<<<add more information here>>>
+    <<<add more information here>>>
 
 Z80_disassembler.lua
 ====================
 Used by the single step debugger to disassemble Z80.
 
-<<<add more information here>>>
+    <<<add more information here>>>
 
 
 Z80_assembler.lua
 =================
 Start of an assembler-in-Lua-code used for testing only.
 
-<<<add more information here>>>
+    <<<add more information here>>>
 

@@ -45,13 +45,13 @@ The following shows a typical display:
 
 The top is the registers, their contents and the data at the address of the register pairs.
 
-<<<Need to add more here>>>
+    <<<Need to add more here>>>
 
 
 Stepping
 ========
 
-<<< add info on this here >>>
+    <<< add info on this here >>>
 
 
 Memory View
@@ -59,11 +59,11 @@ Memory View
 
 This has colour coding as follows:
 
-<<<complete this section>>>
+    <<<complete this section>>>
 
 
 Lua Listing
 ===========
-<<< add info here >>>
+    <<< add info here >>>
 
 
