@@ -36,6 +36,13 @@ dofile("lua_z80.lua")
 function run_Spectrum()
 	local jit = Z80JIT:new()
 	local f=io.open("ROMs/spectrum.rom", "rb")
+	if not f then
+		print("Spectrum ROM not loaded")
+		print("Did you download it?")
+		print("This script assumes it's located as 'ROMs/spectrum.rom'")
+		print("ABORTING!")
+		return
+	end
 	local code = f:read("*all")
 	f:close()
 	jit:load_memory(code, 0)
