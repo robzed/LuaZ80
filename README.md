@@ -12,7 +12,9 @@ The Z80 is an 8-bit microprocessor was used in many popular computers in the 198
 
 Lua is a popular scripting language that where the standard interpreter is one of the faster dynamic programming language interpreters. (There is also an excellent Lua JIT native compiler - although this project hasn't been tested against that yet.)
 
-A dynamic translator means that it could be as fast as Lua, at least in theory, rather than an Z80 interpreter running on top of a Lua interpreter (or compiler). However, see docs/technical.txt for current limiting factors on the speed.
+A dynamic translator means that it could be as fast as Lua, at least in theory, rather than an Z80 interpreter running on top of a Lua interpreter (or compiler). However, see [docs/technical.txt][3] for current limiting factors on the speed.
+
+[3]: https://github.com/robzed/LuaZ80/blob/master/docs/technical.txt
 
 Main Files
 ==========
