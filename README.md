@@ -64,11 +64,11 @@ I'll add more information about how to do that at some point here.
 
 Documentation
 =============
-* This file!
-* Technical *background* information can be found in [docs/technical.txt](http:docs/technical.txt)
-* Current status information about what works and what doesn't can be found in docs/status.md
-* Some information on the debugger/monitor can be found in docs/debugger_manual.md
-* docs/basic_file_usage.md supplies some more information on the basic file information about each of the main Lua files in the project.
+* This README.md file!
+* Technical *background* information can be found in [docs/technical.txt](https://github.com/robzed/LuaZ80/blob/master/docs/technical.txt)
+* Current status information about what works and what doesn't can be found in [docs/status.md](https://github.com/robzed/LuaZ80/blob/master/docs/status.md)
+* Some information on the debugger/monitor can be found in [docs/debugger_manual.md](https://github.com/robzed/LuaZ80/blob/master/docs/debugger_manual.md)
+* [docs/basic_file_usage.md](https://github.com/robzed/LuaZ80/blob/master/docs/basic_file_usage.md) supplies some more information on the basic file information about each of the main Lua files in the project.
 
 More information
 ================
