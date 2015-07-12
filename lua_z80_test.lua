@@ -90,7 +90,7 @@ function lua_memory_invalidate_test()
 	
 	local code
 	if not z:any_errors() then
-		local jit = Z80JIT:new()
+		--local jit = Z80JIT:new()
 		code = z:get_code()
 
 	else
