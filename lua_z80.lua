@@ -16,6 +16,7 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 -- http://robprobin.com
+-- https://github.com/robzed/LuaZ80
 --
 -- LICENSE NOTES
 -- =============
@@ -33,15 +34,16 @@
 -- REQUIREMENTS
 -- ============
 -- Requires Lua 5.2 because we use bit operations. Other changes 5.1/5.2 changes 
--- might be documented as 5.2 in this file.
+-- might be documented as 5.2 in this file. 
+--
+-- Also goto is used to implement branches - that might be more 'serious' for
+-- backporting to Lua 5.1.
 --
 -- FUTURE ACTIONS
 -- ==============
 -- High Priority
 -- @todo: Complete memory invalidation
 -- @todo: test memory invalidation
--- @todo: rename old to LuaZ80_Support, Create new project, Push to github
--- @todo: blog post and web page
 --
 -- Medium Priority
 -- @todo: Test by booting ZX81 or Spectrum ROM and showing basic screen and key input

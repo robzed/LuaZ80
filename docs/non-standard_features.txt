@@ -1,0 +1,17 @@
+Z80_opcodes
+===========
+
+STDOUT write to host
+--------------------
+
+Debug instruction, writes to host stdout .. ED ED
+
+Implemented as: "io.write(string.char(CPU.A))",	-- fake function for debugging
+
+Several other emulators have these type of extensions.
+
+
+Patching in Hardware Emulation
+==============================
+
+Not done yet.
