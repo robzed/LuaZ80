@@ -62,12 +62,12 @@ Internally there are several other classes and functions that are not intended t
 - The function z80_compile(memory, address, number_number_instructions_to_compile, pre_code) generates Lua code from Z80 binary op-codes. It's not intended to be user accessible and instead is called from Z80JIT. Produces a Z80Lump.
 - The function decode_instruction(memory, address, instruction_table) compiles a single Z80 instruction. Used by z80_compile().
 
-Because of forward and backward branches, varous patching needs to be done to insturctions after each instruction is compiled - in a similar way to an assembler or other code generator.
+Because of forward and backward branches, varous patching needs to be done to instructions after each instruction is compiled - in a similar way to an assembler or other code generator.
 
 A few areas where is there is quite a lot of work above running the basic operation of the instruction:
-1. Flags - these are tricky at the best of times with Z80. Quite a few emualtors have bugs here still.
-2. Memory invalidation - where produced code is invalidated by writes to code-space.
-3. Memory write allow (think ROM vs. RAM).
+* Flags - these are tricky at the best of times with Z80. Quite a few emulators have bugs here still.
+* Memory invalidation - where produced code is invalidated by writes to code-space.
+* Memory write allow (think ROM vs. RAM).
 
 We don't optimise host memory usage in this translator - we instead assume speed is the most critical aspect. Even then, not everything has been done to speed the operation of the translator - in order to make something that works.
 
