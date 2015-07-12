@@ -57,12 +57,18 @@ Trying to run Spectrum ROM
 
 I'll add more information about how to do that at some point here.
 
+Documentation
+=============
+* This file!
+* Technical *background* information can be found in docs/technical.txt
+* Current status information about what works and what doesn't can be found in docs/status.md
+* Some information on the debugger/monitor can be found in docs/debugger_manual.md
+* docs/basic_file_usage.md supplies some more information on the basic file information about each of the main Lua files in the project.
+
 More information
 ================
 
 Source can be found here http://github.com/robzed/LuaZ80
-
-Technical background information can be found in docs/technical.txt
 
 My site http://robprobin.com has some more information on the LuaZ80 and other 
 some notes on a few other Z80 emulators on the LuaZ80 page.
