@@ -19,6 +19,7 @@ Conceptually the _normal_ approach is to emulation is as per the following steps
  - decode it 
  - dispatch it via something like a switch statement or table
  - execute the code that does the function requested
+ - go back to the first (read) step
 
 Whilst this is the simplest approach, it's also a bit slow because the first three steps have to be done again and again. A better approach might be to use a JIT compiler model, where the code is processed ahead of time into some 'native' format, thereby only doing steps 1-3 once per sequence of instructions. 
 
@@ -139,17 +140,17 @@ Why isn't this as fast as native Lua?
 -------------------------------------
 At the moment, the issue I'm most worried about (but don't have measured times for) is translating data as instructions into a 'lump' of code, then invalidating the current block when that data is changed. Invalidating the current block will immediately cause the current lump to exit and be recompiled = a relatively slow process.
 
-We therefore will need to add more complication to the compile routine to try to avoid compiling bytes that are not in the intruction path, thereby avoiding compiling data.
+We therefore will need to add more complication to the compile routine to try to avoid compiling bytes that are not in the instruction path, thereby avoiding compiling data.
 
 Other factors in speed
 -----------------------
 There are likely to be other factors which limit the speed.
 
- - Some instructions require us to exit the current lump. Although with most indirect jumps this is somewhat inevitable, but maybe we can reduce this for some intructions without adding too much Lua code to decide (and offset any benefits we gain).
+ - Some instructions require us to exit the current lump. Although with most indirect jumps this is somewhat inevitable, but maybe we can reduce this for some instructions without adding too much Lua code to decide (and offset any benefits we gain).
  
- - I expect flag colculations on a lot of Z80 instructions are very costly - especially where we can't just pull the value out of a table. One approach might be to defer the calculation of flags until they are used. Perhaps in this way we can just use the last update of the flags and the others would be thown away? One possible method would be to pass a flag generation function. We also need to consider how to pass the parameters. And this has to be faster than calculating the flags.
+ - I expect flag calculations on a lot of Z80 instructions are very costly - especially where we can't just pull the value out of a table. One approach might be to defer the calculation of flags until they are used. Perhaps in this way we can just use the last update of the flags and the others would be thrown away? One possible method would be to pass a flag generation function. We also need to consider how to pass the parameters. And this has to be faster than calculating the flags.
 
- - Checking for writes dangerious at compile time would be nice. This might avoid a write check on any write instruction. But it might be impossible for most cases. 
+ - Checking for writes dangerous at compile time would be nice. This might avoid a write check on any write instruction. But it might be impossible for most cases. 
 
 
 Will this ever be as fast a C or C++ Z80 emulator?
