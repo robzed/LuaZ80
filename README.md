@@ -3,7 +3,10 @@ LuaZ80
 
 A Lua Z80 dynamic (binary) translator (similar to a JIT compiler) which translates Z80 to Lua and runs the result.
 
-**WARNING** This software is not complete, but is a work-in-progress proof of concept.
+**WARNING** This software is not complete, but is a work-in-progress proof of concept. Not all op-codes are implemented and it will not work properly. However some are working (e.g. those used in lua_z80_test.lua).
+
+Background
+==========
 
 The Z80 is an 8-bit microprocessor was used in many popular computers in the 1980's including the ZX80, ZX81, ZX Spectrum, Amstrad CPC 464 and TRS-80 Model 1.
 
@@ -11,8 +14,8 @@ Lua is a popular scripting language that where the standard interpreter is one o
 
 A dynamic translator means that it could be as fast as Lua, at least in theory, rather than an Z80 interpreter running on top of a Lua interpreter (or compiler). However, see docs/technical.txt for current limiting factors on the speed.
 
-Files
-=====
+Main Files
+==========
 
 - lua_z80.lua - This is the main translator.
 - lua_z80_test.lua - This is the work in progress test file.
@@ -21,24 +24,45 @@ Files
 - Z80_disassembler.lua - Used by the single step debugger to disassemble Z80.
 - Z80_assembler.lua - Start of an assembler-in-Lua-code used for testing only.
 
+What works
+==========
+
+Nothing properly :-) I'm certainly after some more help - this is very much a side-side-side project for me. But bit-by-bit it will get better.
+
+I'll expand this section to be more accurate, but for now:
+
+- A few op-codes.
+- The debugger/monitor (similar to the old HiSoft DevPac Monitor in some ways)
+- The disassembler (but there might be bugs or gaps)
+- The parts of a crude assembler
+
+All of this is written in pure Lua.
+
 Using it
 ========
 You'll need Lua 5.2. I assume you know how to run a file from lua - it's basically
     lua filename.lua
 
-I suggest running 'lua_z80_test.lua'. This will create some standard code and run it via a simple Z80 debugger. (The Z80 debugger is used if Z80_debugger_enabled is set to true at the top of the file). NOTE: The Z80 debugger issues VT100/ANSI escape sequenes to position the cursor. You might want to change this for some platforms.
+I suggest running 'lua_z80_test.lua'. This will create some standard code and run it via a simple Z80 debugger. (The Z80 debugger is used if Z80_debugger_enabled is set to true at the top of the file). NOTE: The Z80 debugger issues VT100/ANSI escape sequenes to position the cursor. You might want to change this for some platforms. For debugger help type ? or help in the debugger.
 
 If you have a Lua debugger (say the one in the excellent [ZeroBrane Studio][1] or [Eclipse LDT][2]) then you may single step the Lua code to get a good idea how the code works. Changing Z80_debugger_enabled to false at the top of 'lua_z80_test.lua' is a good idea, because this will just run the code, and avoid you have to step through the Z80 debugger code and avoid it emitting VT100/ANSI escape sequences and/or reading commands on every instruction.
 
 [1]: http://studio.zerobrane.com "ZeroBrane Studio"
 [2]: http://www.eclipse.org/koneki/ldt/ "Eclipse LDT"
 
+Trying to run Spectrum ROM
+==========================
+
+'lua test_fake_ZXSpectrum.lua' will try to run the ROM of the spectrum. It expects the ROM to be in ROMs/spectrum.rom; if it doesn't find it, it will tell you. Because not all op-codes are implemented, this won't yet be successful. But with the debugger the first one or two can be stepped.
+
+I'll add more information about how to do that at some point here.
+
 More information
 ================
 
 Source can be found here http://github.com/robzed/LuaZ80
 
-Technical information can be found in docs/technical.txt
+Technical background information can be found in docs/technical.txt
 
 My site http://robprobin.com has some more information on the LuaZ80 and other 
 some notes on a few other Z80 emulators on the LuaZ80 page.
@@ -47,7 +71,7 @@ Authors, Copyright and Licensing
 =================================
 Written by Rob Probin. Started June 2013. (All original work.)
 
-Copyright (c) 2013 Rob Probin
+Copyright (c) 2013-2015 Rob Probin
 
 For licensing see individual Lua files and LICENSE. 
 
