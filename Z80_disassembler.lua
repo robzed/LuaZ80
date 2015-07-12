@@ -16,6 +16,7 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 -- http://robprobin.com
+-- https://github.com/robzed/LuaZ80
 --
 -- LICENSE NOTES
 -- =============
@@ -1131,7 +1132,6 @@ function single_Z80_disassemble(memory, start)
 	end
 end
 
--- We don't use this currently.
 -- Making a different function that was a range of bytes would be trivial
 -- NOTE: Bad instructions might result in misalignment of subsequent instructions.
 function multiple_Z80_disassemble(memory, start, number_of_instructions)
