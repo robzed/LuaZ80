@@ -316,7 +316,7 @@ local function write_2bytes_to_address_command_string(source1, source2, dest_add
 	dest_address1, source1, dest_address2, source2, next_pc)
 end
 
-local function write_to_address_command_string(source, dest_address, optional_flag_check_code, next_pc)
+local function write_to_address_command_string(source, dest_address, next_pc, optional_flag_check_code)
 	-- e.g. dest_address = CPU.H*256+CPU.L
 	-- e.g. source = CPU.A
 	optional_flag_check_code = optional_flag_check_code or ""
@@ -753,8 +753,9 @@ for i = 0, 7 do
 		decode_first_byte[4+(8*i)] = 
 			function(memory, iaddr)
 				return write_to_address_command_string("result", "CPU.H*256+CPU.L", 
+                iaddr,
 				"result = (memory[addr]+1)%256 " .. 
-				string.format(inc_flag_calc, "result", "result", "result"), iaddr ), iaddr
+				string.format(inc_flag_calc, "result", "result", "result")), iaddr
 			end
 	end
 	if _is_single_reg(reg) then
@@ -766,8 +767,9 @@ for i = 0, 7 do
 		decode_first_byte[5+(8*i)] = 
 			function(memory, iaddr)
 				return write_to_address_command_string("result", "CPU.H*256+CPU.L",
+                iaddr, 
 				"result = (memory[addr]-1)%256" ..
-				string.format(dec_flag_calc, "result", "result", "result"), iaddr), iaddr
+				string.format(dec_flag_calc, "result", "result", "result")), iaddr
 			end
 	end
 	if _is_single_reg(reg) then
