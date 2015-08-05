@@ -413,7 +413,7 @@ local decode_first_byte = {
 	[0x22] = function(memory, iaddr)
 			local addr = memory[iaddr]; iaddr = inc_address(iaddr);
 			addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
-			return write_2bytes_to_address_command_string("CPU.L", "CPU.H", string.format("memory[0x%x]", addr), string.format("memory[0x%x]", addr+1, iaddr)), iaddr
+			return write_2bytes_to_address_command_string("CPU.L", "CPU.H", string.format("memory[0x%x]", addr), string.format("memory[0x%x]", addr+1), iaddr), iaddr
 		end,
 	-- 32 = LD (xxxx), A
 	[0x32] = function(memory, iaddr)
