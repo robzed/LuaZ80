@@ -34,34 +34,34 @@ dofile("lua_z80.lua")
 
 
 function run_Spectrum()
-	local jit = Z80JIT:new()
-	local f=io.open("ROMs/spectrum.rom", "rb")
-	if not f then
-		print("Spectrum ROM not loaded")
-		print("Did you download it?")
-		print("This script assumes it's located as 'ROMs/spectrum.rom'")
-		print("ABORTING!")
-		return
-	end
-	local code = f:read("*all")
-	f:close()
-	jit:load_memory(code, 0)
-	jit:make_ROM(0,16384)
-	jit:make_RAM(16384,16384)
-	local cpu = Z80CPU:new()
-	local status
-	repeat
-		status = jit:run_z80(cpu, cpu.PC)
-	until status ~= "ok"
-	print()
-	print("Status =",status)	
-	print(string.format("Next Address = 0x%x", cpu.PC))
-	if status == "undefined" then
-		local pc = cpu.PC - 1
-		local data = jit:fetch_memory(pc, 5)
-		local b1,b2,b3,b4,b5 = data:byte(1,5)
-		print(string.format("%04x:%x %x %x %x %x", pc, b1,b2,b3,b4,b5))
-	end
+    local jit = Z80JIT:new()
+    local f=io.open("ROMs/spectrum.rom", "rb")
+    if not f then
+        print("Spectrum ROM not loaded")
+        print("Did you download it?")
+        print("This script assumes it's located as 'ROMs/spectrum.rom'")
+        print("ABORTING!")
+        return
+    end
+    local code = f:read("*all")
+    f:close()
+    jit:load_memory(code, 0)
+    jit:make_ROM(0,16384)
+    jit:make_RAM(16384,16384)
+    local cpu = Z80CPU:new()
+    local status
+    repeat
+        status = jit:run_z80(cpu, cpu.PC)
+    until status ~= "ok"
+    print()
+    print("Status =",status)    
+    print(string.format("Next Address = 0x%x", cpu.PC))
+    if status == "undefined" then
+        local pc = cpu.PC - 1
+        local data = jit:fetch_memory(pc, 5)
+        local b1,b2,b3,b4,b5 = data:byte(1,5)
+        print(string.format("%04x:%x %x %x %x %x", pc, b1,b2,b3,b4,b5))
+    end
 end
 
 run_Spectrum()

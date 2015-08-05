@@ -34,63 +34,63 @@
 require("third_party/strict")
 
 local function decode_operands(instruction, memory, start, size_so_far)
-	-- Decodes operands, specifically:
-	-- !nn!
-	-- !n!
-	-- !r!
-	-- !d!
-	local byte1 = memory[start] or 0
-	local byte2 = memory[((start+1)%65536)] or 0
+    -- Decodes operands, specifically:
+    -- !nn!
+    -- !n!
+    -- !r!
+    -- !d!
+    local byte1 = memory[start] or 0
+    local byte2 = memory[((start+1)%65536)] or 0
 
-	-- 2's completement displacement for IX and IY ... is occurs before other offsets
-	local mstart, mend = instruction:find("!d!")
-	if mstart then
-		local sign = "+"
-		if byte1 >= 128 then
-			byte1 = 256-byte1	-- 255 = 1, 254 = 2
-			sign = "-"
-		end
-		instruction = string.format("%s%s%02XH%s",
-			instruction:sub(1,mstart-1),
-			sign,
-			byte1,
-			instruction:sub(mend+1))
-		
-		start = start + 1
-		size_so_far = size_so_far + 1
-		byte1 = memory[start] or 0
-		byte2 = memory[((start+1)%65536)] or 0
-	end
-	-- 16 bit immediate operand
-	local mstart, mend = instruction:find("!nn!")
-	if mstart then
-		instruction = string.format("%s%02X%02xH%s",
-			instruction:sub(1,mstart-1),
-			byte2, byte1,
-			instruction:sub(mend+1))
-		size_so_far = size_so_far + 2
-	end
-	-- 8 bit immediate operand
-	mstart, mend = instruction:find("!n!")
-	if mstart then
-		instruction = string.format("%s%02XH%s",
-			instruction:sub(1,mstart-1),
-			byte1,
-			instruction:sub(mend+1))
-		size_so_far = size_so_far + 1
-	end
-	-- 8 bit relative address offset
-	mstart, mend = instruction:find("!r!")
-	if mstart then
-		if byte1 > 127 then byte1 = byte1-256 end
-		local address = ((start+1+byte1)%65536)
-		instruction = string.format("%s%04XH%s",
-			instruction:sub(1,mstart-1),
-			address,
-			instruction:sub(mend+1))
-		size_so_far = size_so_far + 1
-	end
-	return instruction, size_so_far
+    -- 2's completement displacement for IX and IY ... is occurs before other offsets
+    local mstart, mend = instruction:find("!d!")
+    if mstart then
+        local sign = "+"
+        if byte1 >= 128 then
+            byte1 = 256-byte1    -- 255 = 1, 254 = 2
+            sign = "-"
+        end
+        instruction = string.format("%s%s%02XH%s",
+            instruction:sub(1,mstart-1),
+            sign,
+            byte1,
+            instruction:sub(mend+1))
+        
+        start = start + 1
+        size_so_far = size_so_far + 1
+        byte1 = memory[start] or 0
+        byte2 = memory[((start+1)%65536)] or 0
+    end
+    -- 16 bit immediate operand
+    local mstart, mend = instruction:find("!nn!")
+    if mstart then
+        instruction = string.format("%s%02X%02xH%s",
+            instruction:sub(1,mstart-1),
+            byte2, byte1,
+            instruction:sub(mend+1))
+        size_so_far = size_so_far + 2
+    end
+    -- 8 bit immediate operand
+    mstart, mend = instruction:find("!n!")
+    if mstart then
+        instruction = string.format("%s%02XH%s",
+            instruction:sub(1,mstart-1),
+            byte1,
+            instruction:sub(mend+1))
+        size_so_far = size_so_far + 1
+    end
+    -- 8 bit relative address offset
+    mstart, mend = instruction:find("!r!")
+    if mstart then
+        if byte1 > 127 then byte1 = byte1-256 end
+        local address = ((start+1+byte1)%65536)
+        instruction = string.format("%s%04XH%s",
+            instruction:sub(1,mstart-1),
+            address,
+            instruction:sub(mend+1))
+        size_so_far = size_so_far + 1
+    end
+    return instruction, size_so_far
 end
 
 local CB_Z80_table = {
@@ -353,7 +353,7 @@ local CB_Z80_table = {
 }
 
 local function CB_instruction_decoder(memory, start)
-	return CB_Z80_table[memory[start] or 0], 2
+    return CB_Z80_table[memory[start] or 0], 2
 end
 
 local ED_Z80_table = {
@@ -441,14 +441,14 @@ local ED_Z80_table = {
 }
 
 local function ED_instruction_decoder(memory, start)
-	local value = memory[start] or 0
-	local instruction = ED_Z80_table[value]
+    local value = memory[start] or 0
+    local instruction = ED_Z80_table[value]
 
-	if instruction == nil then
-		return string.format("[ED%02X Unknown]", value), 2
-	end
+    if instruction == nil then
+        return string.format("[ED%02X Unknown]", value), 2
+    end
 
-	return decode_operands(instruction, memory, (start+1)%65536, 2)
+    return decode_operands(instruction, memory, (start+1)%65536, 2)
 end
 
 -- Apparently the undocumented instructions here can do three things
@@ -719,23 +719,23 @@ local DD_CB_Z80_table = {
 -- Note, we can't use the FD_DD_instruction_decoder with a table change
 -- because of the displacement is in the 3rd byte not fourth.
 local function FD_DD_CB_instruction_decoder(memory, start, opcode_str, register, size_so_far)
-	local opcode = (start+1)%65536
-	local value = memory[opcode] or 0
-	local instruction = DD_CB_Z80_table[value]
-	size_so_far = size_so_far + 1
-	
-	if instruction == nil then
-		return string.format("[%s%02X %s Unknown]", opcode_str, value, register), size_so_far
-	end
-	
-	-- assume it's a string
-	
-	-- do a replacement of IX with IY, if necessary
-	if register ~= "IX" then
-		instruction = instruction:gsub("IX", register)
-	end
+    local opcode = (start+1)%65536
+    local value = memory[opcode] or 0
+    local instruction = DD_CB_Z80_table[value]
+    size_so_far = size_so_far + 1
+    
+    if instruction == nil then
+        return string.format("[%s%02X %s Unknown]", opcode_str, value, register), size_so_far
+    end
+    
+    -- assume it's a string
+    
+    -- do a replacement of IX with IY, if necessary
+    if register ~= "IX" then
+        instruction = instruction:gsub("IX", register)
+    end
 
-	return decode_operands(instruction, memory, start, size_so_far)
+    return decode_operands(instruction, memory, start, size_so_far)
 end
 
 local DD_Z80_table = {
@@ -829,34 +829,34 @@ local DD_Z80_table = {
 
 -- This decoder is common to DD and FD decoders
 local function FD_DD_instruction_decoder(memory, start, opcode_str, register, size_so_far)
-	local value = memory[start] or 0
-	local instruction = DD_Z80_table[value]
+    local value = memory[start] or 0
+    local instruction = DD_Z80_table[value]
 
-	if instruction == nil then
-		return string.format("[%s%02X %s Unknown]", opcode_str, value, register), size_so_far
-	end
-	
-	if type(instruction) == "function" then
-		return instruction(memory, (start+1)%65536, string.format("%s%02X", opcode_str, value), register, size_so_far)
-	end
-	-- assume it's a string
-	
-	-- do a replacement of IX with IY, if necessary
-	if register ~= "IX" then
-		instruction = instruction:gsub("IX", register)
-	end
+    if instruction == nil then
+        return string.format("[%s%02X %s Unknown]", opcode_str, value, register), size_so_far
+    end
+    
+    if type(instruction) == "function" then
+        return instruction(memory, (start+1)%65536, string.format("%s%02X", opcode_str, value), register, size_so_far)
+    end
+    -- assume it's a string
+    
+    -- do a replacement of IX with IY, if necessary
+    if register ~= "IX" then
+        instruction = instruction:gsub("IX", register)
+    end
 
-	return decode_operands(instruction, memory, (start+1)%65536, size_so_far)
+    return decode_operands(instruction, memory, (start+1)%65536, size_so_far)
 end
 
 -- This decoder deals with IX instructions
 local function DD_instruction_decoder(memory, start)
-	return FD_DD_instruction_decoder(memory, start, "DD", "IX", 2)
+    return FD_DD_instruction_decoder(memory, start, "DD", "IX", 2)
 end
 
 -- This decoder deals with IY instructions
 local function FD_instruction_decoder(memory, start)
-	return FD_DD_instruction_decoder(memory, start, "FD", "IY", 2)
+    return FD_DD_instruction_decoder(memory, start, "FD", "IY", 2)
 end
 
 local basic_Z80_table = {
@@ -1121,78 +1121,78 @@ local basic_Z80_table = {
 
 
 function single_Z80_disassemble(memory, start)
-	local instruction = basic_Z80_table[memory[start] or 0]
+    local instruction = basic_Z80_table[memory[start] or 0]
 
-	if type(instruction) == "string" then
-		return decode_operands(instruction, memory, (start+1)%65536, 1)
-	elseif type(instruction) == "function" then
-		return instruction(memory, (start+1)%65536)
-	else
-		return tostring(instruction), 1
-	end
+    if type(instruction) == "string" then
+        return decode_operands(instruction, memory, (start+1)%65536, 1)
+    elseif type(instruction) == "function" then
+        return instruction(memory, (start+1)%65536)
+    else
+        return tostring(instruction), 1
+    end
 end
 
 -- Making a different function that was a range of bytes would be trivial
 -- NOTE: Bad instructions might result in misalignment of subsequent instructions.
 function multiple_Z80_disassemble(memory, start, number_of_instructions)
-	local instructions = {}
-	for i = 1, number_of_instructions do
-		local instruction, size = single_Z80_disassemble(memory, start)
-		table.insert(instructions, instruction)
-		start = start + size
-	end
-	return instructions, start
+    local instructions = {}
+    for i = 1, number_of_instructions do
+        local instruction, size = single_Z80_disassemble(memory, start)
+        table.insert(instructions, instruction)
+        start = start + size
+    end
+    return instructions, start
 end
 
 --[[
-	print()
-	print("Simple instructions")
-	print(single_Z80_disassemble({ [0]=0x00 }, 0))
-	print(single_Z80_disassemble({ [0]=0x3e, 0x33 }, 0))
-	print(single_Z80_disassemble({ [0]=0x01, 0x34, 0x12 }, 0))
-	print(single_Z80_disassemble({ [0]=0x06, 0x99 }, 0))
-	print(single_Z80_disassemble({ [0]=0xDB, 0x88 }, 0))
-	print()
-	print("ED instructions")
-	print(single_Z80_disassemble({ [0]=0xED, 0x40 }, 0))
-	print(single_Z80_disassemble({ [0]=0xED, 0x44 }, 0))
-	print(single_Z80_disassemble({ [0]=0xED, 0x46 }, 0))
-	print(single_Z80_disassemble({ [0]=0xED, 0x4B, 0x34, 0x12 }, 0))
-	print(single_Z80_disassemble({ [0]=0xED, 0x53, 0x34, 0x12 }, 0))
-	print(single_Z80_disassemble({ [0]=0xED, 0x00 }, 0))
-	print()
-	print("CB instructions")
-	print(single_Z80_disassemble({ [0]=0xCB, 0x00 }, 0))
-	print(single_Z80_disassemble({ [0]=0xCB, 0x01 }, 0))
-	print(single_Z80_disassemble({ [0]=0xCB, 0xFF }, 0))
-	print()
-	print("IX/IY instructions")
-	print(single_Z80_disassemble({ [0]=0xDD, 0x36, 0xF1, 0x21 }, 0))
-	print(single_Z80_disassemble({ [0]=0xDD, 0x09 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0x09 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0x22, 0x34, 0x12 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0x34, 0x77 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0x36, 0x44, 0xAB, 0xFF }, 0))
-	print()
-	print("IX/IY CB instructions")
-	print(single_Z80_disassemble({ [0]=0xDD, 0xCB, 0x20, 0x06 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x20, 0x06 }, 0))
-	print(single_Z80_disassemble({ [0]=0xDD, 0xCB, 0x06, 0x12 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x06, 0x12 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x00, 0xFE }, 0))
+    print()
+    print("Simple instructions")
+    print(single_Z80_disassemble({ [0]=0x00 }, 0))
+    print(single_Z80_disassemble({ [0]=0x3e, 0x33 }, 0))
+    print(single_Z80_disassemble({ [0]=0x01, 0x34, 0x12 }, 0))
+    print(single_Z80_disassemble({ [0]=0x06, 0x99 }, 0))
+    print(single_Z80_disassemble({ [0]=0xDB, 0x88 }, 0))
+    print()
+    print("ED instructions")
+    print(single_Z80_disassemble({ [0]=0xED, 0x40 }, 0))
+    print(single_Z80_disassemble({ [0]=0xED, 0x44 }, 0))
+    print(single_Z80_disassemble({ [0]=0xED, 0x46 }, 0))
+    print(single_Z80_disassemble({ [0]=0xED, 0x4B, 0x34, 0x12 }, 0))
+    print(single_Z80_disassemble({ [0]=0xED, 0x53, 0x34, 0x12 }, 0))
+    print(single_Z80_disassemble({ [0]=0xED, 0x00 }, 0))
+    print()
+    print("CB instructions")
+    print(single_Z80_disassemble({ [0]=0xCB, 0x00 }, 0))
+    print(single_Z80_disassemble({ [0]=0xCB, 0x01 }, 0))
+    print(single_Z80_disassemble({ [0]=0xCB, 0xFF }, 0))
+    print()
+    print("IX/IY instructions")
+    print(single_Z80_disassemble({ [0]=0xDD, 0x36, 0xF1, 0x21 }, 0))
+    print(single_Z80_disassemble({ [0]=0xDD, 0x09 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0x09 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0x22, 0x34, 0x12 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0x34, 0x77 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0x36, 0x44, 0xAB, 0xFF }, 0))
+    print()
+    print("IX/IY CB instructions")
+    print(single_Z80_disassemble({ [0]=0xDD, 0xCB, 0x20, 0x06 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x20, 0x06 }, 0))
+    print(single_Z80_disassemble({ [0]=0xDD, 0xCB, 0x06, 0x12 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x06, 0x12 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x00, 0xFE }, 0))
 
-	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0xFF, 0x00 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0xFE, 0x00 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x80, 0x00 }, 0))
-	print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x7F, 0x00 }, 0))
-	
-	print()
-	local result, nextaddr = multiple_Z80_disassemble({[0]=0x3E, 0x33, 0xD7, 0xC9, 0xDD, 0xCB, 0x20, 0x06 }, 0, 4)
-	print("Multiple test")
-	for _,i in ipairs(result) do
-		print(i)
-	end
-	print("Next address=", nextaddr);
+    print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0xFF, 0x00 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0xFE, 0x00 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x80, 0x00 }, 0))
+    print(single_Z80_disassemble({ [0]=0xFD, 0xCB, 0x7F, 0x00 }, 0))
+    
+    print()
+    local result, nextaddr = multiple_Z80_disassemble({[0]=0x3E, 0x33, 0xD7, 0xC9, 0xDD, 0xCB, 0x20, 0x06 }, 0, 4)
+    print("Multiple test")
+    for _,i in ipairs(result) do
+        print(i)
+    end
+    print("Next address=", nextaddr);
 --]]
 
 
