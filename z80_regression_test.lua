@@ -16,6 +16,7 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 -- http://robprobin.com
+-- https://github.com/robzed/LuaZ80
 --
 -- LICENSE NOTES
 -- =============
@@ -28,6 +29,13 @@
 -- I'm quite willing to consider a different license if you have a specific 
 -- use-case that would benefit - even if part of the (Lua or other) source 
 -- would be closed or licensed under a non-open source license.
+
+--
+-- NOTES:
+-- =====
+-- 
+-- This file is not built for speed, it is intended to be simple & fast to write
+-- and run only occasionlly.
 
 require("lua_z80")
 require("z80_ss_debug")
