@@ -74,6 +74,7 @@
 --        are costly)? Maybe even just stop lump compilation if JP/JR is 
 --        backwards and the lump doesnt have a label right after.
 --        Also can we post-identify data as not self-modifying code?
+-- @todo  What if the whole memory is NOPs? Does the interpreter hang?
 --
 ------------------------------------------------------------------------------------
 -- NOTES: code_write_check and write_allowed go hand in hand. If an instruction doesn't
@@ -1182,7 +1183,7 @@ function Z80JIT:clear_all()
     self:invalidate_all()
 end
 
-function Z80JIT:fetch_memory(address, length)
+function Z80JIT:fetch_memory_table(address, length)
     address = address or 0
     length = length or self._total_memory_length
     
@@ -1194,6 +1195,11 @@ function Z80JIT:fetch_memory(address, length)
         end
         table.insert(output, string.char(ci))
     end
+    return output
+end
+
+function Z80JIT:fetch_memory_string(address, length)
+    local output = self:fetch_memory_table(address, length)
     return table.concat(output)
 end
 

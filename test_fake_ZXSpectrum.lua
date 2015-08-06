@@ -58,7 +58,7 @@ function run_Spectrum()
     print(string.format("Next Address = 0x%x", cpu.PC))
     if status == "undefined" then
         local pc = cpu.PC - 1
-        local data = jit:fetch_memory(pc, 5)
+        local data = jit:fetch_memory_string(pc, 5)
         local b1,b2,b3,b4,b5 = data:byte(1,5)
         print(string.format("%04x:%x %x %x %x %x", pc, b1,b2,b3,b4,b5))
     end

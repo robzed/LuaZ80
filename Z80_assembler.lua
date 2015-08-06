@@ -1075,6 +1075,10 @@ function Z80_Assembler:RET()
     self:assemble("RET")
 end
 
+function Z80_Assembler:NOP()
+    self:assemble("NOP")
+end
+
 
 --[[
 z = Z80_Assembler()
