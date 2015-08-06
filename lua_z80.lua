@@ -112,7 +112,7 @@ function Z80CPU:initialize()
     self.PC = 0
     self.IX = 0    -- remember there is IXH and IXL as well
     self.IY = 0    -- remember there is IYH and IYL as well
-    self.SP = 0
+    self.SP = 0xFFFF
     self.I = 0
 
     -- R refresh register..
@@ -120,10 +120,10 @@ function Z80CPU:initialize()
     --   1. random 7-bit value
     --   2. accurate emulation, involving emulation off all R updates in all instructions
     self.R = 0
-    self._interrupt_mode = 0
+    self._interrupt_mode = 0    -- look at IMFa/IMFb
     -- main registers
-    self.A = 0
-    self._F = 0            -- might only be updated only when requested (if nil). call :get_F()
+    self.A = 0xFF
+    self._F = 0xFF            -- might only be updated only when requested (if nil). call :get_F()
     self.H = 0
     self.L = 0
     self.B = 0
@@ -140,8 +140,8 @@ function Z80CPU:initialize()
     self.cycles = 0
 
     -- alternative 'shadow' registers
-    self.A_ = 0
-    self.F_ = 0        -- never deferred
+    self.A_ = 0xFF
+    self.F_ = 0xFF       -- never deferred
     self.H_ = 0
     self.L_ = 0
     self.B_ = 0
