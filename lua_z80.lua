@@ -924,7 +924,7 @@ function decode_instruction(memory, address, instruction_table)
     if not data then
         data = 0        -- nop instruction
     end
-    print(string.format("%x 0x%x", address, data))
+    --print(string.format("%x 0x%x", address, data))
     address = inc_address(address)
 
       local instruction = instruction_table[data]
