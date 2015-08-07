@@ -157,11 +157,10 @@ local function check_changes(old_state, new_state, checks)
     for k,v in pairs(checks) do
         if type(k) == "number" then
             -- address
-            local new = new_state.mem[k + 1]
-            local new = new_state.mem[k + 1]
+            local new = (new_state.mem[k + 1]):byte()
+            local old = (old_state.mem[k + 1]):byte()
             if new ~= v then
                 print("Memory change didn't occur as expected")
-                print("location: ", addr, "was", v:byte(),"now", new:byte())
                 print("Address", k, "was", old, "now", new, "expected", v)
                 os.exit(5)
             end
@@ -230,9 +229,15 @@ local basic_instruction_tests = {
     
 { "NOP",     function(z) z:NOP()   end, { } },
 { "LD BC,n", function(z) z:assemble("LD", "BC", 0x4321) end, { B=0x43, C=0x21 } },
+    
+{ "LD   (BC),A", function(z)
+                    z:assemble("LD", "BC", 0x8000) 
+                    z:assemble("LD", "A", 0x01)
+                    z:assemble("LD", "(BC)", "A") 
+                end, 
+                { B=0x80, C=0x00, A=0x01, [0x8001]=0x01 } },
 
 --[[
-    ["LD   (BC),A"] =    0x02,
     ["INC  BC"] =        0x03,
     ["INC  B"] =         0x04,
     ["DEC  B"] =         0x05,
