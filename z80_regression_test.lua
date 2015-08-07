@@ -237,8 +237,10 @@ local basic_instruction_tests = {
                 end, 
                 { B=0x80, C=0x00, A=0x01, [0x8001]=0x01 } },
 
+{ "INC  BC", function(z) z:assemble("LD", "BC", 0x43FF)  
+        z:assemble("INC", "BC") end, { B=0x44, C=0x00 } },  
+ 
 --[[
-    ["INC  BC"] =        0x03,
     ["INC  B"] =         0x04,
     ["DEC  B"] =         0x05,
     ["LD   B,!n!"] =     0x06,
