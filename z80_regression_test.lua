@@ -405,7 +405,13 @@ local basic_instruction_tests = {
         z:assemble("INC", "B") end, { B=0x12, F={"-S", "-Z", "-H", "-V", "-N", "oldF=0x10"} } },  
 
  { "INC  B rollover", function(z) z:assemble("LD", "B", 0xFF)  
-        z:assemble("INC", "B") end, { B=0x00, F={"-S", "Z", "H", "V", "-N", "oldF=0xFF"} } },  
+         -- S is set if result is negative; reset otherwise
+        -- Z is set if result is zero; reset otherwise
+        -- H is set if carry from bit 3; reset otherwise
+        -- P/V is set if r was 7FH before operation; reset otherwise
+        -- N is reset
+        -- C is not affected
+        z:assemble("INC", "B") end, { B=0x00, F={"-S", "Z", "H", "-V", "-N", "oldF=0xFF"} } },  
 
  { "INC  B half carry", function(z) z:assemble("LD", "B", 0x0F)  
         z:assemble("INC", "B") end, { B=0x10 } },  
