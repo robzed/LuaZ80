@@ -381,7 +381,7 @@ end
 
 local basic_instruction_tests = {
     
---[[
+
 { "NOP",     function(z) z:NOP()   end, { } },
 { "LD BC,n", function(z) z:assemble("LD", "BC", 0x4321) end, { B=0x43, C=0x21 } },
     
@@ -398,11 +398,10 @@ local basic_instruction_tests = {
  
  { "INC  BC rollover", function(z) z:assemble("LD", "BC", 0xFFFF)  
         z:assemble("INC", "BC") end, { B=0x00, C=0x00 } },  
---]]
 
 -- 0x04
  { "INC  B", function(z) z:assemble("LD", "B", 0x11)  
-        z:assemble("INC", "B") end, { B=0x12, F={"-S", "-Z", "-H", "-V", "-N", "oldF=0x10"} } },  
+        z:assemble("INC", "B") end, { B=0x12, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
 
  { "INC  B rollover", function(z) z:assemble("LD", "B", 0xFF)  
          -- S is set if result is negative; reset otherwise
@@ -411,13 +410,13 @@ local basic_instruction_tests = {
         -- P/V is set if r was 7FH before operation; reset otherwise
         -- N is reset
         -- C is not affected
-        z:assemble("INC", "B") end, { B=0x00, F={"-S", "Z", "H", "-V", "-N", "oldF=0xFF"} } },  
+        z:assemble("INC", "B") end, { B=0x00, F={"-S", "Z", "H", "-V", "-N", "C", "oldF=0xFF"} } },  
 
  { "INC  B half carry", function(z) z:assemble("LD", "B", 0x0F)  
-        z:assemble("INC", "B") end, { B=0x10 } },  
+        z:assemble("INC", "B") end, { B=0x10, F={"-S", "-Z", "H", "-V", "-N", "C", "oldF=0x0F"} } },  
 
  { "INC  B Flags P/V Sign", function(z) z:assemble("LD", "B", 0x7F)  
-        z:assemble("INC", "B") end, { B=0x80 } },  
+        z:assemble("INC", "B") end, { B=0x80, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
 
 --[[
     ["DEC  B"] =         0x05,
