@@ -41,6 +41,8 @@ require("lua_z80")
 require("z80_ss_debug")
 require("Z80_assembler")
 
+local TIMING_ON = false
+
 local function get_state(jit, cpu)
     
     return {
@@ -106,14 +108,20 @@ end
 local function run_code(initial_memory, code)
     -- make the JIT compiler and memory
     local jit = Z80JIT:new()
+    local time_start = os.clock()
     jit:make_ROM(0,16384)
     jit:make_RAM(16384,16384)
     jit:load_memory(initial_memory, 0)
     jit:load_memory(code, 0)    -- load code at zero address
+    local time_end = os.clock()
+    if TIMING_ON then print("Loading Took", time_end - time_start) end
     
     -- now make a CPU to run the code
     local cpu = Z80CPU:new()
+    local time_start = os.clock()
     local old_state = get_state(jit, cpu)
+    local time_end = os.clock()
+    if TIMING_ON then print("Get old_state Took", time_end - time_start) end
 
     local status
     repeat
@@ -124,7 +132,10 @@ local function run_code(initial_memory, code)
         os.exit(1)
     end
     
+    local time_start = os.clock()
     local new_state = get_state(jit, cpu)
+    local time_end = os.clock()
+    if TIMING_ON then print("Get new_state Took", time_end - time_start) end
     return old_state, new_state
 end
 
@@ -157,13 +168,15 @@ local function check_changes(old_state, new_state, checks)
     for k,v in pairs(checks) do
         if type(k) == "number" then
             -- address
-            local new = (new_state.mem[k + 1]):byte()
-            local old = (old_state.mem[k + 1]):byte()
+            local new = (new_state.mem[k]):byte()
+            local old = (old_state.mem[k]):byte()
             if new ~= v then
                 print("Memory change didn't occur as expected")
                 print("Address", k, "was", old, "now", new, "expected", v)
                 os.exit(5)
             end
+            -- revert known change
+            new_state.mem[k] = old_state.mem[k]
         else
             if new_state.reg[k] ~= v then
                 print("Register change didn't occur as expected")
@@ -187,7 +200,7 @@ local function compare_state(old_state, new_state)
     end
     for index, v in pairs(old_state.mem) do
         local new = new_state.mem[index]
-        local addr = index - 1
+        local addr = index
         if v ~= new then
             print("Unexpected memory change")
             print("location: ", addr, "was", v:byte(),"now", new:byte())
@@ -206,7 +219,10 @@ local function test(code, checks)
     local old_state, new_state = run_code(initial_mem, binary)
 
     check_changes(old_state, new_state, checks)
+    local time_start = os.clock()
     compare_state(old_state, new_state)
+    local time_end = os.clock()
+    if TIMING_ON then print("Get compare_state Took", time_end - time_start) end
 end
 
 
@@ -214,7 +230,11 @@ local function run_batch(tests)
     local num_tests = #tests
     for i, one_test in pairs(tests) do
         print(string.format("Running test %i of %i - %s", i, num_tests, one_test[1]))
+        local time_start = os.clock()
         test(one_test[2], one_test[3])
+        local time_end = os.clock()
+        if TIMING_ON then print("Took", time_end - time_start) end
+        
     end
     print("Finished all tests successfully")
 end
@@ -505,4 +525,5 @@ run_batch(basic_instruction_tests)
 --run_batch(FDCB_instruction_tests)
 --run_batch(memory_invalidation_tests)
 --run_batch(more_advanced_tests)
-
+--run_batch(interrupt_test)
+--run_batch(R_reg_test)
