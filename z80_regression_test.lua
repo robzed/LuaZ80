@@ -42,6 +42,7 @@ require("z80_ss_debug")
 require("Z80_assembler")
 
 local TIMING_ON = false
+local IGNORE_BIT3_BIT5_FLAGS = true
 
 local function get_state(jit, cpu)
     
@@ -300,9 +301,15 @@ local function check_changes(old_state, new_state, checks)
             new_state.mem[k] = old_state.mem[k]
         else
             local extra = ""
-            if k == "F" and type(v) == "table" then
-                extra = itable_to_string(v)
-                v = decode_flags(v, old_state.reg[k])
+            if k == "F" then
+                if type(v) == "table" then
+                    extra = itable_to_string(v)
+                    v = decode_flags(v, old_state.reg[k])
+                end
+                if IGNORE_BIT3_BIT5_FLAGS then
+                    v = bit32.band(v, 0xFF-0x28)
+                    new_state.reg[k] = bit32.band(new_state.reg[k], 0xFF-0x28)
+                end
             end
             if new_state.reg[k] ~= v then
                 print("Register change didn't occur as expected")
