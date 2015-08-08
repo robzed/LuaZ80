@@ -452,13 +452,13 @@ local decode_first_byte = {
     -- 3A = LD A,(xxxx)
     
     -- 0B = DEC BC
-    [0x03] = "CPU.C = CPU.C - 1 if CPU.C == -1 then CPU.C = 255 CPU.B = (CPU.B - 1)%256 end",
+    [0x0B] = "CPU.C = CPU.C - 1 if CPU.C == -1 then CPU.C = 255 CPU.B = (CPU.B - 1)%256 end",
     -- 1B = DEC DE
-    [0x13] = "CPU.E = CPU.E - 1 if CPU.E == -1 then CPU.E = 255 CPU.D = (CPU.D - 1)%256 end",
+    [0x1B] = "CPU.E = CPU.E - 1 if CPU.E == -1 then CPU.E = 255 CPU.D = (CPU.D - 1)%256 end",
     -- 2B = DEC HL
-    [0x23] = "CPU.L = CPU.L - 1 if CPU.L == -1 then CPU.L = 255 CPU.H = (CPU.H - 1)%256 end",
+    [0x2B] = "CPU.L = CPU.L - 1 if CPU.L == -1 then CPU.L = 255 CPU.H = (CPU.H - 1)%256 end",
     -- 3B = DEC SP
-    [0x33] = "CPU.SP = (CPU.SP - 1)%65536",
+    [0x3B] = "CPU.SP = (CPU.SP - 1)%65536",
     
     -- nC = INC r, covered below
     -- nD = DEC r, covered below
