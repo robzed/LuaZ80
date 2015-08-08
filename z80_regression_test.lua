@@ -164,6 +164,77 @@ local function assemble_code(code_in)
     return code, end_addr
 end
 
+local function flag_mask_op(altered_mask, mask, flag_string)
+    if bit32.band(altered_mask, mask) ~= 0 then
+        print("Flag switch " .. bad_message .. " flag mentioned twice")
+        os.exit(7)
+    end
+    altered_mask = bit32.bor(altered_mask, mask)
+    return altered_mask
+end
+
+local function flag_set(flags, mask)
+    return bit32.bor(flags, mask)
+end
+
+local function flag_clear(flags, mask)
+    return bit32.band(flags, 0xFF - mask)
+end
+
+local flag_lookup_table = 
+{
+    ["S"] = 0x80, ["-S"] = 0x80,
+    ["Z"] = 0x40, ["-Z"] = 0x40,
+    ["5"] = 0x20, ["-5"] = 0x20,
+    ["H"] = 0x10, ["-H"] = 0x10,
+    ["3"] = 0x08, ["-3"] = 0x08,
+    ["P"] = 0x04, ["-P"] = 0x04,
+    ["V"] = 0x04, ["-V"] = 0x04,
+    ["N"] = 0x02, ["-N"] = 0x02,
+    ["C"] = 0x01, ["-C"] = 0x01,
+}
+
+local function decode_flags(flag_table, old_flags)
+    -- {"S", "-Z", "-H", "-P", "-N", "oldF=0x34"}
+    -- http://www.z80.info/z80sflag.htm
+    local flags = 0
+    local altered_mask = 0x00
+    local old_F = -1
+    for _, flag_switch in pairs(flag_table) do
+        local mask = flag_lookup_table[flag_switch]
+        if mask then
+            if flag_switch:sub(1,1) == "-" then
+                altered_mask = flag_mask_op(altered_mask, mask, flag_switch)
+                flags = flag_clear(flags, 0x80)
+            else
+                altered_mask = flag_mask_op(altered_mask, mask, flag_switch)
+                flags = flag_set(flags, 0x80)
+            end
+        elseif #flag_switch == 9 and flag_switch:sub(1,7) == "oldF=0x" then
+            old_F = tonumber(flag_switch:sub(8,9), 16)
+            if not old_F then
+                print("Unable to convert flag_switch", flag_switch)
+                os.exit(8)
+            end
+        else
+            print("Unexpected Flag switch", flag_switch)
+            os.exit(6)
+        end
+    end
+    
+    -- bits that are not affected get their value either from the flags
+    -- before the test is run, except when we specify old F. 
+    if old_F == -1 then
+        old_flags = bit32.band(old_flags, 0xFF-altered_mask)
+        flags = bit32.bor(flags, old_flags)
+    else
+        old_F = bit32.band(old_F, 0xFF-altered_mask)
+        flags = bit32.bor(flags, old_F)
+    end
+    
+    return flags
+end
+
 local function check_changes(old_state, new_state, checks)
     for k,v in pairs(checks) do
         if type(k) == "number" then
@@ -178,9 +249,14 @@ local function check_changes(old_state, new_state, checks)
             -- revert known change
             new_state.mem[k] = old_state.mem[k]
         else
+            local extra = ""
+            if k == "F" and type(v) == "table" then
+                extra = v
+                v = decode_flags(v, old_state.reg[k])
+            end
             if new_state.reg[k] ~= v then
                 print("Register change didn't occur as expected")
-                print("Register", k, "was", old_state.reg[k], "now", new_state.reg[k], "expected", v)
+                print(string.format("Register %s was 0x%x now 0x%x expected 0x%x %s", k, old_state.reg[k], new_state.reg[k], v, extra))
                 os.exit(4)
             end
             -- change it back so we can ignore it
@@ -247,6 +323,7 @@ end
 
 local basic_instruction_tests = {
     
+--[[
 { "NOP",     function(z) z:NOP()   end, { } },
 { "LD BC,n", function(z) z:assemble("LD", "BC", 0x4321) end, { B=0x43, C=0x21 } },
     
@@ -257,11 +334,28 @@ local basic_instruction_tests = {
                 end, 
                 { B=0x80, C=0x00, A=0x01, [0x8001]=0x01 } },
 
+-- 0x03
 { "INC  BC", function(z) z:assemble("LD", "BC", 0x43FF)  
         z:assemble("INC", "BC") end, { B=0x44, C=0x00 } },  
  
+ { "INC  BC rollover", function(z) z:assemble("LD", "BC", 0xFFFF)  
+        z:assemble("INC", "BC") end, { B=0x00, C=0x00 } },  
+--]]
+
+-- 0x04
+ { "INC  B", function(z) z:assemble("LD", "B", 0x11)  
+        z:assemble("INC", "B") end, { B=0x12, F={"-S", "-Z", "-H", "-V", "-N", "oldF=0x10"} } },  
+
+ { "INC  B rollover", function(z) z:assemble("LD", "B", 0xFF)  
+        z:assemble("INC", "B") end, { B=0x00, F={"-S", "Z", "H", "V", "-N", "oldF=0xFF"} } },  
+
+ { "INC  B half carry", function(z) z:assemble("LD", "B", 0x0F)  
+        z:assemble("INC", "B") end, { B=0x10 } },  
+
+ { "INC  B Flags P/V Sign", function(z) z:assemble("LD", "B", 0x7F)  
+        z:assemble("INC", "B") end, { B=0x80 } },  
+
 --[[
-    ["INC  B"] =         0x04,
     ["DEC  B"] =         0x05,
     ["LD   B,!n!"] =     0x06,
     ["RLCA"] =           0x07,
