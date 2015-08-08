@@ -262,7 +262,7 @@ local function flags_to_str(f)
     else
         s = s .. " "
     end
-    if bit32.btest(f, 0x30) then
+    if bit32.btest(f, 0x08) then
         s = s .. "3"
     else
         s = s .. " "
