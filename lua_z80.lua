@@ -74,8 +74,8 @@
 --        are costly)? Maybe even just stop lump compilation if JP/JR is 
 --        backwards and the lump doesnt have a label right after.
 --        Also can we post-identify data as not self-modifying code?
--- @todo  What if the whole memory is NOPs? Does the interpreter hang?
---
+-- @todo: What if the whole memory is NOPs? Does the interpreter hang?
+-- @todo: Fix flag bits 5 and 3
 ------------------------------------------------------------------------------------
 -- NOTES: code_write_check and write_allowed go hand in hand. If an instruction doesn't
 -- do a write_allowed  first, then code_write_check won't help
@@ -132,7 +132,7 @@ function Z80CPU:initialize()
     self.D = 0
     self.E = 0
     -- Flags 
-    self.Carry = 0    -- duplicate/master copy of carry flag in F register. Not a boolean, but 0 or 1.
+    self.Carry = self._F % 2    -- duplicate/master copy of carry flag in F register. Not a boolean, but 0 or 1.
     
     -- cycle counting not implemented yet. However, don't add a number on every 
     -- instruction, instead accumulate them up during compile and add them on

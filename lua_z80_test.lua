@@ -50,6 +50,9 @@ function lua_memory_invalidate_test()
     local z = Z80_Assembler:new()
     z:set_compile_address(0)
     
+    z:LD("B", 0xFF) 
+    z:assemble("INC", "B")
+
     -- will be address of LD A immediate operand
     local hl_address = z:get_compile_address() + 1
     z:LD_HL(0)
