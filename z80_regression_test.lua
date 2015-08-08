@@ -205,10 +205,10 @@ local function decode_flags(flag_table, old_flags)
         if mask then
             if flag_switch:sub(1,1) == "-" then
                 altered_mask = flag_mask_op(altered_mask, mask, flag_switch)
-                flags = flag_clear(flags, 0x80)
+                flags = flag_clear(flags, mask)
             else
                 altered_mask = flag_mask_op(altered_mask, mask, flag_switch)
-                flags = flag_set(flags, 0x80)
+                flags = flag_set(flags, mask)
             end
         elseif #flag_switch == 9 and flag_switch:sub(1,7) == "oldF=0x" then
             old_F = tonumber(flag_switch:sub(8,9), 16)
@@ -235,6 +235,56 @@ local function decode_flags(flag_table, old_flags)
     return flags
 end
 
+local function itable_to_string(t)
+    return "{ " .. table.concat(t, " ") .. " }"
+end
+
+local function flags_to_str(f)
+    -- "SZ5H3VNC"
+    local s = ""
+    if bit32.btest(f, 0x80) then
+        s = s .. "S"
+    else
+        s = s .. " "
+    end
+    if bit32.btest(f, 0x40) then
+        s = s .. "Z"
+    else
+        s = s .. " "
+    end
+    if bit32.btest(f, 0x20) then
+        s = s .. "5"
+    else
+        s = s .. " "
+    end    
+    if bit32.btest(f, 0x10) then
+        s = s .. "H"
+    else
+        s = s .. " "
+    end
+    if bit32.btest(f, 0x30) then
+        s = s .. "3"
+    else
+        s = s .. " "
+    end
+    if bit32.btest(f, 0x04) then
+        s = s .. "V"
+    else
+        s = s .. " "
+    end
+    if bit32.btest(f, 0x02) then
+        s = s .. "N"
+    else
+        s = s .. " "
+    end
+    if bit32.btest(f, 0x01) then
+        s = s .. "C"
+    else
+        s = s .. " "
+    end
+    return s
+end
+
 local function check_changes(old_state, new_state, checks)
     for k,v in pairs(checks) do
         if type(k) == "number" then
@@ -251,12 +301,13 @@ local function check_changes(old_state, new_state, checks)
         else
             local extra = ""
             if k == "F" and type(v) == "table" then
-                extra = v
+                extra = itable_to_string(v)
                 v = decode_flags(v, old_state.reg[k])
             end
             if new_state.reg[k] ~= v then
                 print("Register change didn't occur as expected")
                 print(string.format("Register %s was 0x%x now 0x%x expected 0x%x %s", k, old_state.reg[k], new_state.reg[k], v, extra))
+                print(string.format("was %s now %s expected %s", flags_to_str(old_state.reg[k]), flags_to_str(new_state.reg[k]), flags_to_str(v)))
                 os.exit(4)
             end
             -- change it back so we can ignore it
