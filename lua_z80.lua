@@ -335,7 +335,7 @@ local decode_first_byte = {
 
     -- 08 = EX AF, AF'
     -- ensure the flags are updated first!
-    [0x08] = [[ CPU.get_F()
+    [0x08] = [[ CPU:get_F()
         result=CPU.A CPU.A=CPU.A_ CPU.A_=result
         result=CPU._F CPU._F=CPU.F_ CPU.F_=result ]],
     -- 10 = DJNZ xx
