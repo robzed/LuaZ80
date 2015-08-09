@@ -454,8 +454,35 @@ local basic_instruction_tests = {
     ["DJNZ !r!"] =       0x10,
     ["LD   DE,!nn!"] =   0x11,
     ["LD   (DE),A"] =    0x12,
-    ["INC  DE"] =        0x13,
-    ["INC  D"] =         0x14,
+--]]
+
+-- 0x13
+{ "INC  DE", function(z) z:assemble("LD", "DE", 0x43FF)  
+        z:assemble("INC", "DE") end, { D=0x44, E=0x00 } },  
+ 
+ { "INC  DE rollover", function(z) z:assemble("LD", "DE", 0xFFFF)  
+        z:assemble("INC", "DE") end, { D=0x00, E=0x00 } },  
+
+-- 0x14
+ { "INC  D", function(z) z:assemble("LD", "D", 0x11)  
+        z:assemble("INC", "D") end, { D=0x12, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+
+ { "INC  D rollover", function(z) z:assemble("LD", "D", 0xFF)  
+         -- S is set if result is negative; reset otherwise
+        -- Z is set if result is zero; reset otherwise
+        -- H is set if carry from bit 3; reset otherwise
+        -- P/V is set if r was 7FH before operation; reset otherwise
+        -- N is reset
+        -- C is not affected
+        z:assemble("INC", "D") end, { D=0x00, F={"-S", "Z", "H", "-V", "-N", "C", "oldF=0xFF"} } },  
+
+ { "INC  D half carry", function(z) z:assemble("LD", "D", 0x0F)  
+        z:assemble("INC", "D") end, { D=0x10, F={"-S", "-Z", "H", "-V", "-N", "C", "oldF=0x0F"} } },  
+
+ { "INC  D Flags P/V Sign", function(z) z:assemble("LD", "D", 0x7F)  
+        z:assemble("INC", "D") end, { D=0x80, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
+
+--[[
     ["DEC  D"] =         0x15,
     ["LD   D,!n!"] =     0x16,
     ["RLA"] =            0x17,
@@ -491,8 +518,14 @@ local basic_instruction_tests = {
     ["JR   NZ,!r!"] =    0x20,
     ["LD   HL,!nn!"] =   0x21,
     ["LD   (!nn!),HL"] = 0x22,
-    ["INC  HL"] =        0x23,
 --]]
+
+-- 0x23
+{ "INC  HL", function(z) z:assemble("LD", "HL", 0x43FF)  
+        z:assemble("INC", "HL") end, { H=0x44, L=0x00 } },  
+ 
+ { "INC  HL rollover", function(z) z:assemble("LD", "HL", 0xFFFF)  
+        z:assemble("INC", "HL") end, { H=0x00, L=0x00 } },  
 
 -- 0x24
  { "INC  H", function(z) z:assemble("LD", "H", 0x11)  
@@ -549,7 +582,16 @@ local basic_instruction_tests = {
     ["JR   NC,!r!"] =    0x30,
     ["LD   SP,!nn!"] =   0x31,
     ["LD   (!nn!),A"] =  0x32,
-    ["INC  SP"] =        0x33,
+--]]
+
+-- 0x33
+{ "INC  SP", function(z) z:assemble("LD", "SP", 0x43FF)  
+        z:assemble("INC", "SP") end, { SP=0x4400 } },  
+ 
+ { "INC  SP rollover", function(z) z:assemble("LD", "SP", 0xFFFF)  
+        z:assemble("INC", "SP") end, { SP=0x0000 } },  
+
+--[[
     ["INC  (HL)"] =      0x34,
     ["DEC  (HL)"] =      0x35,
     ["LD   (HL),!n!"] =  0x36,
