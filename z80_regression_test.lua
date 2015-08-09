@@ -452,7 +452,12 @@ local basic_instruction_tests = {
     ["LD   C,!n!"] =     0x0e,
     ["RRCA"] =           0x0f,
     ["DJNZ !r!"] =       0x10,
-    ["LD   DE,!nn!"] =   0x11,
+--]]
+
+-- 0x11
+{ "LD DE,n", function(z) z:assemble("LD", "DE", 0x4321) end, { D=0x43, E=0x21 } },
+
+--[[
     ["LD   (DE),A"] =    0x12,
 --]]
 
@@ -516,7 +521,12 @@ local basic_instruction_tests = {
     ["LD   E,!n!"] =     0x1E,
     ["RRA"] =            0x1F,
     ["JR   NZ,!r!"] =    0x20,
-    ["LD   HL,!nn!"] =   0x21,
+--]]
+
+-- 0x21
+{ "LD HL,n", function(z) z:assemble("LD", "HL", 0x4321) end, { H=0x43, L=0x21 } },
+
+--[[
     ["LD   (!nn!),HL"] = 0x22,
 --]]
 
@@ -580,7 +590,12 @@ local basic_instruction_tests = {
     ["LD   L,!n!"] =     0x2E,
     ["CPL"] =            0x2F,
     ["JR   NC,!r!"] =    0x30,
-    ["LD   SP,!nn!"] =   0x31,
+--]]
+
+-- 0x31
+{ "LD SP,n", function(z) z:assemble("LD", "SP", 0x4321) end, { SP=0x4321 } },
+
+--[[
     ["LD   (!nn!),A"] =  0x32,
 --]]
 
