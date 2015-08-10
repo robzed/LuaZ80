@@ -731,7 +731,12 @@ local basic_instruction_tests = {
     ["LD   A,H"] =       0x7C,
     ["LD   A,L"] =       0x7D,
     ["LD   A,(HL)"] =    0x7E,
-    ["LD   A,A"] =       0x7F,
+    --]]
+    
+    --0x7F,
+    { "LD A,A", function(z) z:LD("A", 0x7f) z:LD("A", "A")  end, { ["A"]=0x7f } },
+
+--[[
     ["ADD  A,B"] =       0x80,
     ["ADD  A,C"] =       0x81,
     ["ADD  A,D"] =       0x82,
