@@ -314,7 +314,9 @@ local function check_changes(old_state, new_state, checks)
             if new_state.reg[k] ~= v then
                 print("Register change didn't occur as expected")
                 print(string.format("Register %s was 0x%x now 0x%x expected 0x%x %s", k, old_state.reg[k], new_state.reg[k], v, extra))
-                print(string.format("was %s now %s expected %s", flags_to_str(old_state.reg[k]), flags_to_str(new_state.reg[k]), flags_to_str(v)))
+                if k == "F" then
+                    print(string.format("was %s now %s expected %s", flags_to_str(old_state.reg[k]), flags_to_str(new_state.reg[k]), flags_to_str(v)))
+                end
                 os.exit(4)
             end
             -- change it back so we can ignore it
