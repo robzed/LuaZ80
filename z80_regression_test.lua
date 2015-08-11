@@ -735,6 +735,13 @@ local basic_instruction_tests = {
     ["LD   A,(HL)"] =    0x7E,
     --]]
     
+    --0x7E,
+    { "LD A,(HL)", function(z) 
+            z:assemble("LD", "HL", 0x8001) 
+            z:assemble("LD", "D", 0x7E)
+            z:assemble("LD", "(HL)", "D") 
+            z:LD("A", "(HL)")  
+            end, { ["A"]=0x7E, H=0x80, L=0x01, D=0x7E } },
     --0x7F,
     { "LD A,A", function(z) z:LD("A", 0x7f) z:LD("A", "A")  end, { ["A"]=0x7f } },
 
