@@ -1188,19 +1188,19 @@ function Z80JIT:fetch_memory_table(address, length)
     length = length or self._total_memory_length
     
     local output = {}
-    for a = address, address+length do
+    for a = address, address+length-1 do
         local ci = self._memory[a]
         if not ci then
             ci = 0
         end
-        table.insert(output, string.char(ci))
+        output[a] = string.char(ci)
     end
     return output
 end
 
 function Z80JIT:fetch_memory_string(address, length)
     local output = self:fetch_memory_table(address, length)
-    return table.concat(output)
+    return table.concat(output, address, address+length-1)
 end
 
 function Z80JIT:exists(address)
