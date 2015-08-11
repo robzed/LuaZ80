@@ -387,12 +387,24 @@ local basic_instruction_tests = {
 { "NOP",     function(z) z:NOP()   end, { } },
 { "LD BC,n", function(z) z:assemble("LD", "BC", 0x4321) end, { B=0x43, C=0x21 } },
     
-{ "LD   (BC),A", function(z)
+{ "LD   (BC),A (beyond memory)", function(z)
                     z:assemble("LD", "BC", 0x8000) 
                     z:assemble("LD", "A", 0x01)
                     z:assemble("LD", "(BC)", "A") 
                 end, 
-                { B=0x80, C=0x00, A=0x01, [0x8001]=0x01 } },
+                { B=0x80, C=0x00, A=0x01 } },
+{ "LD   (BC),A", function(z)
+                    z:assemble("LD", "BC", 0x7001) 
+                    z:assemble("LD", "A", 0x01)
+                    z:assemble("LD", "(BC)", "A") 
+                end, 
+                { B=0x70, C=0x01, A=0x01, [0x7001]=0x01 } },
+{ "LD   (BC),A (write ROM)", function(z)
+                    z:assemble("LD", "BC", 0x3F00) 
+                    z:assemble("LD", "A", 0x01)
+                    z:assemble("LD", "(BC)", "A") 
+                end, 
+                { B=0x3F, C=0x00, A=0x01 } },
 
 -- 0x03
 { "INC  BC", function(z) z:assemble("LD", "BC", 0x43FF)  
