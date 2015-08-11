@@ -736,24 +736,38 @@ local basic_instruction_tests = {
     ["LD   (HL),E"] =    0x73,
     ["LD   (HL),H"] =    0x74,
     ["LD   (HL),L"] =    0x75,
-    ["HALT"] =           0x76,
-    ["LD   (HL),A"] =    0x77,
-    ["LD   A,B"] =       0x78,
-    ["LD   A,C"] =       0x79,
-    ["LD   A,D"] =       0x7A,
-    ["LD   A,E"] =       0x7B,
-    ["LD   A,H"] =       0x7C,
-    ["LD   A,L"] =       0x7D,
-    ["LD   A,(HL)"] =    0x7E,
     --]]
+--}
+--temp_test = {
+    -- 0x76
+    { "HALT", function(z) end, { PC=1 } },
+    -- 0x77
+    { "LD   (HL),A", function(z)
+        z:assemble("LD", "HL", 0x6677) 
+        z:assemble("LD", "A", 0x22)
+        z:assemble("LD", "(HL)", "A") 
+        end, 
+        { H=0x66, L=0x77, A=0x22, [0x6677]=0x22 } },
     
+    --0x78,
+    { "LD A,B", function(z) z:LD("B", 0x7f) z:LD("A", "B") end, { ["B"]=0x7f, ["A"]=0x7f } },
+    --0x79,
+    { "LD A,C", function(z) z:LD("C", 0x7f) z:LD("A", "C") end, { ["C"]=0x7f, ["A"]=0x7f } },
+    --0x7A,
+    { "LD A,D", function(z) z:LD("D", 0x7f) z:LD("A", "D") end, { ["D"]=0x7f, ["A"]=0x7f } },
+    --0x7B,
+    { "LD A,E", function(z) z:LD("E", 0x7f) z:LD("A", "E") end, { ["E"]=0x7f, ["A"]=0x7f } },
+    --0x7C,
+    { "LD A,H", function(z) z:LD("H", 0x7f) z:LD("A", "H") end, { ["H"]=0x7f, ["A"]=0x7f } },
+    --0x7D,
+    { "LD A,L", function(z) z:LD("L", 0x7f) z:LD("A", "L") end, { ["L"]=0x7f, ["A"]=0x7f } },
     --0x7E,
     { "LD A,(HL)", function(z) 
-            z:assemble("LD", "HL", 0x8001) 
+            z:assemble("LD", "HL", 0x7001) 
             z:assemble("LD", "D", 0x7E)
             z:assemble("LD", "(HL)", "D") 
             z:LD("A", "(HL)")  
-            end, { ["A"]=0x7E, H=0x80, L=0x01, D=0x7E } },
+            end, { ["A"]=0x7E, H=0x70, L=0x01, D=0x7E, [0x7001]=0x7E } },
     --0x7F,
     { "LD A,A", function(z) z:LD("A", 0x7f) z:LD("A", "A")  end, { ["A"]=0x7f } },
 
@@ -887,6 +901,7 @@ local basic_instruction_tests = {
 }
 
 run_batch(basic_instruction_tests)
+--run_batch(temp_test)
 --run_batch(CB_instruction_tests)
 --run_batch(ED_instruction_tests)
 --run_batch(DD_instruction_tests)
