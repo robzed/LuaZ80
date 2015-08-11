@@ -1152,7 +1152,7 @@ end
 
 function Z80JIT:select_writable(address, length, is_writable)
     if type(is_writable) == "boolean" then
-        for ptr = address,address+length do
+        for ptr = address,address+length-1 do
             self.write_allowed[ptr] = is_writable
         end
     end
