@@ -730,15 +730,49 @@ local basic_instruction_tests = {
     ["LD   L,L"] =       0x6D,
     ["LD   L,(HL)"] =    0x6E,
     ["LD   L,A"] =       0x6F,
-    ["LD   (HL),B"] =    0x70,
-    ["LD   (HL),C"] =    0x71,
-    ["LD   (HL),D"] =    0x72,
-    ["LD   (HL),E"] =    0x73,
-    ["LD   (HL),H"] =    0x74,
-    ["LD   (HL),L"] =    0x75,
     --]]
---}
---temp_test = {
+    
+    -- 0x70
+    { "LD   (HL),B", function(z)
+        z:assemble("LD", "HL", 0x6677) 
+        z:assemble("LD", "B", 0x22)
+        z:assemble("LD", "(HL)", "B") 
+        end, 
+        { H=0x66, L=0x77, B=0x22, [0x6677]=0x22 } },
+    -- 0x71
+    { "LD   (HL),C", function(z)
+        z:assemble("LD", "HL", 0x6677) 
+        z:assemble("LD", "C", 0x22)
+        z:assemble("LD", "(HL)", "C") 
+        end, 
+        { H=0x66, L=0x77, C=0x22, [0x6677]=0x22 } },
+    -- 0x72
+    { "LD   (HL),D", function(z)
+        z:assemble("LD", "HL", 0x6677) 
+        z:assemble("LD", "D", 0x22)
+        z:assemble("LD", "(HL)", "D") 
+        end, 
+        { H=0x66, L=0x77, D=0x22, [0x6677]=0x22 } },
+    -- 0x73
+    { "LD   (HL),E", function(z)
+        z:assemble("LD", "HL", 0x6677) 
+        z:assemble("LD", "E", 0x22)
+        z:assemble("LD", "(HL)", "E") 
+        end, 
+        { H=0x66, L=0x77, E=0x22, [0x6677]=0x22 } },
+    -- 0x74
+    { "LD   (HL),H", function(z)
+        z:assemble("LD", "HL", 0x6677) 
+        z:assemble("LD", "(HL)", "H") 
+        end, 
+        { H=0x66, L=0x77, [0x6677]=0x66 } },
+    -- 0x75
+    { "LD   (HL),L", function(z)
+        z:assemble("LD", "HL", 0x6677) 
+        z:assemble("LD", "(HL)", "L") 
+        end, 
+        { H=0x66, L=0x77, [0x6677]=0x77 } },
+
     -- 0x76
     { "HALT", function(z) end, { PC=1 } },
     -- 0x77
