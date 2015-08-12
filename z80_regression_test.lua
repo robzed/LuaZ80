@@ -680,58 +680,163 @@ local basic_instruction_tests = {
 --]]
 
 { "LD A,33", function(z) z:LD("A", 33)   end, { ["A"]=33 } },
+
 --[[
-    ["CCF"] =            0x3F,
-    ["LD   B,B"] =       0x40,
-    ["LD   B,C"] =       0x41,
-    ["LD   B,D"] =       0x42,
-    ["LD   B,E"] =       0x43,
-    ["LD   B,H"] =       0x44,
-    ["LD   B,L"] =       0x45,
-    ["LD   B,(HL)"] =    0x46,
-    ["LD   B,A"] =       0x47,
-    ["LD   C,B"] =       0x48,
-    ["LD   C,C"] =       0x49,
-    ["LD   C,D"] =       0x4A,
-    ["LD   C,E"] =       0x4B,
-    ["LD   C,H"] =       0x4C,
-    ["LD   C,L"] =       0x4D,
-    ["LD   C,(HL)"] =    0x4E,
-    ["LD   C,A"] =       0x4F,
-    ["LD   D,B"] =       0x50,
-    ["LD   D,C"] =       0x51,
-    ["LD   D,D"] =       0x52,
-    ["LD   D,E"] =       0x53,
-    ["LD   D,H"] =       0x54,
-    ["LD   D,L"] =       0x55,
-    ["LD   D,(HL)"] =    0x56,
-    ["LD   D,A"] =       0x57,
-    ["LD   E,B"] =       0x58,
-    ["LD   E,C"] =       0x59,
-    ["LD   E,D"] =       0x5A,
-    ["LD   E,E"] =       0x5B,
-    ["LD   E,H"] =       0x5C,
-    ["LD   E,L"] =       0x5D,
-    ["LD   E,(HL)"] =    0x5E,
-    ["LD   E,A"] =       0x5F,
-    ["LD   H,B"] =       0x60,
-    ["LD   H,C"] =       0x61,
-    ["LD   H,D"] =       0x62,
-    ["LD   H,E"] =       0x63,
-    ["LD   H,H"] =       0x64,
-    ["LD   H,L"] =       0x65,
-    ["LD   H,(HL)"] =    0x66,
-    ["LD   H,A"] =       0x67,
-    ["LD   L,B"] =       0x68,
-    ["LD   L,C"] =       0x69,
-    ["LD   L,D"] =       0x6A,
-    ["LD   L,E"] =       0x6B,
-    ["LD   L,H"] =       0x6C,
-    ["LD   L,L"] =       0x6D,
-    ["LD   L,(HL)"] =    0x6E,
-    ["LD   L,A"] =       0x6F,
-    --]]
+-- 0x3F
+-- F flags: negative cleared, half carry is the same as old carry, carry completemented
+{ "CCF", function(z) z:assemble("CCF") end, { F={"-N", "-C", "H" } } },
+{ "CCF F=00", function(z) z:assemble("LD", "DE", "0x0000") 
+        z:assemble("PUSH","DE") 
+        z:assemble("POP", "AF")
+        z:assemble("CCF") 
+        end, { F={"-N", "-C", "H" } } },
+{ "CCF F=FF", function(z) z:assemble("LD", "DE", "0xFFFF") 
+        z:assemble("PUSH","DE") 
+        z:assemble("POP", "AF")
+        z:assemble("CCF") 
+        end, { F={"-N", "-C", "H" } } },
+--]]
+
+--}
+--local temp_test = {
+
+    --0x40,
+    { "LD B,B", function(z) z:LD("B", 0x7f) z:LD("B", "B") end, { ["B"]=0x7f } },
+    --0x41,
+    { "LD B,C", function(z) z:LD("C", 0x7f) z:LD("B", "C") end, { ["C"]=0x7f, ["B"]=0x7f } },
+    --0x42,
+    { "LD B,D", function(z) z:LD("D", 0x7f) z:LD("B", "D") end, { ["D"]=0x7f, ["B"]=0x7f } },
+    --0x43,
+    { "LD B,E", function(z) z:LD("E", 0x7f) z:LD("B", "E") end, { ["E"]=0x7f, ["B"]=0x7f } },
+    --0x44,
+    { "LD B,H", function(z) z:LD("H", 0x7f) z:LD("B", "H") end, { ["H"]=0x7f, ["B"]=0x7f } },
+    --0x45,
+    { "LD B,L", function(z) z:LD("L", 0x7f) z:LD("B", "L") end, { ["L"]=0x7f, ["B"]=0x7f } },
+    --0x46,
+    { "LD B,(HL)", function(z) 
+            z:assemble("LD", "HL", 0x7001) 
+            z:assemble("LD", "D", 0x7E)
+            z:assemble("LD", "(HL)", "D") 
+            z:LD("B", "(HL)")  
+            end, { ["B"]=0x7E, H=0x70, L=0x01, D=0x7E, [0x7001]=0x7E } },
+    --0x47,
+    { "LD B,A", function(z) z:LD("A", 0x7f) z:LD("B", "A")  end, { ["B"]=0x7f, ["A"]=0x7f } },
     
+
+    --0x48,
+    { "LD C,B", function(z) z:LD("B", 0x7f) z:LD("C", "B") end, { ["B"]=0x7f, ["C"]=0x7f } },
+    --0x49,
+    { "LD C,C", function(z) z:LD("C", 0x7f) z:LD("C", "C") end, { ["C"]=0x7f } },
+    --0x4A,
+    { "LD C,D", function(z) z:LD("D", 0x7f) z:LD("C", "D") end, { ["D"]=0x7f, ["C"]=0x7f } },
+    --0x4B,
+    { "LD C,E", function(z) z:LD("E", 0x7f) z:LD("C", "E") end, { ["E"]=0x7f, ["C"]=0x7f } },
+    --0x4C,
+    { "LD C,H", function(z) z:LD("H", 0x7f) z:LD("C", "H") end, { ["H"]=0x7f, ["C"]=0x7f } },
+    --0x4D,
+    { "LD C,L", function(z) z:LD("L", 0x7f) z:LD("C", "L") end, { ["L"]=0x7f, ["C"]=0x7f } },
+    --0x4E,
+    { "LD C,(HL)", function(z) 
+            z:assemble("LD", "HL", 0x7001) 
+            z:assemble("LD", "D", 0x7E)
+            z:assemble("LD", "(HL)", "D") 
+            z:LD("C", "(HL)")  
+            end, { ["C"]=0x7E, H=0x70, L=0x01, D=0x7E, [0x7001]=0x7E } },
+    --0x4F,
+    { "LD C,A", function(z) z:LD("A", 0x7f) z:LD("C", "A")  end, { ["A"]=0x7f, C=0x7f } },
+    
+    
+    --0x50,
+    { "LD D,B", function(z) z:LD("B", 0x7f) z:LD("D", "B") end, { ["B"]=0x7f, ["D"]=0x7f } },
+    --0x51,
+    { "LD D,C", function(z) z:LD("C", 0x7f) z:LD("D", "C") end, { ["C"]=0x7f, ["D"]=0x7f } },
+    --0x52,
+    { "LD D,D", function(z) z:LD("D", 0x7f) z:LD("D", "D") end, { ["D"]=0x7f } },
+    --0x53,
+    { "LD D,E", function(z) z:LD("E", 0x7f) z:LD("D", "E") end, { ["E"]=0x7f, ["D"]=0x7f } },
+    --0x54,
+    { "LD D,H", function(z) z:LD("H", 0x7f) z:LD("D", "H") end, { ["H"]=0x7f, ["D"]=0x7f } },
+    --0x55,
+    { "LD D,L", function(z) z:LD("L", 0x7f) z:LD("D", "L") end, { ["L"]=0x7f, ["D"]=0x7f } },
+    --0x56,
+    { "LD D,(HL)", function(z) 
+            z:assemble("LD", "HL", 0x7001) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(HL)", "A") 
+            z:LD("D", "(HL)")  
+            end, { ["D"]=0x7E, H=0x70, L=0x01, A=0x7E, [0x7001]=0x7E } },
+    --0x57,
+    { "LD D,A", function(z) z:LD("A", 0x7f) z:LD("D", "A")  end, { ["D"]=0x7f, A=0x7f } },
+    
+    
+    --0x58,
+    { "LD E,B", function(z) z:LD("B", 0x7f) z:LD("E", "B") end, { ["B"]=0x7f, ["E"]=0x7f } },
+    --0x59,
+    { "LD E,C", function(z) z:LD("C", 0x7f) z:LD("E", "C") end, { ["C"]=0x7f, ["E"]=0x7f } },
+    --0x5A,
+    { "LD E,D", function(z) z:LD("D", 0x7f) z:LD("E", "D") end, { ["D"]=0x7f, ["E"]=0x7f } },
+    --0x5B,
+    { "LD E,E", function(z) z:LD("E", 0x7f) z:LD("E", "E") end, { ["E"]=0x7f } },
+    --0x5C,
+    { "LD E,H", function(z) z:LD("H", 0x7f) z:LD("E", "H") end, { ["H"]=0x7f, ["E"]=0x7f } },
+    --0x5D,
+    { "LD E,L", function(z) z:LD("L", 0x7f) z:LD("E", "L") end, { ["L"]=0x7f, ["E"]=0x7f } },
+    --0x5E,
+    { "LD E,(HL)", function(z) 
+            z:assemble("LD", "HL", 0x7001) 
+            z:assemble("LD", "D", 0x7E)
+            z:assemble("LD", "(HL)", "D") 
+            z:LD("E", "(HL)")  
+            end, { ["E"]=0x7E, H=0x70, L=0x01, D=0x7E, [0x7001]=0x7E } },
+    --0x5F,
+    { "LD E,A", function(z) z:LD("A", 0x7f) z:LD("E", "A")  end, { ["A"]=0x7f, E=0x7f } },
+    
+    
+    --0x60,
+    { "LD H,B", function(z) z:LD("B", 0x7f) z:LD("H", "B") end, { ["B"]=0x7f, ["H"]=0x7f } },
+    --0x61,
+    { "LD H,C", function(z) z:LD("C", 0x7f) z:LD("H", "C") end, { ["C"]=0x7f, ["H"]=0x7f } },
+    --0x62,
+    { "LD H,D", function(z) z:LD("D", 0x7f) z:LD("H", "D") end, { ["D"]=0x7f, ["H"]=0x7f } },
+    --0x63,
+    { "LD H,E", function(z) z:LD("E", 0x7f) z:LD("H", "E") end, { ["E"]=0x7f, ["H"]=0x7f } },
+    --0x64,
+    { "LD H,H", function(z) z:LD("H", 0x7f) z:LD("H", "H") end, { ["H"]=0x7f } },
+    --0x65,
+    { "LD H,L", function(z) z:LD("L", 0x7f) z:LD("H", "L") end, { ["L"]=0x7f, ["H"]=0x7f } },
+    --0x66,
+    { "LD H,(HL)", function(z) 
+            z:assemble("LD", "HL", 0x7001) 
+            z:assemble("LD", "D", 0x7E)
+            z:assemble("LD", "(HL)", "D") 
+            z:LD("H", "(HL)")  
+            end, { ["H"]=0x7E, L=0x01, D=0x7E, [0x7001]=0x7E } },
+    --0x67,
+    { "LD H,A", function(z) z:LD("A", 0x7f) z:LD("H", "A")  end, { ["A"]=0x7f, H=0x7f } },
+    
+    
+    --0x68,
+    { "LD L,B", function(z) z:LD("B", 0x7f) z:LD("L", "B") end, { ["B"]=0x7f, ["L"]=0x7f } },
+    --0x69,
+    { "LD L,C", function(z) z:LD("C", 0x7f) z:LD("L", "C") end, { ["C"]=0x7f, ["L"]=0x7f } },
+    --0x6A,
+    { "LD L,D", function(z) z:LD("D", 0x7f) z:LD("L", "D") end, { ["D"]=0x7f, ["L"]=0x7f } },
+    --0x6B,
+    { "LD L,E", function(z) z:LD("E", 0x7f) z:LD("L", "E") end, { ["E"]=0x7f, ["L"]=0x7f } },
+    --0x6C,
+    { "LD L,H", function(z) z:LD("H", 0x7f) z:LD("L", "H") end, { ["H"]=0x7f, ["L"]=0x7f } },
+    --0x6D,
+    { "LD L,L", function(z) z:LD("L", 0x7f) z:LD("L", "L") end, { ["L"]=0x7f } },
+    --0x6E,
+    { "LD L,(HL)", function(z) 
+            z:assemble("LD", "HL", 0x7001) 
+            z:assemble("LD", "D", 0x7E)
+            z:assemble("LD", "(HL)", "D") 
+            z:LD("L", "(HL)")  
+            end, { ["L"]=0x7E, H=0x70, D=0x7E, [0x7001]=0x7E } },
+    --0x6F,
+    { "LD L,A", function(z) z:LD("A", 0x7f) z:LD("L", "A")  end, { ["A"]=0x7f, L=0x7F } },
+
     -- 0x70
     { "LD   (HL),B", function(z)
         z:assemble("LD", "HL", 0x6677) 
