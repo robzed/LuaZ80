@@ -1042,6 +1042,17 @@ local basic_instruction_tests = {
             z:assemble("LD", "SP", 0x6000)
             z:assemble("PUSH", "DE")
             end, { D=0x43, E=0x21, SP=0x5FFE, [0x5FFE]=0x21, [0x5FFF]=0x43 } },
+    { "PUSH DE wrap0", function(z) 
+            z:assemble("LD", "DE", 0x4321)
+            z:assemble("LD", "SP", 0x0000)
+            z:assemble("PUSH", "DE")
+            end, { D=0x43, E=0x21, SP=0xFFFE, [0xFFFE]=0x21, [0xFFFF]=0x43 } },
+    { "PUSH DE wrap1", function(z) 
+            z:assemble("NOP")       -- this will get overwritten
+            z:assemble("LD", "DE", 0x4321)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("PUSH", "DE")
+            end, { D=0x43, E=0x21, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
 
     --[[
     ["SUB  A,!n!"] =     0xD6,
@@ -1065,6 +1076,17 @@ local basic_instruction_tests = {
             z:assemble("LD", "SP", 0x6000)
             z:assemble("PUSH", "HL")
             end, { H=0x43, L=0x21, SP=0x5FFE, [0x5FFE]=0x21, [0x5FFF]=0x43 } },
+    { "PUSH HL wrap0", function(z) 
+            z:assemble("LD", "HL", 0x4321)
+            z:assemble("LD", "SP", 0x0000)
+            z:assemble("PUSH", "HL")
+            end, { H=0x43, L=0x21, SP=0xFFFE, [0xFFFE]=0x21, [0xFFFF]=0x43 } },
+    { "PUSH HL wrap1", function(z) 
+            z:assemble("NOP")       -- this will get overwritten
+            z:assemble("LD", "HL", 0x4321)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("PUSH", "HL")
+            end, { H=0x43, L=0x21, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
 
     --[[
     ["AND  !n!"] =       0xE6,
@@ -1089,6 +1111,17 @@ local basic_instruction_tests = {
             z:assemble("LD", "SP", 0x6000)
             z:assemble("PUSH", "AF")
             end, { A=0x43, F=0xFF, SP=0x5FFE, [0x5FFE]=0xFF, [0x5FFF]=0x43 } },
+    { "PUSH AF wrap0", function(z) 
+            z:assemble("LD", "A", 0x43)
+            z:assemble("LD", "SP", 0x0000)
+            z:assemble("PUSH", "AF")
+            end, { A=0x43, F=0xFF, SP=0xFFFE, [0xFFFE]=0xFF, [0xFFFF]=0x43 } },
+    { "PUSH AF wrap1", function(z) 
+            z:assemble("NOP")       -- this will get overwritten
+            z:assemble("LD", "A", 0x43)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("PUSH", "AF")
+            end, { A=0x43, F=0xFF, SP=0xFFFF, [0xFFFF]=0xFF, [0x0000]=0x43 } },
 
     --[[
     ["OR   !n!"] =       0xF6,
