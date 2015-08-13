@@ -46,6 +46,7 @@ local IGNORE_BIT3_BIT5_FLAGS = true
 
 local function get_state(jit, cpu)
     
+    local str, tab = jit:fetch_memory_string_table(0, 65536)
     return {
         
         -- we only check the 'user-visibie' registers here, not various
@@ -91,7 +92,8 @@ local function get_state(jit, cpu)
             IMFb = cpu.IMFb,
         },
         
-        mem = jit:fetch_memory_table(0, 65536)
+        mem = tab,
+        mem_string = str
         }
 end
 
@@ -124,6 +126,7 @@ local function run_code(initial_memory, code)
     local time_end = os.clock()
     if TIMING_ON then print("Get old_state Took", time_end - time_start) end
 
+    local time_start = os.clock()
     local status
     repeat
         status = jit:run_z80(cpu, cpu.PC)
@@ -132,6 +135,8 @@ local function run_code(initial_memory, code)
         print("Failed to Halt")
         os.exit(1)
     end
+    local time_end = os.clock()
+    if TIMING_ON then print("Execute Took", time_end - time_start) end
     
     local time_start = os.clock()
     local new_state = get_state(jit, cpu)
@@ -334,20 +339,26 @@ local function compare_state(old_state, new_state)
             os.exit(2)
         end
     end
-    for index, v in pairs(old_state.mem) do
-        local new = new_state.mem[index]
-        local addr = index
-        if v ~= new then
-            print("Unexpected memory change")
-            print("location: ", addr, "was", v:byte(),"now", new:byte())
-            os.exit(3)
+    if old_state.mem_string ~= new_state.mem_string then
+        for index, v in pairs(old_state.mem) do
+            local new = new_state.mem[index]
+            local addr = index
+            if v ~= new then
+                print("Unexpected memory change")
+                print("location: ", addr, "was", v:byte(),"now", new:byte())
+                os.exit(3)
+            end
         end
     end
 end
 
 
 local function test(code, checks)
+    local time_start = os.clock()
     local initial_mem = halt_65536_times()
+    local time_end = os.clock()
+    if TIMING_ON then print("Halt table Took", time_end - time_start) end
+    
     local binary, end_addr = assemble_code(code)
     if not checks.PC then
         checks.PC = end_addr + 1 -- +1 for halt instruction

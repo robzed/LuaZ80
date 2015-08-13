@@ -1200,7 +1200,12 @@ end
 
 function Z80JIT:fetch_memory_string(address, length)
     local output = self:fetch_memory_table(address, length)
-    return table.concat(output, address, address+length-1)
+    return table.concat(output, nil, address, address+length-1)
+end
+
+function Z80JIT:fetch_memory_string_table(address, length)
+    local output = self:fetch_memory_table(address, length)
+    return table.concat(output, nil, address, address+length-1), output
 end
 
 function Z80JIT:exists(address)
