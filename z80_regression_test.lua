@@ -36,6 +36,11 @@
 -- 
 -- This file is not built for speed, it is intended to be simple & fast to write
 -- and run only occasionlly.
+-- 
+-- It checks 'user visible' changes to the CPU, e.g. registers and 
+-- There are interactions that it doesn't test. One big example is that
+-- the Carry flag is seperate from the F register bottom bit. So there are 
+-- interactions between instructions that might have bugs. 
 
 require("lua_z80")
 require("z80_ss_debug")
@@ -114,7 +119,9 @@ local function run_code(initial_memory, code)
     local time_start = os.clock()
     jit:make_RAM(0,1)               -- first byte RAM for some tests (e.g. PUSH BC wrap1)
     jit:make_ROM(1,16384)
-    jit:make_RAM(16384,49152)
+    jit:make_RAM(16384,16384)
+    -- gap of 16384
+    jit:make_RAM(49152,16384)       -- use for certain tests (roll-over)
     local time_end = os.clock()
     if TIMING_ON then print("Setting memory type Took", time_end - time_start) end
     local time_start = os.clock()
@@ -575,9 +582,13 @@ local basic_instruction_tests = {
 -- 0x21
 { "LD HL,n", function(z) z:assemble("LD", "HL", 0x4321) end, { H=0x43, L=0x21 } },
 
---[[
-    ["LD   (!nn!),HL"] = 0x22,
---]]
+-- 0x22
+{"LD   (nn),HL", function(z) z:assemble("LD", "HL", 0x4321) 
+        z:assemble("LD", "(0x5555)", "HL") 
+        end, { H=0x43, L=0x21, [0x5555]=0x21, [0x5556]=0x43 }},
+{"LD   (nn),HL wrap", function(z) z:assemble("LD", "HL", 0x4321) 
+        z:assemble("LD", "(0xFFFF)", "HL") 
+        end, { H=0x43, L=0x21, [0xFFFF]=0x21, [0x0000]=0x43 }},
 
 -- 0x23
 { "INC  HL", function(z) z:assemble("LD", "HL", 0x43FF)  
@@ -652,9 +663,10 @@ local basic_instruction_tests = {
 -- 0x31
 { "LD SP,n", function(z) z:assemble("LD", "SP", 0x4321) end, { SP=0x4321 } },
 
---[[
-    ["LD   (!nn!),A"] =  0x32,
---]]
+-- 0x32
+{"LD   (nn),A", function(z) z:assemble("LD", "A", 0x83) 
+        z:assemble("LD", "(0x5555)", "A") 
+        end, { A=0x83, [0x5555]=0x83 }},
 
 -- 0x33
 { "INC  SP", function(z) z:assemble("LD", "SP", 0x43FF)  
@@ -1154,3 +1166,4 @@ run_batch(basic_instruction_tests)
 --run_batch(more_advanced_tests)
 --run_batch(interrupt_test)
 --run_batch(R_reg_test)
+--run_batch(Carry_Flag_seperate_from_F_flag_interactions_test)

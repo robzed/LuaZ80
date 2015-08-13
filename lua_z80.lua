@@ -133,6 +133,7 @@ function Z80CPU:initialize()
     self.E = 0
     -- Flags 
     self.Carry = self._F % 2    -- duplicate/master copy of carry flag in F register. Not a boolean, but 0 or 1.
+                                -- Carry must always be maintained with F!!!
     
     -- cycle counting not implemented yet. However, don't add a number on every 
     -- instruction, instead accumulate them up during compile and add them on
@@ -338,7 +339,8 @@ local decode_first_byte = {
     -- ensure the flags are updated first!
     [0x08] = [[ CPU:get_F()
         result=CPU.A CPU.A=CPU.A_ CPU.A_=result
-        result=CPU._F CPU._F=CPU.F_ CPU.F_=result ]],
+        result=CPU._F CPU._F=CPU.F_ CPU.F_=result 
+        CPU.Carry = CPU._F % 2 ]],
     -- 10 = DJNZ xx
     [0x10] = function(memory, iaddr) 
             -- safe to pre-read because a lump write in this rejoin immediately invalidates lump
@@ -415,13 +417,13 @@ local decode_first_byte = {
     [0x22] = function(memory, iaddr)
             local addr = memory[iaddr]; iaddr = inc_address(iaddr);
             addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
-            return write_2bytes_to_address_command_string("CPU.L", "CPU.H", string.format("memory[0x%x]", addr), string.format("memory[0x%x]", addr+1), iaddr), iaddr
+            return write_2bytes_to_address_command_string("CPU.L", "CPU.H", string.format("0x%x", addr), string.format("0x%x", (addr+1)%65536), iaddr), iaddr
         end,
     -- 32 = LD (xxxx), A
     [0x32] = function(memory, iaddr)
             local addr = memory[iaddr]; iaddr = inc_address(iaddr);
             addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
-            return write_to_address_command_string("CPU.A", string.format("memory[0x%x]", addr), iaddr), iaddr
+            return write_to_address_command_string("CPU.A", string.format("0x%x", addr), iaddr), iaddr
         end,
 
     -- 03 = INC BC
