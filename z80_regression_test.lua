@@ -1046,7 +1046,12 @@ local basic_instruction_tests = {
     ["OR   !n!"] =       0xF6,
     ["RST  30H"] =       0xF7,
     ["RET  M"] =         0xF8,
-    ["LD   SP,HL"] =     0xF9,
+    --]]
+    
+    -- 0xF9
+    { "LD SP,HL", function(z) z:assemble("LD", "HL", 0x1234) z:assemble("LD", "SP", "HL") end, { H=0x12, L=0x34, SP=0x1234 } },
+
+    --[[
     ["JP   M,!nn!"] =    0xFA,
     ["EI"] =             0xFB,
     ["CALL M,!nn!"] =    0xFC,
