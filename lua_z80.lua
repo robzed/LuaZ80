@@ -305,16 +305,17 @@ local function call_code_string(return_addr, target)
             math.floor(return_addr/256), return_addr%256, target, target, target)
 end
 
-local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc)
+local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc, pre_code)
+    pre_code = pre_code or ""
     return string.format(
     -- we only do write_checks for invalid if the write was allowed. 
     -- we return after both writes have been attempted.
-    [[ addr=%s if jit.write_allowed[addr] then memory[addr]=%s
+    [[%s addr=%s if jit.write_allowed[addr] then memory[addr]=%s
     if jit:code_write_check(addr) then addr = nil end end
     addr2=%s if jit.write_allowed[addr2] then memory[addr2]=%s
     if jit:code_write_check(addr2) then addr = nil end end
     if addr == nil then CPU.PC = 0x%x return 'invalidate' end ]], 
-    dest_address1, source1, dest_address2, source2, next_pc)
+    pre_code, dest_address1, source1, dest_address2, source2, next_pc)
 end
 
 local function write_to_address_command_string(source, dest_address, next_pc, optional_flag_check_code)
@@ -498,7 +499,19 @@ local decode_first_byte = {
 
     -- C4/CC/D4/DC/E4/EC/F4/FC = CALL instructions with different flags, covered below
     
-    -- C5/D5/E5/F5 - push register pairs (DE/BC/HL/AF)
+    -- C5/D5/E5/F5 - push register pairs (BC=00/DE=01/HL=10/AF=11)
+    [0xC5] = function(memory, iaddr)    -- push BC
+            return write_2bytes_to_address_command_string("CPU.C", "CPU.B", "CPU.SP", "(CPU.SP+1)%65536", iaddr, "CPU.SP=(CPU.SP-2)%65536"), iaddr
+        end,
+    [0xD5] = function(memory, iaddr)    -- push DE
+            return write_2bytes_to_address_command_string("CPU.E", "CPU.D", "CPU.SP", "(CPU.SP+1)%65536", iaddr, "CPU.SP=(CPU.SP-2)%65536"), iaddr
+        end,
+    [0xE5] = function(memory, iaddr)    -- push HL
+            return write_2bytes_to_address_command_string("CPU.L", "CPU.H", "CPU.SP", "(CPU.SP+1)%65536", iaddr, "CPU.SP=(CPU.SP-2)%65536"), iaddr
+        end,
+    [0xF5] = function(memory, iaddr)    -- push AF
+            return write_2bytes_to_address_command_string("CPU._F", "CPU.A", "CPU.SP", "(CPU.SP+1)%65536", iaddr, "CPU.SP=(CPU.SP-2)%65536 CPU:get_F()"), iaddr
+        end,
 
     -- C6/CE/D6/DE/E6/EE/F6/FE = ADD/ADC/SUB/SBC/AND/XOR/OR/CP A with immediate value, covered below.
 

@@ -112,8 +112,9 @@ local function run_code(initial_memory, code)
     -- make the JIT compiler and memory
     local jit = Z80JIT:new()
     local time_start = os.clock()
-    jit:make_ROM(0,16384)
-    jit:make_RAM(16384,16384)
+    jit:make_RAM(0,1)               -- first byte RAM for some tests (e.g. PUSH BC wrap1)
+    jit:make_ROM(1,16384)
+    jit:make_RAM(16384,49152)
     local time_end = os.clock()
     if TIMING_ON then print("Setting memory type Took", time_end - time_start) end
     local time_start = os.clock()
@@ -998,6 +999,27 @@ local basic_instruction_tests = {
     ["JP   !nn!"] =      0xC3,
     ["CALL NZ,!nn!"] =   0xC4,
     ["PUSH BC"] =        0xC5,
+    --]]
+    
+    -- 0xC5
+    { "PUSH BC", function(z) 
+            z:assemble("LD", "BC", 0x4321)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("PUSH", "BC")
+            end, { B=0x43, C=0x21, SP=0x5FFE, [0x5FFE]=0x21, [0x5FFF]=0x43 } },
+    { "PUSH BC wrap0", function(z) 
+            z:assemble("LD", "BC", 0x4321)
+            z:assemble("LD", "SP", 0x0000)
+            z:assemble("PUSH", "BC")
+            end, { B=0x43, C=0x21, SP=0xFFFE, [0xFFFE]=0x21, [0xFFFF]=0x43 } },
+    { "PUSH BC wrap1", function(z) 
+            z:assemble("NOP")       -- this will get overwritten
+            z:assemble("LD", "BC", 0x4321)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("PUSH", "BC")
+            end, { B=0x43, C=0x21, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
+
+    --[[
     ["ADD  A,!n!"] =     0xC6,
     ["RST  00H"] =       0xC7,
     ["RET  Z"] =         0xC8,
@@ -1012,7 +1034,16 @@ local basic_instruction_tests = {
     ["JP   NC,!nn!"] =   0xD2,
     ["OUT  (!n!),A"] =   0xD3,
     ["CALL NC,!nn!"] =   0xD4,
-    ["PUSH DE"] =        0xD5,
+    --]]
+    
+        -- 0xD5
+    { "PUSH DE", function(z) 
+            z:assemble("LD", "DE", 0x4321)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("PUSH", "DE")
+            end, { D=0x43, E=0x21, SP=0x5FFE, [0x5FFE]=0x21, [0x5FFF]=0x43 } },
+
+    --[[
     ["SUB  A,!n!"] =     0xD6,
     ["RST  10H"] =       0xD7,
     ["RET  C"] =         0xD8,
@@ -1027,7 +1058,15 @@ local basic_instruction_tests = {
     ["JP   PO,!nn!"] =   0xE2,
     ["EX   (SP),HL"] =   0xE3,
     ["CALL PO,!nn!"] =   0xE4,
-    ["PUSH HL"] =        0xE5,
+    --]]
+    -- 0xE5
+    { "PUSH HL", function(z) 
+            z:assemble("LD", "HL", 0x4321)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("PUSH", "HL")
+            end, { H=0x43, L=0x21, SP=0x5FFE, [0x5FFE]=0x21, [0x5FFF]=0x43 } },
+
+    --[[
     ["AND  !n!"] =       0xE6,
     ["RST  20H"] =       0xE7,
     ["RET  PE"] =        0xE8,
@@ -1042,7 +1081,16 @@ local basic_instruction_tests = {
     ["JP   P,!nn!"] =    0xF2,
     ["DI"] =             0xF3,
     ["CALL P,!nn!"] =    0xF4,
-    ["PUSH AF"] =        0xF5,
+    --]]
+    -- 0xF5
+    { "PUSH AF", function(z) 
+            -- assumes F = 0xff
+            z:assemble("LD", "A", 0x43)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("PUSH", "AF")
+            end, { A=0x43, F=0xFF, SP=0x5FFE, [0x5FFE]=0xFF, [0x5FFF]=0x43 } },
+
+    --[[
     ["OR   !n!"] =       0xF6,
     ["RST  30H"] =       0xF7,
     ["RET  M"] =         0xF8,
