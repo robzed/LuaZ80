@@ -36,7 +36,9 @@
 -- ============
 -- Probably requires Lua 5.2 (e.g. Hex string escape), but could be back-ported
 -- to Lua 5.1 without much effort.
-
+--
+-- http://clrhome.org/table/
+-- 
 require("third_party/strict")
 require("third_party/middleclass")
 
@@ -694,7 +696,9 @@ local _CB_Z80_table = {
 }
 -- add in the CB values to the basic_Z80_table
 for k,v in pairs(_CB_Z80_table) do
-    basic_Z80_table[v] = 0xCB00 + k
+    if not basic_Z80_table[v] then
+        basic_Z80_table[v] = 0xCB00 + k
+    end
 end
 
 
@@ -762,7 +766,9 @@ local _ED_Z80_table = {
 }
 -- add in the ED values to the basic_Z80_table
 for k,v in pairs(_ED_Z80_table) do
-    basic_Z80_table[v] = 0xED00 + k
+    if not basic_Z80_table[v] then
+        basic_Z80_table[v] = 0xED00 + k
+    end
 end
 
 local _DD_CB_Z80_table = {
@@ -802,11 +808,15 @@ local _DD_CB_Z80_table = {
 -- add in the DDCB or FDCB values to the basic_Z80_table
 for k,v in pairs(_DD_CB_Z80_table) do
     -- create the IX version
-    basic_Z80_table[v] = 0xDDCB00 + k
+    if not basic_Z80_table[v] then
+        basic_Z80_table[v] = 0xDDCB00 + k
+    end
     
     -- do the IY version as well
     v = v:gsub("IX", "IY")
-    basic_Z80_table[v] = 0xFDCB00 + k
+    if not basic_Z80_table[v] then
+        basic_Z80_table[v] = 0xFDCB00 + k
+    end
 end
 
 
@@ -900,11 +910,15 @@ local _DD_Z80_table = {
 -- add in the DD or FD values to the basic_Z80_table
 for k,v in pairs(_DD_Z80_table) do
     -- create the IX version
-    basic_Z80_table[v] = 0xDD00 + k
+    if not basic_Z80_table[v] then
+        basic_Z80_table[v] = 0xDD00 + k
+    end
     
     -- do the IY version as well
     v = v:gsub("IX", "IY")
-    basic_Z80_table[v] = 0xFD00 + k
+    if not basic_Z80_table[v] then
+        basic_Z80_table[v] = 0xFD00 + k
+    end
 end
 
 
@@ -930,6 +944,9 @@ function Z80_Assembler:assemble(instruction, dest, source)
         dest_op = nil
     elseif type(dest) == "number" then
         dest_op = "!n!"
+    elseif dest:sub(1,1) == "(" and dest:sub(#dest) ==")" and tonumber(dest:sub(2,#dest-1)) then
+        dest_op = "(!n!)"
+        dest = tonumber(dest:sub(2,#dest-1))
     else
         dest_op = dest:upper()
     end
@@ -943,6 +960,9 @@ function Z80_Assembler:assemble(instruction, dest, source)
             return
         end
         src_op = "!n!"
+    elseif source:sub(1,1) == "(" and source:sub(#source) ==")" and tonumber(source:sub(2,#source-1)) then
+        src_op = "(!n!)"
+        source = tonumber(source:sub(2,#source-1))
     else
         src_op = source:upper()
     end
@@ -962,12 +982,12 @@ function Z80_Assembler:assemble(instruction, dest, source)
         local opcode = basic_Z80_table[attempt]
         if opcode then
             -- we've found the op code, generate the code!
-            if dest_op == "!n!" then
+            if dest_op == "!n!" or dest_op == "(!n!)" then
                 dest = self:_byte_check(dest, instruction .. " byte truncated")
                 self:_save_opcode(opcode)
                 self:DB(dest)
                 
-            elseif dest_op == "!nn!" then
+            elseif dest_op == "!nn!" or dest_op == "(!nn!)" then
                 local high = math.floor(dest / 256)
                 local low = dest % 256
                 high = self:_byte_check(high, instruction .. " high byte truncated")
@@ -975,12 +995,12 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 self:_save_opcode(opcode)
                 self:DB(low, high)
             
-            elseif src_op == "!n!" then
+            elseif src_op == "!n!" or src_op == "(!n!)" then
                 source = self:_byte_check(source, instruction .. " byte truncated")
                 self:_save_opcode(opcode)
                 self:DB(source)
             
-            elseif src_op == "!nn!" then
+            elseif src_op == "!nn!" or src_op == "(!nn!)" then
                 local high = math.floor(source / 256)
                 local low = source % 256
                 high = self:_byte_check(high, instruction .. " high byte truncated")
@@ -996,12 +1016,16 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 dest_op = "!nn!"
             elseif src_op == "!n!" then
                 src_op = "!nn!"
+            elseif dest_op == "(!n!)" then
+                dest_op = "(!nn!)"
+            elseif src_op == "(!n!)" then
+                src_op = "(!nn!)"
             else
                 self:set_error("invalid operands in "..instruction)
                 break
             end
         end
-    end    
+    end
 end
 
 ---
