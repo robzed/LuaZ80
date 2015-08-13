@@ -99,10 +99,10 @@ end
 
 
 
-local function halt_65536_times()
+local function block_of_halts(number)
     local t = {}
     local halt_instruction = 0x76
-    for addr = 0, 65535 do
+    for addr = 0, number-1 do
         t[addr] = halt_instruction
     end
     return t
@@ -114,10 +114,16 @@ local function run_code(initial_memory, code)
     local time_start = os.clock()
     jit:make_ROM(0,16384)
     jit:make_RAM(16384,16384)
+    local time_end = os.clock()
+    if TIMING_ON then print("Setting memory type Took", time_end - time_start) end
+    local time_start = os.clock()
     jit:load_memory(initial_memory, 0)
+    local time_end = os.clock()
+    if TIMING_ON then print("Loading HALTs Took", time_end - time_start) end
+    local time_start = os.clock()
     jit:load_memory(code, 0)    -- load code at zero address
     local time_end = os.clock()
-    if TIMING_ON then print("Loading Took", time_end - time_start) end
+    if TIMING_ON then print("Loading code Took", time_end - time_start) end
     
     -- now make a CPU to run the code
     local cpu = Z80CPU:new()
@@ -355,7 +361,7 @@ end
 
 local function test(code, checks)
     local time_start = os.clock()
-    local initial_mem = halt_65536_times()
+    local initial_mem = block_of_halts(2048)
     local time_end = os.clock()
     if TIMING_ON then print("Halt table Took", time_end - time_start) end
     
