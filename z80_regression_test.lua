@@ -727,9 +727,6 @@ local basic_instruction_tests = {
         end, { F={"-N", "-C", "H" } } },
 --]]
 
---}
---local temp_test = {
-
     --0x40,
     { "LD B,B", function(z) z:LD("B", 0x7f) z:LD("B", "B") end, { ["B"]=0x7f } },
     --0x41,
@@ -1006,11 +1003,29 @@ local basic_instruction_tests = {
     ["CP   (HL)"] =      0xBE,
     ["CP   A"] =         0xBF,
     ["RET  NZ"] =        0xC0,
-    ["POP  BC"] =        0xC1,
+    --]]
+    
+--    }
+--local temp_test = {
+    
+  -- 0xC1
+    { "POP BC", function(z)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("LD", "HL", 0x1234)
+            z:assemble("LD", "(0x6000)", "HL")
+            z:assemble("POP", "BC")
+        end, {SP=0x6002, H=0x12, L=0x34, B=0x12, C=0x34, [0x6000]=0x34, [0x6001]=0x12 } },
+    { "POP BC (wrap)", function(z)
+            z:assemble("LD", "SP", 0xFFFF)
+            z:assemble("LD", "HL", 0x1234)
+            z:assemble("LD", "(0xFFFF)", "HL")
+            z:assemble("POP", "BC")
+        end, {SP=0x1, H=0x12, L=0x34, B=0x12, C=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
+    
+    --[[
     ["JP   NZ,!nn!"] =   0xC2,
     ["JP   !nn!"] =      0xC3,
     ["CALL NZ,!nn!"] =   0xC4,
-    ["PUSH BC"] =        0xC5,
     --]]
     
     -- 0xC5
@@ -1042,7 +1057,22 @@ local basic_instruction_tests = {
     ["ADC  A,!n!"] =     0xCE,
     ["RST  08H"] =       0xCF,
     ["RET  NC"] =        0xD0,
-    ["POP  DE"] =        0xD1,
+    --]]
+      -- 0xD1
+    { "POP DE", function(z)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("LD", "HL", 0x1234)
+            z:assemble("LD", "(0x6000)", "HL")
+            z:assemble("POP", "DE")
+        end, {SP=0x6002, H=0x12, L=0x34, D=0x12, E=0x34, [0x6000]=0x34, [0x6001]=0x12 } },
+    { "POP DE (wrap)", function(z)
+            z:assemble("LD", "SP", 0xFFFF)
+            z:assemble("LD", "HL", 0x1234)
+            z:assemble("LD", "(0xFFFF)", "HL")
+            z:assemble("POP", "DE")
+        end, {SP=0x1, H=0x12, L=0x34, D=0x12, E=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
+    
+    --[[
     ["JP   NC,!nn!"] =   0xD2,
     ["OUT  (!n!),A"] =   0xD3,
     ["CALL NC,!nn!"] =   0xD4,
@@ -1077,7 +1107,22 @@ local basic_instruction_tests = {
     ["SBC  A,!n!"] =     0xDE,
     ["RST  18H"] =       0xDF,
     ["RET  PO"] =        0xE0,
-    ["POP  HL"] =        0xE1,
+    --]]
+      -- 0xE1
+    { "POP HL", function(z)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("LD", "BC", 0x1234)
+            z:assemble("PUSH", "BC")
+            z:assemble("POP", "HL")
+        end, {SP=0x6000, H=0x12, L=0x34, B=0x12, C=0x34, [0x5FFE]=0x34, [0x5FFF]=0x12 } },
+    { "POP HL (wrap)", function(z)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("LD", "BC", 0x1234)
+            z:assemble("PUSH", "BC")
+            z:assemble("POP", "HL")
+        end, {SP=0x1, H=0x12, L=0x34, B=0x12, C=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
+    
+    --[[
     ["JP   PO,!nn!"] =   0xE2,
     ["EX   (SP),HL"] =   0xE3,
     ["CALL PO,!nn!"] =   0xE4,
@@ -1111,7 +1156,21 @@ local basic_instruction_tests = {
     ["XOR  !n!"] =       0xEE,
     ["RST  28H"] =       0xEF,
     ["RET  P"] =         0xF0,
-    ["POP  AF"] =        0xF1,
+    --]]
+      -- 0xF1
+    { "POP AF", function(z)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("LD", "HL", 0x1234)
+            z:assemble("LD", "(0x6000)", "HL")
+            z:assemble("POP", "AF")
+        end, {SP=0x6002, H=0x12, L=0x34, A=0x12, F=0x34, [0x6000]=0x34, [0x6001]=0x12 } },
+    { "POP AF (wrap)", function(z)
+            z:assemble("LD", "SP", 0xFFFF)
+            z:assemble("LD", "HL", 0x1234)
+            z:assemble("LD", "(0xFFFF)", "HL")
+            z:assemble("POP", "AF")
+        end, {SP=0x1, H=0x12, L=0x34, A=0x12, F=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
+    --[[
     ["JP   P,!nn!"] =    0xF2,
     ["DI"] =             0xF3,
     ["CALL P,!nn!"] =    0xF4,

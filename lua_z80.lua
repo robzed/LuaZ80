@@ -476,7 +476,12 @@ local decode_first_byte = {
     -- 80 to BF = ADD/ADC/SUB/SBC/AND/XOR/OR/CP, covered below
 
     -- C0/C8/D0/D8/E0/E8/F0/F8 = return instructions with different flags, covered below
-    -- C1/D1/E1/F1 = pop register pairs (DE/BC/HL/AF)
+    -- C1/D1/E1/F1 = pop register pairs (BC/DE/HL/AF)
+        [0xC1] = "CPU.C = memory[CPU.SP] CPU.B = memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536",
+        [0xD1] = "CPU.E = memory[CPU.SP] CPU.D = memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536",
+        [0xE1] = "CPU.L = memory[CPU.SP] CPU.H = memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536",
+        [0xF1] = "CPU._F = memory[CPU.SP] CPU.A = memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536 CPU.Carry = CPU._F % 2",
+
     -- C2/CA/D2/DA/E2/EA/F2/FA = JP instructions with different flags, covered below
 
     -- C3 = JP XXXX
