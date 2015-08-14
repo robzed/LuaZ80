@@ -25,6 +25,14 @@ Main Files
 - test_fake_ZXSpectrum.lua - At some point this will run the ZX Spectrum ROM though the emulator for testing.
 - Z80_disassembler.lua - Used by the single step debugger to disassemble Z80.
 - Z80_assembler.lua - Start of an assembler-in-Lua-code used for testing only.
+- z80_regression_test.lua - Start of a file that tests all instructions to some basic level.
+
+Latest Changes
+==============
+
+I've been working on z80_regression_test.lua to prove existing instruction work
+and providing some new instructions as well.
+
 
 What works
 ==========
