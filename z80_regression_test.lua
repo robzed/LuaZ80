@@ -1182,7 +1182,17 @@ local basic_instruction_tests = {
     ["RET  PE"] =        0xE8,
     ["JP   (HL)"] =      0xE9,
     ["JP   PE,!nn!"] =   0xEA,
-    ["EX   DE,HL"] =     0xEB,
+    --]]
+    
+    -- 0xEB
+    {"EX DE, HL", function(z)
+        z:LD("HL", 0xCDEF)
+        z:LD("DE", 0x5678)
+        z:assemble("EX", "DE", "HL")
+    end, { H=0xCD, L=0xEF, D=0x56, E=0x78, 
+            H=0x56, L=0x78, D=0xCD, E=0xEF} },
+    
+    --[[
     ["CALL PE,!nn!"] =   0xEC,
     ["XOR  !n!"] =       0xEE,
     ["RST  28H"] =       0xEF,
