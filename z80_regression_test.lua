@@ -230,8 +230,8 @@ local function decode_flags(flag_table, old_flags)
                 altered_mask = flag_mask_op(altered_mask, mask, flag_switch)
                 flags = flag_set(flags, mask)
             end
-        elseif #flag_switch == 9 and flag_switch:sub(1,7) == "oldF=0x" then
-            old_F = tonumber(flag_switch:sub(8,9), 16)
+        elseif type(flag_switch) == "string" and #flag_switch >= 6 and flag_switch:sub(1,5) == "oldF=" then
+            old_F = tonumber(flag_switch:sub(6))
             if not old_F then
                 print("Unable to convert flag_switch", flag_switch)
                 os.exit(8)
@@ -711,21 +711,28 @@ local basic_instruction_tests = {
 
 { "LD A,33", function(z) z:LD("A", 33)   end, { ["A"]=33 } },
 
---[[
+--   }
+--local temp_test = {
+
 -- 0x3F
 -- F flags: negative cleared, half carry is the same as old carry, carry completemented
 { "CCF", function(z) z:assemble("CCF") end, { F={"-N", "-C", "H" } } },
-{ "CCF F=00", function(z) z:assemble("LD", "DE", "0x0000") 
+
+{ "CCF F=00", function(z) 
+        z:assemble("LD", "SP", 0x6000)
+        z:assemble("LD", "DE", 0x0000) 
         z:assemble("PUSH","DE") 
         z:assemble("POP", "AF")
         z:assemble("CCF") 
-        end, { F={"-N", "-C", "H" } } },
-{ "CCF F=FF", function(z) z:assemble("LD", "DE", "0xFFFF") 
+    end, { F={ "oldF=0", "-N", "C", "-H" }, D = 0, E = 0, A = 0, SP = 0x6000, [0x5FFF]=0, [0x5FFe]=0 } },
+
+{ "CCF F=FF", function(z) 
+        z:assemble("LD", "SP", 0x6000)
+        z:assemble("LD", "DE", 0xFFFF) 
         z:assemble("PUSH","DE") 
         z:assemble("POP", "AF")
         z:assemble("CCF") 
-        end, { F={"-N", "-C", "H" } } },
---]]
+        end, { F={"oldF=0xFF", "-N", "-C", "H" }, D = 0xFF, E = 0xFF, A = 0xFF, SP = 0x6000, [0x5FFF]=0xFF, [0x5FFe]=0xFF } },
 
     --0x40,
     { "LD B,B", function(z) z:LD("B", 0x7f) z:LD("B", "B") end, { ["B"]=0x7f } },
@@ -1004,10 +1011,7 @@ local basic_instruction_tests = {
     ["CP   A"] =         0xBF,
     ["RET  NZ"] =        0xC0,
     --]]
-    
---    }
---local temp_test = {
-    
+        
   -- 0xC1
     { "POP BC", function(z)
             z:assemble("LD", "SP", 0x6000)
