@@ -1119,7 +1119,19 @@ local basic_instruction_tests = {
     ["SUB  A,!n!"] =     0xD6,
     ["RST  10H"] =       0xD7,
     ["RET  C"] =         0xD8,
-    ["EXX"] =            0xD9,
+    --]]
+    -- 0xD9
+    {"EXX", function(z)
+        z:LD("HL", 0x1234)
+        z:LD("DE", 0x5678)
+        z:LD("BC", 0x90AB)
+        z:assemble("EXX")
+        z:LD("HL", 0xCDEF)
+        z:LD("DE", 0x1122)
+        z:LD("BC", 0x3344)
+    end, { H=0xCD, L=0xEF, D=0x11, E=0x22, B=0x33, C=0x44, 
+        H_=0x12, L_=0x34, D_=0x56, E_=0x78, B_=0x90, C_=0xAB} },
+    --[[
     ["JP   C,!nn!"] =    0xDA,
     ["IN   A,(!n!)"] =   0xDB,
     ["CALL C,!nn!"] =    0xDC,
