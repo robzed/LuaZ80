@@ -1213,7 +1213,11 @@ local basic_instruction_tests = {
         end, {SP=0x1, H=0x12, L=0x34, A=0x12, F=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
     --[[
     ["JP   P,!nn!"] =    0xF2,
-    ["DI"] =             0xF3,
+    --]]
+    -- 0xF3
+    { "DI", function(z) z:assemble("DI") end, { IFF1 = false, IFF2 = false } },
+    
+    --[[
     ["CALL P,!nn!"] =    0xF4,
     --]]
     -- 0xF5
@@ -1246,7 +1250,11 @@ local basic_instruction_tests = {
 
     --[[
     ["JP   M,!nn!"] =    0xFA,
-    ["EI"] =             0xFB,
+    --]]
+    -- 0xFB
+    { "EI", function(z) z:assemble("EI") end, { IFF1 = true, IFF2 = true } },
+
+    --[[
     ["CALL M,!nn!"] =    0xFC,
     ["CP   !n!"] =       0xFE,
     ["RST  38H"] =       0xFF,
