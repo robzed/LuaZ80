@@ -1104,11 +1104,11 @@ function Z80_Assembler:NOP()
 end
 
 function Z80_Assembler:POP(register_pair)
-    z:assemble("POP", register_pair)
+    self:assemble("POP", register_pair)
 end
 
 function Z80_Assembler:PUSH(register_pair)
-    z:assemble("PUSH", register_pair)
+    self:assemble("PUSH", register_pair)
 end
 
 

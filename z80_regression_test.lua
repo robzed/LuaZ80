@@ -465,7 +465,22 @@ local basic_instruction_tests = {
 
 --[[
     ["RLCA"] =           0x07,
-    ["EX   AF,AF'"] =    0x08,
+    --]]
+    
+-- 0x08
+{ "EX AF, AF'", function(z) z:LD("SP", 0x6000)
+                            z:LD("DE", 0x1234)
+                            z:PUSH("DE") 
+                            z:POP("AF")
+                            z:assemble("EX", "AF", "AF'")
+                            z:LD("DE", 0xABCD)
+                            z:PUSH("DE") 
+                            z:POP("AF")
+                            z:LD("DE", 0x9876)
+                        end, 
+        { D=0x98, E=0x76, A=0xAB, F=0xCD, SP=0x6000, [0x5FFE]=0xCD, [0x5FFF]=0xAB, 
+            A_ = 0x12, F_=0x34 } },
+    --[[
     ["ADD  HL,BC"] =     0x09,
     ["LD   A,(BC)"] =    0x0A,
     ["DEC  BC"] =        0x0b,
