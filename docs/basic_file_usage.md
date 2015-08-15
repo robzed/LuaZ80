@@ -95,6 +95,9 @@ This can be used to assemble Z80 assembler mnemonics inside Lua code. An example
     require("Z80_assembler")
     
     z = Z80_Assembler()
+    z:LD("SP", 0)
+    z:LD("HL", 0x1234)
+    z:PUSH("HL")
     z:DS("fred", "hello")
     z:LD_A(255)
     z:LD_A(65)            -- the character 'A"
@@ -102,7 +105,7 @@ This can be used to assemble Z80 assembler mnemonics inside Lua code. An example
     if not z:any_errors() then
         code = z:get_code()
 
-For further functions that can be used, see the first few definitions of 'Z80_assembler.lua'.
+For further functions that can be used, see the first few and last few definitions of 'Z80_assembler.lua'.
 
     <<<add more information about funtions supplied as part of Z80_Assembler class here>>>
 
