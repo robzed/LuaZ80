@@ -457,9 +457,28 @@ local basic_instruction_tests = {
  { "INC  B Flags P/V Sign", function(z) z:assemble("LD", "B", 0x7F)  
         z:assemble("INC", "B") end, { B=0x80, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
 
---[[
-    ["DEC  B"] =         0x05,
---]]
+-- 0x05
+{ "DEC  B", function(z) z:LD("B", 0x11)  
+        z:assemble("DEC", "B") end, { B=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"} } },  
+
+{ "DEC  B to zero", function(z) z:LD("B", 0x01)  
+        z:assemble("DEC", "B") end, { B=0x00, F={"-S", "Z", "-H", "-V", "N", "oldF=0xFF"} } },  
+
+ { "DEC  B rollover", function(z) z:assemble("LD", "B", 0x00)  
+         -- S is set if result is negative; reset otherwise
+        -- Z is set if result is zero; reset otherwise
+        -- H is set if borrow from bit 4, reset otherwise
+        -- P/V is set if m was 80H before operation; reset otherwise
+        -- N is set
+        -- C is not affected
+        z:assemble("DEC", "B") end, { B=0xFF, F={"S", "-Z", "H", "-V", "N", "oldF=0xFF"} } },  
+
+ { "DEC  B half carry", function(z) z:assemble("LD", "B", 0x10)  
+        z:assemble("DEC", "B") end, { B=0x0F, F={"-S", "-Z", "H", "-V", "N", "oldF=0xFF"} } },  
+
+ { "DEC  B Flags P/V Sign", function(z) z:assemble("LD", "B", 0x80)  
+        z:assemble("DEC", "B") end, { B=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"} } },  
+
 -- 0x06
  { "LD  B,n", function(z) z:assemble("LD", "B", 0xe1) end, { B=0xe1 } }, 
 
