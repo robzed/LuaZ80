@@ -856,8 +856,12 @@ local basic_instruction_tests = {
     ["SCF"] =            0x37,
     ["JR   C,!r!"] =     0x38,
     ["ADD  HL,SP"] =     0x39,
-    ["LD   A,(!nn!)"] =  0x3A,
 --]]
+
+    -- 0x3A
+    { "LD A,(nn)", function(z) z:LD("A", 22) z:LD("(0x6000)", "A") z:LD("A", "(0x6000)") end,
+        { [0x6000] = 22, A = 22 } },
+    
     -- 0x3B
     { "DEC SP", function(z) z:LD("SP", 0x1234) z:assemble("DEC", "SP") end, { SP = 0x1233 } },
     { "DEC SP rollover1", function(z) z:LD("SP", 0x0100) z:assemble("DEC", "SP") end, { SP = 0x00FF } },
