@@ -1021,7 +1021,7 @@ function Z80_Assembler:assemble(instruction, dest, source)
             elseif src_op == "(!n!)" then
                 src_op = "(!nn!)"
             else
-                self:set_error("invalid operands in "..instruction)
+                self:set_error(string.format("invalid operands in %s (dest op='%s' source op='%s')",instruction,dest_op,src_op))
                 break
             end
         end
