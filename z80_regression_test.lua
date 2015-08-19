@@ -502,8 +502,13 @@ local basic_instruction_tests = {
     --[[
     ["ADD  HL,BC"] =     0x09,
     ["LD   A,(BC)"] =    0x0A,
-    ["DEC  BC"] =        0x0b,
     --]]
+    
+    -- 0x0b
+    { "DEC BC", function(z) z:LD("BC", 0x1234) z:assemble("DEC", "BC") end, { C = 0x33, B = 0x12 } },
+    { "DEC BC rollover1", function(z) z:LD("BC", 0x0100) z:assemble("DEC", "BC") end, { B = 0x00, C = 0xFF } },
+    { "DEC BC rollover2", function(z) z:LD("BC", 0x0000) z:assemble("DEC", "BC") end, { B = 0xFF, C = 0xFF } },
+    
 
 -- 0x0c
 { "INC  C", function(z) z:assemble("LD", "C", 0x11)  
@@ -621,8 +626,11 @@ local basic_instruction_tests = {
     ["JR   !r!"] =       0x18,
     ["ADD  HL,DE"] =     0x19,
     ["LD   A,(DE)"] =    0x1A,
-    ["DEC  DE"] =        0x1B,
 --]]
+    -- 0x1B
+    { "DEC DE", function(z) z:LD("DE", 0x1234) z:assemble("DEC", "DE") end, { E = 0x33, D = 0x12 } },
+    { "DEC DE rollover1", function(z) z:LD("DE", 0x0100) z:assemble("DEC", "DE") end, { D = 0x00, E = 0xFF } },
+    { "DEC DE rollover2", function(z) z:LD("DE", 0x0000) z:assemble("DEC", "DE") end, { D = 0xFF, E = 0xFF } },
 
 -- 0x1C
  { "INC  E", function(z) z:assemble("LD", "E", 0x11)  
@@ -744,8 +752,11 @@ local basic_instruction_tests = {
     ["JR   Z,!r!"] =     0x28,
     ["ADD  HL,HL"] =     0x29,
     ["LD   HL,(!nn!)"] = 0x2A,
-    ["DEC  HL"] =        0x2B,
 --]]
+    -- 0x2B
+    { "DEC HL", function(z) z:LD("HL", 0x1234) z:assemble("DEC", "HL") end, { L = 0x33, H = 0x12 } },
+    { "DEC HL rollover1", function(z) z:LD("HL", 0x0100) z:assemble("DEC", "HL") end, { H = 0x00, L = 0xFF } },
+    { "DEC HL rollover2", function(z) z:LD("HL", 0x0000) z:assemble("DEC", "HL") end, { H = 0xFF, L = 0xFF } },
 
 -- 0x2C
  { "INC  L", function(z) z:assemble("LD", "L", 0x11)  
@@ -846,8 +857,11 @@ local basic_instruction_tests = {
     ["JR   C,!r!"] =     0x38,
     ["ADD  HL,SP"] =     0x39,
     ["LD   A,(!nn!)"] =  0x3A,
-    ["DEC  SP"] =        0x3B,
 --]]
+    -- 0x3B
+    { "DEC SP", function(z) z:LD("SP", 0x1234) z:assemble("DEC", "SP") end, { SP = 0x1233 } },
+    { "DEC SP rollover1", function(z) z:LD("SP", 0x0100) z:assemble("DEC", "SP") end, { SP = 0x00FF } },
+    { "DEC SP rollover2", function(z) z:LD("SP", 0x0000) z:assemble("DEC", "SP") end, { SP = 0xFFFF } },
 
 -- 0x3C
  { "INC  A", function(z) z:assemble("LD", "A", 0x11)  
