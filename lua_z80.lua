@@ -506,6 +506,12 @@ local decode_first_byte = {
         
     -- D3 = OUT (xx),A
     -- E3 = EX (SP), HL
+    [0xE3] = function(memory, iaddr)
+            -- seems like candidate for faster implementation! (2 extra copies, extra calculation of SP+1)
+            return write_2bytes_to_address_command_string("temp", "result", "CPU.SP", "(CPU.SP+1)%65536", iaddr, 
+                "result = CPU.H temp = CPU.L CPU.L = memory[CPU.SP] CPU.H = memory[(CPU.SP+1)%65536]"), iaddr
+        end,
+
     -- F3 = DI
     [0xf3] = "CPU.IFF1 = false;CPU.IFF2 = false",
 
@@ -989,7 +995,7 @@ function z80_compile(memory, address, number_number_instructions_to_compile, pre
     local to_patch
     local instruction_addresses = {}
     local to_patch_table = {}
-    local codetext_table = {"local CPU, jit = ... ","; local addr, addr2, result; local memory = jit._memory; local zflags = jit._zflags"} -- define the CPU parameter
+    local codetext_table = {"local CPU, jit = ... ","; local addr, addr2, result, temp; local memory = jit._memory; local zflags = jit._zflags"} -- define the CPU parameter
     local next_address
 
     while number_number_instructions_to_compile > 0 do

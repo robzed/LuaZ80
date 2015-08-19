@@ -893,9 +893,6 @@ local basic_instruction_tests = {
 
 { "LD A,33", function(z) z:LD("A", 33)   end, { ["A"]=33 } },
 
---   }
---local temp_test = {
-
 -- 0x3F
 -- F flags: negative cleared, half carry is the same as old carry, carry completemented
 { "CCF", function(z) z:assemble("CCF") end, { F={"-N", "-C", "H" } } },
@@ -1322,9 +1319,35 @@ local basic_instruction_tests = {
     
     --[[
     ["JP   PO,!nn!"] =   0xE2,
-    ["EX   (SP),HL"] =   0xE3,
+    --]]
+    
+--   }
+--local temp_test = {
+
+    -- 0xE3
+    { "EX (SP), HL", function(z) 
+            z:LD("SP", 0x6000)
+            z:LD("HL", 0x1234)
+            z:LD("A", 0xCD)
+            z:LD("(0x6000)", "A")
+            z:LD("A", 0xAB)
+            z:LD("(0x6001)", "A")
+            z:assemble("EX", "(SP)", "HL")
+        end, { SP=0x6000, H=0xAB, L=0xCD, A=0xAB, [0x6000]=0x34, [0x6001]=0x12 } },
+    { "EX (SP), HL  rollover", function(z) 
+            z:LD("SP", 0xFFFF)
+            z:LD("HL", 0x1234)
+            z:LD("A", 0xCD)
+            z:LD("(0xFFFF)", "A")
+            z:LD("A", 0xAB)
+            z:LD("(0x0000)", "A")
+            z:assemble("EX", "(SP)", "HL")
+        end, { SP=0xFFFF, H=0xAB, L=0xCD, A=0xAB, [0xFFFF]=0x34, [0x0000]=0x12 } },
+
+    --[[
     ["CALL PO,!nn!"] =   0xE4,
     --]]
+    
     -- 0xE5
     { "PUSH HL", function(z) 
             z:assemble("LD", "HL", 0x4321)
