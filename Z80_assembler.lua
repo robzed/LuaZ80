@@ -102,10 +102,10 @@ end
 function Z80_Assembler:_byte_check(value, warning_string)
     if value < -128 then
         value = 128    -- signed -128
-        self:warning(warning_string)
+        self:set_warning(warning_string)
     elseif value > 255 then
         value = 255
-        self:warning(warning_string)
+        self:set_warning(warning_string)
     elseif value < 0 then
         -- make unsigned
         value = value + 256
