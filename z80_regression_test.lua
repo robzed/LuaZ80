@@ -757,8 +757,26 @@ local basic_instruction_tests = {
     ["DAA"] =            0x27,
     ["JR   Z,!r!"] =     0x28,
     ["ADD  HL,HL"] =     0x29,
-    ["LD   HL,(!nn!)"] = 0x2A,
 --]]
+    -- 0x2A
+    { "LD HL,(nn)", function(z)
+            z:LD("A", 22) 
+            z:LD("(0x6000)", "A") 
+            z:LD("A", 11) 
+            z:LD("(0x6001)", "A")
+            z:LD("HL", "(0x6000)")
+            end,
+        { [0x6000] = 22, [0x6001] = 11, A = 11, L = 22, H = 11 } },
+    { "LD HL,(nn) rollover", function(z)
+            z:LD("A", 22) 
+            z:LD("(0xFFFF)", "A") 
+            z:LD("A", 33) 
+            z:LD("(0x0000)", "A")
+            z:LD("HL", "(0xFFFF)") 
+            z:LD("A", 99)
+            end,
+        { [0xFFFF] = 22, [0x0000] = 33, A = 99, L = 22, H = 33 } },
+
     -- 0x2B
     { "DEC HL", function(z) z:LD("HL", 0x1234) z:assemble("DEC", "HL") end, { L = 0x33, H = 0x12 } },
     { "DEC HL rollover1", function(z) z:LD("HL", 0x0100) z:assemble("DEC", "HL") end, { H = 0x00, L = 0xFF } },
