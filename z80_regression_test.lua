@@ -501,9 +501,15 @@ local basic_instruction_tests = {
             A_ = 0x12, F_=0x34 } },
     --[[
     ["ADD  HL,BC"] =     0x09,
-    ["LD   A,(BC)"] =    0x0A,
     --]]
-    
+    -- 0x0A
+    { "LD A,(BC)", function(z) 
+            z:LD("BC", 0x5F12) 
+            z:LD("A", 0x0A)
+            z:LD("(BC)", "A")
+            z:LD("A", 0xFF)
+            z:LD("A", "(BC)")
+            end, { B = 0x5F, C = 0x12, A = 0x0A, [0x5F12]=0x0A } }, 
     -- 0x0b
     { "DEC BC", function(z) z:LD("BC", 0x1234) z:assemble("DEC", "BC") end, { C = 0x33, B = 0x12 } },
     { "DEC BC rollover1", function(z) z:LD("BC", 0x0100) z:assemble("DEC", "BC") end, { B = 0x00, C = 0xFF } },
