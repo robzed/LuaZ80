@@ -865,7 +865,7 @@ local basic_instruction_tests = {
 --]]
 
     -- 0x3A
-    { "LD A,(nn)", function(z) z:LD("A", 22) z:LD("(0x6000)", "A") z:LD("A", "(0x6000)") end,
+    { "LD A,(nn)", function(z) z:LD("A", 22) z:LD("(0x6000)", "A") z:LD("A", 0) z:LD("A", "(0x6000)") end,
         { [0x6000] = 22, A = 22 } },
     
     -- 0x3B
