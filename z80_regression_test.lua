@@ -571,9 +571,13 @@ local basic_instruction_tests = {
 -- 0x11
 { "LD DE,n", function(z) z:assemble("LD", "DE", 0x4321) end, { D=0x43, E=0x21 } },
 
---[[
-    ["LD   (DE),A"] =    0x12,
---]]
+-- 0x12
+{ "LD (DE), A", function(z) 
+        z:LD("A", 12)
+        z:LD("DE", 0x6040)
+        z:LD("(DE)", "A") 
+    end,
+    { D = 0x60, E = 0x40, A = 12, [0x6040] = 12 } },
 
 -- 0x13
 { "INC  DE", function(z) z:assemble("LD", "DE", 0x43FF)  
