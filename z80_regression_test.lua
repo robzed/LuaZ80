@@ -886,9 +886,11 @@ local basic_instruction_tests = {
  { "DEC  (HL) Flags P/V Sign", function(z) z:LD("HL", 0x6000) z:assemble("LD", "(HL)", 0x80)  
         z:assemble("DEC", "(HL)") end, { [0x6000]=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"}, H=0x60, L=0x00 } },  
 
+ { "LD (HL), n", function(z)
+         z:LD("HL", 0x5DEF)
+         z:LD("(HL)", 0x11)
+         end, { H=0x5D, L=0xEF, [0x5DEF] = 0x11 } },
 --[[
-
-    ["LD   (HL),!n!"] =  0x36,
     ["SCF"] =            0x37,
     ["JR   C,!r!"] =     0x38,
     ["ADD  HL,SP"] =     0x39,
