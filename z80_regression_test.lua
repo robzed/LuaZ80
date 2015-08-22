@@ -1235,7 +1235,20 @@ local basic_instruction_tests = {
     ["OR   H"] =         0xB4,
     ["OR   L"] =         0xB5,
     ["OR   (HL)"] =      0xB6,
-    ["OR   A"] =         0xB7,
+--]]
+
+--  }
+--local temp_test = {
+
+    --0xB7,
+    { "OR A", function(z) z:LD("A", 99) z:OR("A") end, { A=99, F={"-Z", "-N", "-H", "P", "-S", "-C"} } },   -- 99=0x63 even number of bits = Parity set
+    { "OR A", function(z) z:LD("A", 0x99) z:OR("A") end, { A=0x99, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    { "OR A", function(z) z:LD("A", 0xFF) z:OR("A") end, { A=0xFF, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    { "OR A non-negative", function(z) z:LD("A", 1) z:OR("A") end, { A=1, F={"-Z", "-N", "-H", "-P", "-S", "-C"} } }, -- odd number of bits = parity clear
+    { "OR A parity even", function(z) z:LD("A", 3) z:OR("A") end, { A=3, F={"-Z", "-N", "-H", "P", "-S", "-C"} } }, -- even number of bits = parity set
+    { "OR A parity odd", function(z) z:LD("A", 7) z:OR("A") end, { A=7, F={"-Z", "-N", "-H", "-P", "-S", "-C"} } },
+    { "OR A zero", function(z) z:LD("A", 0) z:OR("A") end, { A=0, F={"Z", "-N", "-H", "P", "-S", "-C"} } }, -- even number of bits = parity set
+--[[
     ["CP   B"] =         0xB8,
     ["CP   C"] =         0xB9,
     ["CP   D"] =         0xBA,
@@ -1377,8 +1390,6 @@ local basic_instruction_tests = {
     ["JP   PO,!nn!"] =   0xE2,
     --]]
     
---   }
---local temp_test = {
 
     -- 0xE3
     { "EX (SP), HL", function(z) 
