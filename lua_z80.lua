@@ -1113,10 +1113,7 @@ function Z80JIT:initialize()
     --            C == 0, H == 0
     self._zflags = {}
     for A = 0,255 do
-        self._zflags[A] = bit32.band(A,0xa8)    -- create the sign, bit6, bit3
-        if A == 0 then
-            self._zflags[A] = self._zflags[A] + Z80_Z_FLAG
-        end
+        self._zflags[A] = bit32.band(A,0xa8)    -- create the sign, bit5, bit3
         -- um0080
         -- This flag is also used with logical operations and rotate instructions 
         -- to indicate the resulting parity is Even. The number of 1 bits in a 
@@ -1131,7 +1128,8 @@ function Z80JIT:initialize()
             self._zflags[A] = self._zflags[A] + Z80_P_FLAG
         end
     end
-    
+    -- insert zero flag
+    self._zflags[0] = self._zflags[0] + Z80_Z_FLAG
     --[[ Print out parity values for checking
     for A = 0, 255, 16 do
         for B = 0, 15 do
