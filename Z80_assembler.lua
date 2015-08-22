@@ -1111,6 +1111,22 @@ function Z80_Assembler:PUSH(register_pair)
     self:assemble("PUSH", register_pair)
 end
 
+function Z80_Assembler:ADD(op1, op2)
+    self:assemble("ADD", op1, op2)
+end
+
+function Z80_Assembler:OR(op)
+    self:assemble("OR", op)
+end
+function Z80_Assembler:XOR(op)
+    self:assemble("XOR", op)
+end
+function Z80_Assembler:AND(op)
+    self:assemble("AND", op)
+end
+function Z80_Assembler:CP(op)
+    self:assemble("CP", op)
+end
 
 --[[
 z = Z80_Assembler()
