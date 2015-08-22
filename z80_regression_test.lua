@@ -1195,7 +1195,38 @@ local basic_instruction_tests = {
     ["ADC  A,H"] =       0x8C,
     ["ADC  A,L"] =       0x8D,
     ["ADC  A,(HL)"] =    0x8E,
-    ["ADC  A,A"] =       0x8F,
+--]]
+
+-- }
+--local temp_test = {
+
+    -- 0x8F
+    { "ADC A,A", function(z) z:OR("A") 
+            z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+            z:LD("A", 0x01) z:assemble("ADC", "A", "A") end, 
+        { A = 0x02, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+    
+    { "ADC A,A carry set", function(z)
+            z:LD("A", 0xFF) z:assemble("ADD", "A", "A")
+            z:LD("A", 0x01) z:assemble("ADC", "A", "A") end, 
+        { A = 0x03, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+    
+    { "ADC A,A carry overflow", function(z)
+            z:LD("A", 0xFF) z:assemble("ADD", "A", "A")
+            z:LD("A", 0xFF) z:assemble("ADC", "A", "A") end, 
+        { A = 0xFF, F = { "S", "-Z", "H", "-V", "-N", "C" } } },
+
+    { "ADC A,A sign", function(z)
+            z:LD("A", 0xFF) z:assemble("ADD", "A", "A")
+            z:LD("A", 0x80) z:assemble("ADC", "A", "A") end, 
+        { A = 0x01, F = { "-S", "-Z", "-H", "V", "-N", "C" } } },
+
+    { "ADC A,A zero", function(z)
+            z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+            z:LD("A", 0x80) z:assemble("ADC", "A", "A") end, 
+        { A = 0x00, F = { "-S", "Z", "-H", "V", "-N", "C" } } },
+
+--[[
     ["SUB  A,B"] =       0x90,
     ["SUB  A,C"] =       0x91,
     ["SUB  A,D"] =       0x92,
@@ -1237,8 +1268,6 @@ local basic_instruction_tests = {
     ["OR   (HL)"] =      0xB6,
 --]]
 
---  }
---local temp_test = {
 
     --0xB7,
     { "OR A", function(z) z:LD("A", 99) z:OR("A") end, { A=99, F={"-Z", "-N", "-H", "P", "-S", "-C"} } },   -- 99=0x63 even number of bits = Parity set
