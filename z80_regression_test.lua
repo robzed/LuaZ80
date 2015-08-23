@@ -973,15 +973,19 @@ local basic_instruction_tests = {
         z:LD("A", 0)
         z:ADD("A", "A")
         z:assemble("CCF") 
+        z:LD("A", 0)
+        z:assemble("ADC", "A", "A")
         end,
-        { A = 0, F={"-N", "C", "-H", "-V", "-S", "Z"} } },
+        { A = 1, F={"-N", "-C", "-H", "-V", "-S", "-Z"} } },
     
 { "CCF carry flag clear", function(z)
         z:LD("A", 0xFF)
         z:ADD("A", "A")
-        z:assemble("CCF") 
+        z:assemble("CCF")
+        z:LD("A", 0)
+        z:assemble("ADC", "A", "A")
         end,
-        { A = 0xFE, F={"-N", "-C", "H", "-V", "S", "-Z"} } },
+        { A = 0, F={"-N", "-C", "-H", "-V", "-S", "Z"} } },
 
     --0x40,
     { "LD B,B", function(z) z:LD("B", 0x7f) z:LD("B", "B") end, { ["B"]=0x7f } },
