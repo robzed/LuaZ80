@@ -1277,7 +1277,25 @@ local basic_instruction_tests = {
     ["XOR  L"] =         0xAD,
     ["XOR  (HL)"] =      0xAE,
     ["XOR  A"] =         0xAF,
-    ["OR   B"] =         0xB0,
+    --]]
+    
+    -- 0xB0
+    { "OR B", function(z) z:LD("A", 0x80) z:LD("B", 0x01) z:OR("B") end, { A=0x81, B=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB1
+    { "OR C", function(z) z:LD("A", 0x80) z:LD("C", 0x01) z:OR("C") end, { A=0x81, C=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB2
+    { "OR D", function(z) z:LD("A", 0x80) z:LD("D", 0x01) z:OR("D") end, { A=0x81, D=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB3
+    { "OR E", function(z) z:LD("A", 0x80) z:LD("E", 0x01) z:OR("E") end, { A=0x81, E=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB4
+    { "OR H", function(z) z:LD("A", 0x80) z:LD("H", 0x01) z:OR("H") end, { A=0x81, H=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB6
+    { "OR L", function(z) z:LD("A", 0x80) z:LD("L", 0x01) z:OR("L") end, { A=0x81, L=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB7
+    { "OR (HL)", function(z) z:LD("A", 0x80) z:LD("HL", 0x6000) z:LD("(HL)", 0x01) z:OR("(HL)") end, { A=0x81, H=0x60, L=0x00, [0x6000]=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+
+    --[[
+    
     ["OR   C"] =         0xB1,
     ["OR   D"] =         0xB2,
     ["OR   E"] =         0xB3,
@@ -1286,8 +1304,8 @@ local basic_instruction_tests = {
     ["OR   (HL)"] =      0xB6,
 --]]
 
-
     --0xB7,
+    -- extra checks for flags
     { "OR A", function(z) z:LD("A", 99) z:OR("A") end, { A=99, F={"-Z", "-N", "-H", "P", "-S", "-C"} } },   -- 99=0x63 even number of bits = Parity set
     { "OR A", function(z) z:LD("A", 0x99) z:OR("A") end, { A=0x99, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
     { "OR A", function(z) z:LD("A", 0xFF) z:OR("A") end, { A=0xFF, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
