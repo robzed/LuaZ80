@@ -1294,16 +1294,6 @@ local basic_instruction_tests = {
     -- 0xB7
     { "OR (HL)", function(z) z:LD("A", 0x80) z:LD("HL", 0x6000) z:LD("(HL)", 0x01) z:OR("(HL)") end, { A=0x81, H=0x60, L=0x00, [0x6000]=0x01, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
 
-    --[[
-    
-    ["OR   C"] =         0xB1,
-    ["OR   D"] =         0xB2,
-    ["OR   E"] =         0xB3,
-    ["OR   H"] =         0xB4,
-    ["OR   L"] =         0xB5,
-    ["OR   (HL)"] =      0xB6,
---]]
-
     --0xB7,
     -- extra checks for flags
     { "OR A", function(z) z:LD("A", 99) z:OR("A") end, { A=99, F={"-Z", "-N", "-H", "P", "-S", "-C"} } },   -- 99=0x63 even number of bits = Parity set
