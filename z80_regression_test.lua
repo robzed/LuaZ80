@@ -1261,14 +1261,35 @@ local basic_instruction_tests = {
     ["SBC  A,L"] =       0x9D,
     ["SBC  A,(HL)"] =    0x9E,
     ["SBC  A,A"] =       0x9F,
-    ["AND  B"] =         0xA0,
-    ["AND  C"] =         0xA1,
-    ["AND  D"] =         0xA2,
-    ["AND  E"] =         0xA3,
-    ["AND  H"] =         0xA4,
-    ["AND  L"] =         0xA5,
+    --]]
+    
+        -- 0xA0
+    { "AND B", function(z) z:LD("A", 0x8F) z:LD("B", 0x01) z:AND("B") end, { A=0x01, B=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND B zero", function(z) z:LD("A", 0x80) z:LD("B", 0x01) z:AND("B") end, { A=0x00, B=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xA1
+    { "AND C", function(z) z:LD("A", 0x8F) z:LD("C", 0x01) z:AND("C") end, { A=0x01, C=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND C zero", function(z) z:LD("A", 0x80) z:LD("C", 0x01) z:AND("C") end, { A=0x00, C=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xA2
+    { "AND D", function(z) z:LD("A", 0x8F) z:LD("D", 0x01) z:AND("D") end, { A=0x01, D=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND D zero", function(z) z:LD("A", 0x80) z:LD("D", 0x01) z:AND("D") end, { A=0x00, D=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xA3
+    { "AND E", function(z) z:LD("A", 0x8F) z:LD("E", 0x01) z:AND("E") end, { A=0x01, E=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND E zero", function(z) z:LD("A", 0x80) z:LD("E", 0x01) z:AND("E") end, { A=0x00, E=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xA4
+    { "AND H", function(z) z:LD("A", 0x8F) z:LD("H", 0x01) z:AND("H") end, { A=0x01, H=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND H zero", function(z) z:LD("A", 0x80) z:LD("H", 0x01) z:AND("H") end, { A=0x00, H=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xA5
+    { "AND L", function(z) z:LD("A", 0x8F) z:LD("L", 0x01) z:AND("L") end, { A=0x01, L=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND L zero", function(z) z:LD("A", 0x80) z:LD("L", 0x01) z:AND("L") end, { A=0x00, L=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xA6
+--    { "AND (HL)", function(z) z:LD("A", 0x8F) z:LD("B", 0x01) z:AND("B") end, { A=0x01, H=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+--    { "AND (HL) zero", function(z) z:LD("A", 0x80) z:LD("B", 0x01) z:AND("B") end, { A=0x00, H=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xA6
+    { "AND A", function(z) z:LD("A", 0x8F) z:AND("A") end, { A=0x8F, F={"-Z", "-N", "H", "-P", "S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND A zero", function(z) z:LD("A", 0x00) z:AND("A") end, { A=0x00, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+
+    --[[
     ["AND  (HL)"] =      0xA6,
-    ["AND  A"] =         0xA7,
     ["XOR  B"] =         0xA8,
     ["XOR  C"] =         0xA9,
     ["XOR  D"] =         0xAA,
