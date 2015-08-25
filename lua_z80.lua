@@ -996,6 +996,13 @@ function decode_instruction(memory, address, instruction_table)
     return instruction, address, patch
 end
 
+--  We use these to calculate the timings of each instruction
+local instruction_timings = {}
+
+-- R register ... 
+-- http://rk.nvg.ntnu.no/sinclair/faq/tech_z80.html#RREG
+-- http://z80.info/z80info.htm
+local M1_cycles = {}
 
 
 -- z80_compile
