@@ -171,6 +171,12 @@ local function assemble_code(code_in)
     
     local code
     if not z:any_errors() then
+        if z:any_errors_or_warnings() then
+            for _,warnings in ipairs(z:get_error_and_warning_messages()) do
+                print(warnings)
+            end
+        end
+        
         code = z:get_code()
     else
         print("FAIL: didn't assemble")
