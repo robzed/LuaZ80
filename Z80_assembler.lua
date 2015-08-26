@@ -77,7 +77,7 @@ function Z80_Assembler:any_errors()
 end
 
 function Z80_Assembler:any_errors_or_warnings()
-    return #self.message ~= 0
+    return #self.messages ~= 0
 end
 
 function Z80_Assembler:get_code()
@@ -101,11 +101,11 @@ end
 
 function Z80_Assembler:_byte_check(value, warning_string)
     if value < -128 then
+        self:set_warning(string.format("%s from 0x%x to -128 (== 128)", warning_string, value))
         value = 128    -- signed -128
-        self:set_warning(warning_string)
     elseif value > 255 then
+        self:set_warning(string.format("%s from 0x%x to 255", warning_string, value))
         value = 255
-        self:set_warning(warning_string)
     elseif value < 0 then
         -- make unsigned
         value = value + 256
