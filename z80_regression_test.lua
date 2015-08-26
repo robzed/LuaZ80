@@ -1197,6 +1197,9 @@ local basic_instruction_tests = {
     --0x7F,
     { "LD A,A", function(z) z:LD("A", 0x7f) z:LD("A", "A")  end, { ["A"]=0x7f } },
 
+--}
+--local temp_test = {
+
 --[[
     ["ADD  A,B"] =       0x80,
     ["ADD  A,C"] =       0x81,
@@ -1215,8 +1218,6 @@ local basic_instruction_tests = {
     ["ADC  A,(HL)"] =    0x8E,
 --]]
 
--- }
---local temp_test = {
 
     -- 0x8F
     { "ADC A,A", function(z) z:OR("A") 
