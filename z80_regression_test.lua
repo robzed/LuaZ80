@@ -895,7 +895,13 @@ local basic_instruction_tests = {
  { "LD (HL), n", function(z)
          z:LD("HL", 0x5DEF)
          z:LD("(HL)", 0x11)
-         end, { H=0x5D, L=0xEF, [0x5DEF] = 0x11 } },
+     end, { H=0x5D, L=0xEF, [0x5DEF] = 0x11 } },
+ 
+ { "LD (HL), n>255", function(z) 
+         z:LD("HL", 0x6000) 
+         z:LD("(HL)", 0x6001) 
+         end, { H=0x60, L=0x00, [0x6000]=0xFF } },
+
 --[[
     ["SCF"] =            0x37,
     ["JR   C,!r!"] =     0x38,
