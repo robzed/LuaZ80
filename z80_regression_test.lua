@@ -634,7 +634,7 @@ local basic_instruction_tests = {
         z:assemble("DEC", "D") end, { D=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"} } },  
 
 
--- 0x26
+-- 0x16
  { "LD  D,n", function(z) z:assemble("LD", "D", 0xe1) end, { D=0xe1 } }, 
 
 --[[
