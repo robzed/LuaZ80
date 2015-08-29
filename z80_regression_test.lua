@@ -505,9 +505,48 @@ local basic_instruction_tests = {
                         end, 
         { D=0x98, E=0x76, A=0xAB, F=0xCD, SP=0x6000, [0x5FFE]=0xCD, [0x5FFF]=0xAB, 
             A_ = 0x12, F_=0x34 } },
-    --[[
-    ["ADD  HL,BC"] =     0x09,
-    --]]
+    
+    -- 0x09
+    -- ADD HL, ss ... doesn't affect Z or S or V
+    { "ADD HL, BC", function(z) z:LD("HL", 0x1234)
+                                z:LD("BC", 0x4320)
+                                z:ADD("HL", "BC") end,
+                                { H = 0x55, L = 0x54, B = 0x43, C = 0x20, F = { "-N", "-H", "-C" } } },
+    
+    { "ADD HL, BC no half-carry", function(z) z:LD("HL", 0x003F)
+                                z:LD("BC", 0x003F)
+                                    z:ADD("HL", "BC") end,
+                                { H = 0x00, L = 0x7E, B = 0x00, C = 0x3F, F = { "-N", "-H", "-C" } } },
+
+    { "ADD HL, BC half-carry", function(z) z:LD("HL", 0x3F00)
+                                z:LD("BC", 0x0100)
+                                z:ADD("HL", "BC") end,
+                                { H = 0x40, L = 0x00, B = 0x01, C = 0x00, F = { "-N", "H", "-C" } } },
+    
+    { "ADD HL, BC overflow", function(z) z:LD("HL", 0x8000)
+                                z:LD("BC", 0x8000)
+                                z:ADD("HL", "BC") end,
+                                { H = 0x00, L = 0x00, B = 0x80, C = 0x00, F = { "-N", "-H", "C" } } },
+
+    { "ADD HL, BC overflow2", function(z) z:LD("HL", 0x1000)
+                                z:LD("BC", 0x7000)
+                                z:ADD("HL", "BC") end,
+                                { H = 0x80, L = 0x00, B = 0x70, C = 0x00, F = { "-N", "-H", "-C" } } },
+
+    { "ADD HL, BC half and overflow", function(z) z:LD("HL", 0x0001)
+                                z:LD("BC", 0xFFFF)
+                                z:ADD("HL", "BC") end,
+                                { H = 0x00, L = 0x00, B = 0xFF, C = 0xFF, F = { "-N", "H", "C" } } },
+    
+    { "ADD HL, BC check no S Z flags", function(z)
+                                z:LD("SP", 0x6000)
+                                z:LD("HL", 0x0001)
+                                z:PUSH("HL")
+                                z:POP("AF")
+                                z:LD("BC", 0xFFFF)
+                                z:ADD("HL", "BC") end,
+                                { H = 0x00, L = 0x00, B = 0xFF, C = 0xFF, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, SP=0x6000, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
+    
     -- 0x0A
     { "LD A,(BC)", function(z) 
             z:LD("BC", 0x5F12) 

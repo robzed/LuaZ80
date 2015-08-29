@@ -171,7 +171,7 @@ function Z80CPU:initialize()
     
     self.simple_flags = {}
     for A = 0,255 do
-        self.simple_flags[A] = bit32.band(A,0xa8)    -- create the sign, bit6, bit3
+        self.simple_flags[A] = bit32.band(A,0xa8)    -- create the sign, bit5, bit3
         if A == 0 then
             self.simple_flags[A] = self.simple_flags[A] + Z80_Z_FLAG
         end
@@ -179,6 +179,10 @@ function Z80CPU:initialize()
 
 end
 
+-- Flags are complex
+-- http://rk.nvg.ntnu.no/sinclair/faq/tech_z80.html#RREG
+-- http://www.z80.info/z80sflag.htm
+-- 
 local function calc_add_overflow(oldA,op2,newA)
 --if (~(ra^R)&(wml^ra)&0x80 ~= 0 then V_FLAG end
     if bit32.band(bit32.bnot(bit32.bxor(oldA, op2)), bit32.bxor(newA,oldA), 0x80) ~= 0 then
@@ -217,6 +221,24 @@ function Z80CPU:get_F()
         self._F = F    -- don't calculate twice
     end
     
+    return F
+end
+local SZV_flag_mask = Z80_S_FLAG + Z80_V_FLAG + Z80_Z_FLAG
+function Z80CPU:get_F_only_SZV()
+    local F = self._F
+    if not F then
+        local oldA = self._oldA
+        local op2 = self._otherOp
+        local newA = self._newA
+        F = self.simple_flags[newA]
+        if self._subtract then
+            F = F + calc_sub_overflow(oldA,op2,newA)
+        else
+            F = F + calc_add_overflow(oldA,op2,newA)
+        end
+    end
+    F = bit32.band(F, SZV_flag_mask)
+    self._F = F
     return F
 end
 
@@ -444,10 +466,12 @@ local decode_first_byte = {
     -- 27 = DAA
     -- 37 = SCF
         
+    -- these four are covered below
     -- 09 = ADD HL, BC
     -- 19 = ADD HL, DE
     -- 29 = ADD HL, HL
     -- 39 = ADD HL, SP
+
     
     -- 0A = LD A,(BC)
     [0x0A] = "CPU.A = memory[CPU.B*256+CPU.C]",
@@ -721,6 +745,44 @@ local function ADC_to_A_string(what)
     CPU.A = result
     ]]
 end
+
+-- 09 = ADD HL, BC
+-- 19 = ADD HL, DE
+-- 29 = ADD HL, HL
+-- 39 = ADD HL, SP
+-- ADD HL, ss ... doesn't affect Z or S, just H F3 F5 V N C
+
+local function ADD_to_HL_string(hi, lo)
+    -- basically a simple add followed by an ADC H,x.
+    -- maybe we should try a 16 bit add? (but then we have to split anyway...)
+    -- or get rid of the use of CPU.carry internally?
+    return string.format(
+[[  
+    result=CPU.L+%s
+    if result > 255 then 
+        temp=1 result=result-256
+    else
+        temp=0
+    end
+    CPU.L=result
+    
+    result = CPU.H+%s+temp
+    temp = CPU:get_F_only_SZV()
+    
+    if result > 255 then
+        CPU.Carry=1 result=result-256 temp = temp + 1
+    else
+        CPU.Carry=0
+    end
+    temp = temp + bit32.band(bit32.bxor(CPU.H, %s, result),Z80_H_FLAG)
+    CPU._F = temp
+    CPU.H = result ]], lo, hi, hi)
+end
+decode_first_byte[0x09] = ADD_to_HL_string("CPU.B", "CPU.C")
+decode_first_byte[0x19] = ADD_to_HL_string("CPU.D", "CPU.E")
+decode_first_byte[0x29] = ADD_to_HL_string("CPU.H", "CPU.L")
+decode_first_byte[0x39] = ADD_to_HL_string("bit32.rshift(CPU.SP, 8)", "(CPU.SP%256)") -- math.floor(b / 256)
+
 local function SUB_to_A_string(what)
     return "result=".."CPU.A-" .. what .. [[
     if result < 0 then
