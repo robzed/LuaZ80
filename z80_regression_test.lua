@@ -853,8 +853,42 @@ local basic_instruction_tests = {
 --[[
     ["DAA"] =            0x27,
     ["JR   Z,!r!"] =     0x28,
-    ["ADD  HL,HL"] =     0x29,
 --]]
+    -- 0x29
+    -- ADD HL, ss ... doesn't affect Z or S or V
+    { "ADD HL, HL", function(z) z:LD("HL", 0x1234)
+                                z:ADD("HL", "HL") end,
+                                { H = 0x24, L = 0x68, F = { "-N", "-H", "-C" } } },
+    
+    { "ADD HL, HL no half-carry", function(z) z:LD("HL", 0x003F)
+                                    z:ADD("HL", "HL") end,
+                                { H = 0x00, L = 0x7E, F = { "-N", "-H", "-C" } } },
+
+    { "ADD HL, HL half-carry", function(z) z:LD("HL", 0x3F00)
+                                z:ADD("HL", "HL") end,
+                                { H = 0x7E, L = 0x00, F = { "-N", "H", "-C" } } },
+    
+    { "ADD HL, HL overflow", function(z) z:LD("HL", 0x8000)
+                                z:ADD("HL", "HL") end,
+                                { H = 0x00, L = 0x00, F = { "-N", "-H", "C" } } },
+
+    { "ADD HL, HL overflow2", function(z) z:LD("HL", 0x4000)
+                                z:ADD("HL", "HL") end,
+                                { H = 0x80, L = 0x00, F = { "-N", "-H", "-C" } } },
+
+    { "ADD HL, HL half and overflow", function(z) z:LD("HL", 0x8888)
+                                z:ADD("HL", "HL") end,
+                                { H = 0x11, L = 0x10, F = { "-N", "H", "C" } } },
+    
+    { "ADD HL, HL check no S Z flags", function(z)
+                                z:LD("SP", 0x6000)
+                                z:LD("HL", 0x0001)
+                                z:PUSH("HL")
+                                z:POP("AF")
+                                z:LD("HL", 0x8888)
+                                z:ADD("HL", "HL") end,
+                                { H = 0x11, L = 0x10, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, SP=0x6000, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
+
     -- 0x2A
     { "LD HL,(nn)", function(z)
             z:LD("A", 22) 
