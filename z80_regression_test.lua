@@ -67,6 +67,7 @@ local function get_state(jit, cpu)
             -- main registers
             A = cpu.A,
             F = cpu:get_F(),    -- always calculate F
+            Carry = cpu.Carry,
             H = cpu.H,
             L = cpu.L,
             B = cpu.B,
@@ -312,6 +313,17 @@ local function flags_to_str(f)
 end
 
 local function check_changes(old_state, new_state, checks)
+    if new_state.reg.F % 2 ~= new_state.reg.Carry then
+        print("Carry Flag and F register don't agree in new state")
+        print(string.format("Register %s was 0x%x now 0x%x expected", k, old_state.reg[k], new_state.reg[k]))
+    end
+    if old_state.reg.F % 2 ~= old_state.reg.Carry then
+        print("Carry Flag and F register don't agree in old state")
+        print(string.format("Register %s was 0x%x now 0x%x expected", k, old_state.reg[k], new_state.reg[k]))
+    end
+    -- hide carry flag - it's checked as part of F
+    new_state.reg.Carry = old_state.reg.Carry
+    
     for k,v in pairs(checks) do
         if type(k) == "number" then
             -- address
