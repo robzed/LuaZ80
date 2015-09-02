@@ -461,11 +461,13 @@ local decode_first_byte = {
     -- n5 = DEC r, covered below
     -- n6 = LD r, xx, covered below
     
-    -- 07 = RLCA
-    -- 17 = RLA
+    -- 07 = RLCA ... bit 7 to carry and bit 0
+    [0x07] = "CPU:get_F_only_SZV() CPU.A = CPU.A * 2 if CPU.A > 255 then CPU.A = CPU.A - 255 CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end",
+    -- 17 = RLA ... carry to bit 0, bit 7 to carry
+    [0x17] = "CPU:get_F_only_SZV() CPU.A = CPU.A * 2 + CPU.Carry if CPU.A > 255 then CPU.A = CPU.A - 256 CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end",
     -- 27 = DAA
     -- 37 = SCF
-        
+    
     -- these four are covered below
     -- 09 = ADD HL, BC
     -- 19 = ADD HL, DE

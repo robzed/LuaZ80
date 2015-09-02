@@ -502,9 +502,15 @@ local basic_instruction_tests = {
 -- 0x06
  { "LD  B,n", function(z) z:assemble("LD", "B", 0xe1) end, { B=0xe1 } }, 
 
---[[
-    ["RLCA"] =           0x07,
-    --]]
+-- 0x07
+{ "RLCA", function(z) z:LD("A", 0x01) z:assemble("RLCA") end,
+    { A = 0x02, F = { "-N", "-C", "-H"}}},
+{ "RLCA carry", function(z) z:LD("A", 0x80) z:assemble("RLCA") end,
+    { A = 0x01, F = { "-N", "C", "-H"}}},
+{ "RLCA carry clear", function(z) z:assemble("CCF") z:LD("A", 0x80) z:assemble("RLCA") end,
+    { A = 0x01, F = { "-N", "C", "-H"}}},
+{ "RLCA carry clear2", function(z) z:assemble("CCF") z:LD("A", 0x33) z:assemble("RLCA") end,
+    { A = 0x66, F = { "-N", "-C", "-H"}}},
     
 -- 0x08
 { "EX AF, AF'", function(z) z:LD("SP", 0x6000)
@@ -690,8 +696,17 @@ local basic_instruction_tests = {
 -- 0x16
  { "LD  D,n", function(z) z:assemble("LD", "D", 0xe1) end, { D=0xe1 } }, 
 
+-- 0x17
+{ "RLA", function(z) z:LD("A", 0x01) z:assemble("RLA") end,
+    { A = 0x03, F = { "-N", "-C", "-H"}}},
+{ "RLA carry", function(z) z:LD("A", 0x80) z:assemble("RLA") end,
+    { A = 0x01, F = { "-N", "C", "-H"}}},
+{ "RLA carry clear", function(z) z:assemble("CCF") z:LD("A", 0x80) z:assemble("RLA") end,
+    { A = 0x00, F = { "-N", "C", "-H"}}},
+{ "RLA carry clear2", function(z) z:assemble("CCF") z:LD("A", 0x33) z:assemble("RLA") end,
+    { A = 0x66, F = { "-N", "-C", "-H"}}},
+
 --[[
-    ["RLA"] =            0x17,
     ["JR   !r!"] =       0x18,
 --]]
     -- 0x19
