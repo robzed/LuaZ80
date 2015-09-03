@@ -509,8 +509,10 @@ local decode_first_byte = {
     -- nD = DEC r, covered below
     -- nE = LD r, xx, covered below
     
-    -- 0F = RRCA
-    -- 1F = RRA
+    -- 0F = RRCA ... bit 0 to carry and bit 7
+    [0x0F] = "CPU:get_F_only_SZV() if (CPU.A % 2) == 1 then CPU.A = CPU.A + 256 CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end CPU.A = bit32.rshift(CPU.A, 1)",
+    -- 1F = RRA ... carry to bit 7, bit 0 to carry
+    [0x1F] = "CPU:get_F_only_SZV() result = bit32.rshift(CPU.A, 1) + (128*CPU.Carry) if (CPU.A % 2) == 1 then CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end CPU.A = result",
     -- 2F = CPL
     
     -- 3F = CCF

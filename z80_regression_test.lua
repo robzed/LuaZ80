@@ -627,9 +627,17 @@ local basic_instruction_tests = {
 -- 0x0e
  { "LD  C,n", function(z) z:assemble("LD", "C", 0xe1) end, { C=0xe1 } }, 
 
---[[
+-- 0x0f
+{ "RRCA", function(z) z:LD("A", 0x02) z:assemble("RRCA") end,
+    { A = 0x01, F = { "-N", "-C", "-H"}}},
+{ "RRCA carry", function(z) z:LD("A", 0x81) z:assemble("RRCA") end,
+    { A = 0xC0, F = { "-N", "C", "-H"}}},
+{ "RRCA carry clear", function(z) z:assemble("CCF") z:LD("A", 0x81) z:assemble("RRCA") end,
+    { A = 0xC0, F = { "-N", "C", "-H"}}},
+{ "RRCA carry clear2", function(z) z:assemble("CCF") z:LD("A", 0x66) z:assemble("RRCA") end,
+    { A = 0x33, F = { "-N", "-C", "-H"}}},
 
-    ["RRCA"] =           0x0f,
+--[[
     ["DJNZ !r!"] =       0x10,
 --]]
 
