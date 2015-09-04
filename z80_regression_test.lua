@@ -734,9 +734,13 @@ local basic_instruction_tests = {
 { "RLA carry clear2", function(z) z:assemble("CCF") z:LD("A", 0x33) z:assemble("RLA") end,
     { A = 0x66, F = { "-N", "-C", "-H"}}},
 
---[[
-    ["JR   !r!"] =       0x18,
---]]
+    -- 0x18
+{ "JR r", function(z)
+        z:LD("A", 0x01) 
+        z:assemble("JR", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x01 } },
+
     -- 0x19
     -- ADD HL, ss ... doesn't affect Z or S or V
     { "ADD HL, DE", function(z) z:LD("HL", 0x1234)
