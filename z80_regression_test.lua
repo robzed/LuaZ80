@@ -851,9 +851,21 @@ local basic_instruction_tests = {
 { "RRA carry clear2", function(z) z:assemble("CCF") z:LD("A", 0x66) z:assemble("RRA") end,
     { A = 0x33, F = { "-N", "-C", "-H"}}},
 
---[[
-    ["JR   NZ,!r!"] =    0x20,
---]]
+-- 0x20
+{ "JR NZ, r", function(z)
+        z:LD("A", 0x01)
+        z:assemble("DEC", "A")
+        z:assemble("JR", "NZ", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x02, F={ "-S", "Z", "-H", "-V", "N" } } },
+
+{ "JR NZ, r   notzero", function(z)
+        z:LD("A", 0x01)
+        z:assemble("DEC", "A")
+        z:assemble("INC", "A")
+        z:assemble("JR", "NZ", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x01, F={ "-S", "-Z", "-H", "-V", "-N" } } },
 
 -- 0x21
 { "LD HL,n", function(z) z:assemble("LD", "HL", 0x4321) end, { H=0x43, L=0x21 } },
