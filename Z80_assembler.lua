@@ -113,6 +113,17 @@ function Z80_Assembler:_byte_check(value, warning_string)
     return value
 end
 
+function Z80_Assembler:_byte_check_signed_only(value, warning_string)
+    if value < -128 or value > 127 then
+        self:set_error(string.format("%s: Value 0x%x is out of signed byte bounds", warning_string, value))
+        value = 0
+    elseif value < 0 then
+        -- make unsigned
+        value = value + 256
+    end
+    return value
+end
+
 function Z80_Assembler:DS(...)
     for _, a_string in ipairs{...} do
         if type(a_string) ~= "string"then
@@ -987,6 +998,11 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 self:_save_opcode(opcode)
                 self:DB(dest)
                 
+            elseif dest_op == "!r!" then
+                dest = self:_byte_check_signed_only(dest, instruction)
+                self:_save_opcode(opcode)
+                self:DB(dest)
+
             elseif dest_op == "!nn!" or dest_op == "(!nn!)" then
                 local high = math.floor(dest / 256)
                 local low = dest % 256
@@ -997,6 +1013,11 @@ function Z80_Assembler:assemble(instruction, dest, source)
             
             elseif src_op == "!n!" or src_op == "(!n!)" then
                 source = self:_byte_check(source, instruction .. " byte truncated")
+                self:_save_opcode(opcode)
+                self:DB(source)
+            
+            elseif src_op == "!r!" then
+                source = self:_byte_check_signed_only(source, instruction)
                 self:_save_opcode(opcode)
                 self:DB(source)
             
@@ -1016,6 +1037,10 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 dest_op = "!nn!"
             elseif src_op == "!n!" then
                 src_op = "!nn!"
+            elseif dest_op == "!nn!" then
+                dest_op = "!r!"
+            elseif src_op == "!nn!" then
+                src_op = "!r!"
             elseif dest_op == "(!n!)" then
                 dest_op = "(!nn!)"
             elseif src_op == "(!n!)" then
