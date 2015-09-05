@@ -934,8 +934,23 @@ local basic_instruction_tests = {
 
 --[[
     ["DAA"] =            0x27,
-    ["JR   Z,!r!"] =     0x28,
 --]]
+-- 0x28
+{ "JR Z, r", function(z)
+        z:LD("A", 0x01)
+        z:assemble("DEC", "A")
+        z:assemble("JR", "Z", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x00, F={ "-S", "Z", "-H", "-V", "N" } } },
+
+{ "JR Z, r   notzero", function(z)
+        z:LD("A", 0x01)
+        z:assemble("DEC", "A")
+        z:assemble("INC", "A")
+        z:assemble("JR", "Z", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x02, F={ "-S", "-Z", "-H", "-V", "-N" } } },
+
     -- 0x29
     -- ADD HL, ss ... doesn't affect Z or S or V
     { "ADD HL, HL", function(z) z:LD("HL", 0x1234)
