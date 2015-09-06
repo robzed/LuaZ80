@@ -467,7 +467,8 @@ local decode_first_byte = {
     [0x17] = "CPU:get_F_only_SZV() CPU.A = CPU.A * 2 + CPU.Carry if CPU.A > 255 then CPU.A = CPU.A - 256 CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end",
     -- 27 = DAA
     -- 37 = SCF
-    
+    [0x37] = [[ CPU._F = bit32.band(CPU:get_F(), 0xFF-(Z80_N_FLAG + Z80_H_FLAG + Z80_C_FLAG)) + Z80_C_FLAG CPU.Carry = 1 ]],
+
     -- these four are covered below
     -- 09 = ADD HL, BC
     -- 19 = ADD HL, DE
@@ -519,7 +520,6 @@ local decode_first_byte = {
     [0x3F] =
 [[   CPU:get_F() CPU._F = bit32.band(CPU._F, 0xFF-(Z80_N_FLAG + Z80_H_FLAG + Z80_C_FLAG))
      if CPU.Carry==1 then CPU._F = CPU._F + Z80_H_FLAG CPU.Carry = 0 else CPU._F = CPU._F + Z80_C_FLAG CPU.Carry = 1 end ]],
-     --CPU.Carry = CPU._F % 2 ]] ,
 
     -- 40 to 7F = mostly various LD, covered below
     -- 80 to BF = ADD/ADC/SUB/SBC/AND/XOR/OR/CP, covered below
