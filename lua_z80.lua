@@ -406,7 +406,7 @@ local decode_first_byte = {
             if byte1 > 127 then byte1 = byte1-256 end
             local target = iaddr+byte1
             return string.format(
-            "if not CPU.Carry then if jit.jump_count==0 then CPU.PC = 0x%x; return 'ok' else jit.jump_count = jit.jump_count-1;goto l_%04x end end", target, target), iaddr, target
+            "if CPU.Carry == 0 then if jit.jump_count==0 then CPU.PC = 0x%x; return 'ok' else jit.jump_count = jit.jump_count-1;goto l_%04x end end", target, target), iaddr, target
         end,
     -- 38 = JR C, xx
     [0x38] = function(memory, iaddr) 
@@ -415,7 +415,7 @@ local decode_first_byte = {
             if byte1 > 127 then byte1 = byte1-256 end
             local target = iaddr+byte1
             return string.format(
-            "if CPU.Carry then if jit.jump_count==0 then CPU.PC = 0x%x; return 'ok' else jit.jump_count = jit.jump_count-1;goto l_%04x end end", target, target), iaddr, target
+            "if CPU.Carry == 1 then if jit.jump_count==0 then CPU.PC = 0x%x; return 'ok' else jit.jump_count = jit.jump_count-1;goto l_%04x end end", target, target), iaddr, target
         end,
 
     -- 01 = LD BC, xxxx
