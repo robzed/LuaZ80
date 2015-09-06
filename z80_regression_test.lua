@@ -1058,8 +1058,23 @@ local basic_instruction_tests = {
 
 --[[
     ["CPL"] =            0x2F,
-    ["JR   NC,!r!"] =    0x30,
 --]]
+-- 0x30
+{ "JR NC, r   notzero", function(z)
+        z:LD("A", 0x01)
+        z:assemble("OR", "A")
+        z:assemble("CCF")
+        z:assemble("JR", "NC", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x02, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },    
+
+{ "JR NC, r", function(z)
+        z:LD("A", 0x00)
+        z:assemble("OR", "A")
+        z:assemble("JR", "NC", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x00, F={ "-S", "Z", "-H", "P", "-N", "-C" } } }, -- Parity set if even number of bits set 
+
 
 -- 0x31
 { "LD SP,n", function(z) z:assemble("LD", "SP", 0x4321) end, { SP=0x4321 } },
@@ -1114,8 +1129,24 @@ local basic_instruction_tests = {
 
 --[[
     ["SCF"] =            0x37,
-    ["JR   C,!r!"] =     0x38,
 --]]
+-- 0x38
+{ "JR C, r   notzero", function(z)
+        z:LD("A", 0x01)
+        z:assemble("OR", "A")
+        z:assemble("CCF")
+        z:assemble("JR", "C", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x01, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },    
+
+{ "JR C, r", function(z)
+        z:LD("A", 0x00)
+        z:assemble("OR", "A")
+        z:assemble("JR", "C", 2)
+        z:LD("A", 0x02) end,
+        { A = 0x02, F={ "-S", "Z", "-H", "P", "-N", "-C" } } }, -- Parity set if even number of bits set 
+
+
     -- 0x39
     -- ADD HL, ss ... doesn't affect Z or S or V
     { "ADD HL, SP", function(z) z:LD("HL", 0x1234)
