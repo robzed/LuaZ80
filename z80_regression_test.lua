@@ -1127,9 +1127,25 @@ local basic_instruction_tests = {
          z:LD("(HL)", 0x6001) 
          end, { H=0x60, L=0x00, [0x6000]=0xFF } },
 
---[[
-    ["SCF"] =            0x37,
---]]
+-- 0x37
+-- F flags: negative cleared, half carry is the same as old carry, carry completemented
+{ "SCF", function(z) z:assemble("SCF") end, { F={"-N", "C", "-H" } } },
+{ "SCF", function(z) 
+        z:LD("SP", 0x6000)
+        z:LD("HL", 0)
+        z:assemble("PUSH", "HL")
+        z:assemble("POP", "AF")
+        z:assemble("SCF") 
+        end, { SP=0x6000, [0x5FFF]=0, [0x5FFE]=0, H=0, L=0, A = 0, F={"oldF=0x00", "-N", "C", "-H" } } },
+{ "SCF", function(z) 
+        z:LD("SP", 0x6000)
+        z:LD("HL", 0x00FF)
+        z:assemble("PUSH", "HL")
+        z:assemble("POP", "AF")
+        z:assemble("SCF") 
+        end, { SP=0x6000, [0x5FFF]=0, [0x5FFE]=0xFF, H=0, L=0xFF, A = 0, F={"oldF=0xFF", "-N", "C", "-H" } } },
+
+
 -- 0x38
 { "JR C, r   notzero", function(z)
         z:LD("A", 0x01)
