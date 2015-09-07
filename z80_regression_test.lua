@@ -1056,9 +1056,27 @@ local basic_instruction_tests = {
 -- 0x2E
  { "LD  L,n", function(z) z:assemble("LD", "L", 0xe1) end, { L=0xe1 } }, 
 
---[[
-    ["CPL"] =            0x2F,
---]]
+-- 0x2F
+ { "CPL (1)", function(z) z:LD("A", 0x00) z:assemble("CPL") end, { A=0xFF, F={ "N", "H" } } }, 
+ { "CPL (2)", function(z) z:LD("A", 0x01) z:assemble("CPL") end, { A=0xFE, F={ "N", "H" } } }, 
+ { "CPL (3)", function(z) z:LD("A", 0xFF) z:assemble("CPL") end, { A=0x00, F={ "N", "H" } } }, 
+ { "CPL (4)", function(z) z:LD("A", 0xAA) z:assemble("CPL") end, { A=0x55, F={ "N", "H" } } },
+ { "CPL (5)", function(z) z:LD("A", 0xB4) z:assemble("CPL") end, { A=0x4B, F={ "N", "H" } } }, 
+ { "CPL (6)", function(z)  
+        z:LD("SP", 0x6000)
+        z:LD("HL", 0)
+        z:assemble("PUSH", "HL")
+        z:assemble("POP", "AF")
+        z:assemble("CPL") 
+        end, { SP=0x6000, [0x5FFF]=0, [0x5FFE]=0, H=0, L=0, A = 0xFF, F={"oldF=0x00", "N", "H" } } },
+ { "CPL (7)", function(z) 
+        z:LD("SP", 0x6000)
+        z:LD("HL", 0xFF00)
+        z:assemble("PUSH", "HL")
+        z:assemble("POP", "AF")
+        z:assemble("CPL") 
+        end, { SP=0x6000, [0x5FFF]=0xFF, [0x5FFE]=0, H=0xFF, L=0, A = 0, F={"oldF=0x00", "N", "H" } } },
+
 -- 0x30
 { "JR NC, r   notzero", function(z)
         z:LD("A", 0x01)

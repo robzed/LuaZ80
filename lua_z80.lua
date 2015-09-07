@@ -515,6 +515,7 @@ local decode_first_byte = {
     -- 1F = RRA ... carry to bit 7, bit 0 to carry
     [0x1F] = "CPU:get_F_only_SZV() result = bit32.rshift(CPU.A, 1) + (128*CPU.Carry) if (CPU.A % 2) == 1 then CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end CPU.A = result",
     -- 2F = CPL
+    [0x2F] = "CPU._F = bit32.bor(CPU:get_F(), Z80_N_FLAG + Z80_H_FLAG) CPU.A = 255 - CPU.A",
     
     -- 3F = CCF
     [0x3F] = [[   CPU._F = bit32.band(CPU:get_F(), 0xFF-(Z80_N_FLAG + Z80_H_FLAG + Z80_C_FLAG))
