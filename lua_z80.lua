@@ -517,8 +517,7 @@ local decode_first_byte = {
     -- 2F = CPL
     
     -- 3F = CCF
-    [0x3F] =
-[[   CPU:get_F() CPU._F = bit32.band(CPU._F, 0xFF-(Z80_N_FLAG + Z80_H_FLAG + Z80_C_FLAG))
+    [0x3F] = [[   CPU._F = bit32.band(CPU:get_F(), 0xFF-(Z80_N_FLAG + Z80_H_FLAG + Z80_C_FLAG))
      if CPU.Carry==1 then CPU._F = CPU._F + Z80_H_FLAG CPU.Carry = 0 else CPU._F = CPU._F + Z80_C_FLAG CPU.Carry = 1 end ]],
 
     -- 40 to 7F = mostly various LD, covered below
