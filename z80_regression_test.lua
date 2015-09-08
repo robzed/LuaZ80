@@ -1526,8 +1526,11 @@ local basic_instruction_tests = {
 --}
 --local temp_test = {
 
+-- 0x80
+ { "ADD A, B", function(z) z:LD("A", 1) z:LD("B", 2) z:assemble("ADD", "A", "B") end,
+     { A = 3, B = 2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ 
 --[[
-    ["ADD  A,B"] =       0x80,
     ["ADD  A,C"] =       0x81,
     ["ADD  A,D"] =       0x82,
     ["ADD  A,E"] =       0x83,
