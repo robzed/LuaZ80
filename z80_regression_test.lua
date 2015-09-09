@@ -1529,6 +1529,14 @@ local basic_instruction_tests = {
 -- 0x80
  { "ADD A, B", function(z) z:LD("A", 1) z:LD("B", 2) z:assemble("ADD", "A", "B") end,
      { A = 3, B = 2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ { "ADD A, B", function(z) z:LD("A", 0x0F) z:LD("B", 1) z:assemble("ADD", "A", "B") end,
+     { A = 0x10, B = 1, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+ { "ADD A, B", function(z) z:LD("A", 0x80) z:LD("B", 0x80) z:assemble("ADD", "A", "B") end,
+     { A = 0, B = 0x80, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+ { "ADD A, B", function(z) z:LD("A", 0x7F) z:LD("B", 1) z:assemble("ADD", "A", "B") end,
+     { A = 0x80, B = 1, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+ { "ADD A, B", function(z) z:LD("A", 0xFF) z:LD("B", 2) z:assemble("ADD", "A", "B") end,
+     { A = 1, B = 2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
  
 --[[
     ["ADD  A,C"] =       0x81,
