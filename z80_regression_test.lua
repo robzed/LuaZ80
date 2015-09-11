@@ -1631,12 +1631,92 @@ local basic_instruction_tests = {
         z:LD("A", 0xFF) z:assemble("ADC", "A", "B") end, 
     { A = 0x01, B = 1, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
 
+ -- 0x89
+{ "ADC A,C  carry clear", function(z) z:OR("A") 
+        z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+        z:LD("C", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "C") end, 
+    { A = 0x02, C = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,C  carry set", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("C", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "C") end, 
+    { A = 0x03, C = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,C  carry set2", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("C", 0x01)
+        z:LD("A", 0xFF) z:assemble("ADC", "A", "C") end, 
+    { A = 0x01, C = 1, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+ -- 0x8A
+{ "ADC A,D  carry clear", function(z) z:OR("A") 
+        z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+        z:LD("D", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "D") end, 
+    { A = 0x02, D = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,D  carry set", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("D", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "D") end, 
+    { A = 0x03, D = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,D  carry set2", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("D", 0x01)
+        z:LD("A", 0xFF) z:assemble("ADC", "A", "D") end, 
+    { A = 0x01, D = 1, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+ -- 0x8B
+{ "ADC A,E  carry clear", function(z) z:OR("A") 
+        z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+        z:LD("E", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "E") end, 
+    { A = 0x02, E = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,E  carry set", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("E", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "E") end, 
+    { A = 0x03, E = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,E  carry set2", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("E", 0x01)
+        z:LD("A", 0xFF) z:assemble("ADC", "A", "E") end, 
+    { A = 0x01, E = 1, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+ -- 0x8C
+{ "ADC A,H  carry clear", function(z) z:OR("A") 
+        z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+        z:LD("H", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "H") end, 
+    { A = 0x02, H = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,H  carry set", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("H", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "H") end, 
+    { A = 0x03, H = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,H  carry set2", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("H", 0x01)
+        z:LD("A", 0xFF) z:assemble("ADC", "A", "H") end, 
+    { A = 0x01, H = 1, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+ -- 0x8D
+{ "ADC A,L  carry clear", function(z) z:OR("A") 
+        z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+        z:LD("L", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "L") end, 
+    { A = 0x02, L = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,L  carry set", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("L", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "L") end, 
+    { A = 0x03, L = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,L  carry set2", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("L", 0x01)
+        z:LD("A", 0xFF) z:assemble("ADC", "A", "L") end, 
+    { A = 0x01, L = 1, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
+
 --[[
-    ["ADC  A,C"] =       0x89,
-    ["ADC  A,D"] =       0x8A,
-    ["ADC  A,E"] =       0x8B,
-    ["ADC  A,H"] =       0x8C,
-    ["ADC  A,L"] =       0x8D,
     ["ADC  A,(HL)"] =    0x8E,
 --]]
 
