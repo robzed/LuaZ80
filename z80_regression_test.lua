@@ -1620,9 +1620,18 @@ local basic_instruction_tests = {
         z:LD("B", 0x01)
         z:LD("A", 0x01) z:assemble("ADC", "A", "B") end, 
     { A = 0x02, B = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,B  carry set", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("B", 0x01)
+        z:LD("A", 0x01) z:assemble("ADC", "A", "B") end, 
+    { A = 0x03, B = 1, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,B  carry set2", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("B", 0x01)
+        z:LD("A", 0xFF) z:assemble("ADC", "A", "B") end, 
+    { A = 0x01, B = 1, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
 
 --[[
-    ["ADC  A,B"] =       0x88,
     ["ADC  A,C"] =       0x89,
     ["ADC  A,D"] =       0x8A,
     ["ADC  A,E"] =       0x8B,
