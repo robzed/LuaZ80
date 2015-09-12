@@ -1598,9 +1598,18 @@ local basic_instruction_tests = {
  { "ADD A, L", function(z) z:LD("A", 0xFF) z:LD("L", 2) z:assemble("ADD", "A", "L") end,
      { A = 1, L = 2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
---[[
-    ["ADD  A,(HL)"] =    0x86,
---]]
+-- 0x86
+ { "ADD A, (HL)", function(z) z:LD("A", 1) z:LD("HL", 0x6000) z:LD("(HL)", 2) z:assemble("ADD", "A", "(HL)") end,
+     { A = 3, H = 0x60, L=0x00, [0x6000]=2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ { "ADD A, (HL)", function(z) z:LD("A", 0x0F) z:LD("HL", 0x6000) z:LD("(HL)", 1) z:assemble("ADD", "A", "(HL)") end,
+     { A = 0x10, H = 0x60, L=0x00, [0x6000]=1, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+ { "ADD A, (HL)", function(z) z:LD("A", 0x80) z:LD("HL", 0x6000) z:LD("(HL)", 0x80) z:assemble("ADD", "A", "(HL)") end,
+     { A = 0, H = 0x60, L=0x00, [0x6000]=0x80, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+ { "ADD A, (HL)", function(z) z:LD("A", 0x7F) z:LD("HL", 0x6000) z:LD("(HL)", 1) z:assemble("ADD", "A", "(HL)") end,
+     { A = 0x80, H = 0x60, L=0x00, [0x6000]=1, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+ { "ADD A, (HL)", function(z) z:LD("A", 0xFF) z:LD("HL", 0x6000) z:LD("(HL)", 2) z:assemble("ADD", "A", "(HL)") end,
+     { A = 1, H = 0x60, L=0x00, [0x6000]=2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+
 
 -- 0x87
  { "ADD A, A", function(z) z:LD("A", 1) z:assemble("ADD", "A", "A") end,
