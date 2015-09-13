@@ -1934,7 +1934,22 @@ local basic_instruction_tests = {
     ["JP   Z,!nn!"] =    0xCA,
     ["CALL Z,!nn!"] =    0xCC,
     ["CALL !nn!"] =      0xCD,
-    ["ADC  A,!n!"] =     0xCE,
+--]]
+ -- 0xCE
+{ "ADC A,n  carry clear", function(z) z:OR("A") 
+        z:LD("A", 0x00) z:assemble("ADD", "A", "A")
+        z:LD("A", 0x01) z:assemble("ADC", "A", 1) end, 
+    { A = 0x02, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,n  carry set", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("A", 0x01) z:assemble("ADC", "A", 1) end, 
+    { A = 0x03, F = { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC A,n  carry set2", function(z) z:OR("A") 
+        z:LD("A", 0x80) z:assemble("ADD", "A", "A")
+        z:LD("A", 0xFF) z:assemble("ADC", "A", 1) end, 
+    { A = 0x01, F = { "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+--[[
     ["RST  08H"] =       0xCF,
     ["RET  NC"] =        0xD0,
     --]]
