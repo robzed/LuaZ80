@@ -2123,8 +2123,9 @@ local basic_instruction_tests = {
             z:assemble("PUSH", "AF")
             end, { A=0x43, F=0xFF, SP=0xFFFF, [0xFFFF]=0xFF, [0x0000]=0x43 } },
 
+    -- 0xF6
+    { "OR n", function(z) z:LD("A", 0x80) z:OR(0x01) end, { A=0x81, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
     --[[
-    ["OR   !n!"] =       0xF6,
     ["RST  30H"] =       0xF7,
     ["RET  M"] =         0xF8,
     --]]
