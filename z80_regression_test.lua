@@ -2056,7 +2056,6 @@ local basic_instruction_tests = {
     { "AND n zero", function(z) z:LD("A", 0x80) z:AND(0x01) end, { A=0x00, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
 
     --[[
-    ["AND  !n!"] =       0xE6,
     ["RST  20H"] =       0xE7,
     ["RET  PE"] =        0xE8,
     ["JP   (HL)"] =      0xE9,
@@ -2073,7 +2072,13 @@ local basic_instruction_tests = {
     
     --[[
     ["CALL PE,!nn!"] =   0xEC,
-    ["XOR  !n!"] =       0xEE,
+--]]
+
+-- 0xEE
+    { "XOR n", function(z) z:LD("A", 0x8F) z:XOR(0x01) end, { A=0x8E, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- odd number of bits = Parity clear
+    { "XOR n zero", function(z) z:LD("A", 0x01) z:XOR(0x01) end, { A=0x00, F={"Z", "-N", "-H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+
+--[[
     ["RST  28H"] =       0xEF,
     ["RET  P"] =         0xF0,
     --]]
