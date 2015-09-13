@@ -2051,6 +2051,10 @@ local basic_instruction_tests = {
             z:assemble("PUSH", "HL")
             end, { H=0x43, L=0x21, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
 
+        -- 0xE6
+    { "AND n", function(z) z:LD("A", 0x8F) z:AND(0x01) end, { A=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND n zero", function(z) z:LD("A", 0x80) z:AND(0x01) end, { A=0x00, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+
     --[[
     ["AND  !n!"] =       0xE6,
     ["RST  20H"] =       0xE7,
