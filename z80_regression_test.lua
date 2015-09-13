@@ -1109,9 +1109,28 @@ local basic_instruction_tests = {
  { "INC  SP rollover", function(z) z:assemble("LD", "SP", 0xFFFF)  
         z:assemble("INC", "SP") end, { SP=0x0000 } },  
 
---[[
-    ["INC  (HL)"] =      0x34,
---]]
+-- 0x34
+ { "INC  (HL)", function(z) z:assemble("LD", "HL", 0x6000)
+    z:LD("(HL)", 0x11)
+    z:assemble("INC", "(HL)") end, { [0x6000]=0x12, H=0x60, L=0, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+
+ { "INC  (HL) rollover", function(z) z:assemble("LD", "HL", 0x6000)  
+    z:LD("(HL)", 0xFF)
+         -- S is set if result is negative; reset otherwise
+        -- Z is set if result is zero; reset otherwise
+        -- H is set if carry from bit 3; reset otherwise
+        -- P/V is set if r was 7FH before operation; reset otherwise
+        -- N is reset
+        -- C is not affected
+        z:assemble("INC", "(HL)") end, { [0x6000]=0x00, H=0x60, L=0, F={"-S", "Z", "H", "-V", "-N", "C", "oldF=0xFF"} } },  
+
+ { "INC  (HL) half carry", function(z) z:assemble("LD", "HL", 0x6000)  
+    z:LD("(HL)", 0x0F)
+        z:assemble("INC", "(HL)") end, { [0x6000]=0x10, H=0x60, L=0, F={"-S", "-Z", "H", "-V", "-N", "C", "oldF=0x0F"} } },  
+
+ { "INC  (HL) Flags P/V Sign", function(z) z:assemble("LD", "HL", 0x6000)  
+    z:LD("(HL)", 0x7F)
+        z:assemble("INC", "(HL)") end, { [0x6000]=0x80, H=0x60, L=0, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
 
 -- 0x35
 { "DEC  (HL)", function(z) z:LD("HL", 0x6000) z:LD("(HL)", 0x11)  
