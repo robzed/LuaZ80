@@ -430,8 +430,9 @@ local basic_instruction_tests = {
     
 
 { "NOP",     function(z) z:NOP()   end, { } },
+-- 0x01
 { "LD BC,n", function(z) z:assemble("LD", "BC", 0x4321) end, { B=0x43, C=0x21 } },
-    
+-- 0x02
 { "LD   (BC),A (beyond memory)", function(z)
                     z:assemble("LD", "BC", 0x8000) 
                     z:assemble("LD", "A", 0x01)
@@ -1154,6 +1155,7 @@ local basic_instruction_tests = {
  { "DEC  (HL) Flags P/V Sign", function(z) z:LD("HL", 0x6000) z:assemble("LD", "(HL)", 0x80)  
         z:assemble("DEC", "(HL)") end, { [0x6000]=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"}, H=0x60, L=0x00 } },  
 
+-- 0x36
  { "LD (HL), n", function(z)
          z:LD("HL", 0x5DEF)
          z:LD("(HL)", 0x11)
@@ -1291,7 +1293,7 @@ local basic_instruction_tests = {
  { "DEC  A Flags P/V Sign", function(z) z:assemble("LD", "A", 0x80)  
         z:assemble("DEC", "A") end, { A=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"} } },  
 
-
+-- 0x3E
 { "LD A,33", function(z) z:LD("A", 33)   end, { ["A"]=33 } },
 
 -- 0x3F
