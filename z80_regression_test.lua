@@ -1824,12 +1824,172 @@ local basic_instruction_tests = {
     end,
     { A = 0x7E, B=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
 
+
+-- 0x91
+{ "SUB A,C", function(z)
+        z:LD("A", 0x26)
+        z:LD("C", 0x02)
+        z:assemble("SUB", "A", "C")
+    end,
+    { A = 0x024, C=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,C zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("C", 0x26)
+        z:assemble("SUB", "A", "C")
+    end,
+    { A = 0x00, C=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,C half", function(z)
+        z:LD("A", 0x10)
+        z:LD("C", 0x02)
+        z:assemble("SUB", "A", "C")
+    end,
+    { A = 0x0E, C=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,C carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("C", 0x02)
+        z:assemble("SUB", "A", "C")
+    end,
+    { A = 0xFE, C=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,C overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("C", 0x02)
+        z:assemble("SUB", "A", "C")
+    end,
+    { A = 0x7E, C=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0x92
+{ "SUB A,D", function(z)
+        z:LD("A", 0x26)
+        z:LD("D", 0x02)
+        z:assemble("SUB", "A", "D")
+    end,
+    { A = 0x024, D=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,D zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("D", 0x26)
+        z:assemble("SUB", "A", "D")
+    end,
+    { A = 0x00, D=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,D half", function(z)
+        z:LD("A", 0x10)
+        z:LD("D", 0x02)
+        z:assemble("SUB", "A", "D")
+    end,
+    { A = 0x0E, D=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,D carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("D", 0x02)
+        z:assemble("SUB", "A", "D")
+    end,
+    { A = 0xFE, D=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,D overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("D", 0x02)
+        z:assemble("SUB", "A", "D")
+    end,
+    { A = 0x7E, D=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0x93
+{ "SUB A,E", function(z)
+        z:LD("A", 0x26)
+        z:LD("E", 0x02)
+        z:assemble("SUB", "A", "E")
+    end,
+    { A = 0x024, E=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,E zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("E", 0x26)
+        z:assemble("SUB", "A", "E")
+    end,
+    { A = 0x00, E=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,E half", function(z)
+        z:LD("A", 0x10)
+        z:LD("E", 0x02)
+        z:assemble("SUB", "A", "E")
+    end,
+    { A = 0x0E, E=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,E carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("E", 0x02)
+        z:assemble("SUB", "A", "E")
+    end,
+    { A = 0xFE, E=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,E overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("E", 0x02)
+        z:assemble("SUB", "A", "E")
+    end,
+    { A = 0x7E, E=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0x94
+{ "SUB A,H", function(z)
+        z:LD("A", 0x26)
+        z:LD("H", 0x02)
+        z:assemble("SUB", "A", "H")
+    end,
+    { A = 0x024, H=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,H zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("H", 0x26)
+        z:assemble("SUB", "A", "H")
+    end,
+    { A = 0x00, H=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,H half", function(z)
+        z:LD("A", 0x10)
+        z:LD("H", 0x02)
+        z:assemble("SUB", "A", "H")
+    end,
+    { A = 0x0E, H=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,H carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("H", 0x02)
+        z:assemble("SUB", "A", "H")
+    end,
+    { A = 0xFE, H=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,H overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("H", 0x02)
+        z:assemble("SUB", "A", "H")
+    end,
+    { A = 0x7E, H=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0x95
+{ "SUB A,L", function(z)
+        z:LD("A", 0x26)
+        z:LD("L", 0x02)
+        z:assemble("SUB", "A", "L")
+    end,
+    { A = 0x024, L=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,L zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("L", 0x26)
+        z:assemble("SUB", "A", "L")
+    end,
+    { A = 0x00, L=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,L half", function(z)
+        z:LD("A", 0x10)
+        z:LD("L", 0x02)
+        z:assemble("SUB", "A", "L")
+    end,
+    { A = 0x0E, L=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,L carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("L", 0x02)
+        z:assemble("SUB", "A", "L")
+    end,
+    { A = 0xFE, L=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,L overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("L", 0x02)
+        z:assemble("SUB", "A", "L")
+    end,
+    { A = 0x7E, L=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
     --[[
-    ["SUB  A,C"] =       0x91,
-    ["SUB  A,D"] =       0x92,
-    ["SUB  A,E"] =       0x93,
-    ["SUB  A,H"] =       0x94,
-    ["SUB  A,L"] =       0x95,
     ["SUB  A,(HL)"] =    0x96,
     ["SUB  A,A"] =       0x97,
     ["SBC  A,B"] =       0x98,
