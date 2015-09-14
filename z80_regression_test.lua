@@ -1794,6 +1794,16 @@ local basic_instruction_tests = {
 
 --[[
     ["SUB  A,B"] =       0x90,
+    ]]--
+    
+{ "SUB A,B", function(z)
+        z:LD("A", 0x26)
+        z:LD("B", 0x02)
+        z:assemble("SUB", "A", "B")
+    end,
+    { A = 0x024, B=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+
+    --[[
     ["SUB  A,C"] =       0x91,
     ["SUB  A,D"] =       0x92,
     ["SUB  A,E"] =       0x93,
