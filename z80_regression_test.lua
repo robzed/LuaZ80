@@ -2203,8 +2203,34 @@ local basic_instruction_tests = {
             z:assemble("PUSH", "DE")
             end, { D=0x43, E=0x21, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
 
+-- 0xD6
+{ "SUB A,n", function(z)
+        z:LD("A", 0x26)
+        z:assemble("SUB", "A", 0x02)
+    end,
+    { A = 0x024, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,n zero", function(z)
+        z:LD("A", 0x26)
+        z:assemble("SUB", "A", 0x26)
+    end,
+    { A = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,n half", function(z)
+        z:LD("A", 0x10)
+        z:assemble("SUB", "A", 0x02)
+    end,
+    { A = 0x0E, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,n carry", function(z)
+        z:LD("A", 0x00)
+        z:assemble("SUB", "A", 0x02)
+    end,
+    { A = 0xFE, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,n overflow", function(z)
+        z:LD("A", 0x80)
+        z:assemble("SUB", "A", 0x02)
+    end,
+    { A = 0x7E, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
     --[[
-    ["SUB  A,!n!"] =     0xD6,
     ["RST  10H"] =       0xD7,
     ["RET  C"] =         0xD8,
     --]]
