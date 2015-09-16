@@ -1991,7 +1991,27 @@ local basic_instruction_tests = {
 
     --[[
     ["SUB  A,(HL)"] =    0x96,
-    ["SUB  A,A"] =       0x97,
+    --]]
+    
+    -- 0x97
+{ "SUB A,A", function(z)
+        z:LD("A", 0x26)
+        z:assemble("SUB", "A", "A")
+    end,
+    { A = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,A zero", function(z)
+        z:LD("A", 0x00)
+        z:assemble("SUB", "A", "A")
+    end,
+    { A = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,A overflow", function(z)
+        z:LD("A", 0x80)
+        z:assemble("SUB", "A", "A")
+    end,
+    { A = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+
+
+    --[[
     ["SBC  A,B"] =       0x98,
     ["SBC  A,C"] =       0x99,
     ["SBC  A,D"] =       0x9A,
