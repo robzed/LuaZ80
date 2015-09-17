@@ -1989,9 +1989,43 @@ local basic_instruction_tests = {
     end,
     { A = 0x7E, L=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
 
-    --[[
-    ["SUB  A,(HL)"] =    0x96,
-    --]]
+-- 0x96
+{ "SUB A,(HL)", function(z)
+        z:LD("A", 0x26)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("SUB", "A", "(HL)")
+    end,
+    { A = 0x024, H=0x60, L=0, [0x6000]=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,(HL) zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x26)
+        z:assemble("SUB", "A", "(HL)")
+    end,
+    { A = 0x00, H=0x60, L=0, [0x6000]=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,(HL) half", function(z)
+        z:LD("A", 0x10)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("SUB", "A", "(HL)")
+    end,
+    { A = 0x0E, H=0x60, L=0, [0x6000]=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,(HL) carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("SUB", "A", "(HL)")
+    end,
+    { A = 0xFE, H=0x60, L=0, [0x6000]=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,(HL) overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("SUB", "A", "(HL)")
+    end,
+    { A = 0x7E, H=0x60, L=0, [0x6000]=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+    
     
     -- 0x97
 { "SUB A,A", function(z)
