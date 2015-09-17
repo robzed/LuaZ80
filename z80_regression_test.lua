@@ -2132,15 +2132,262 @@ local basic_instruction_tests = {
     { "OR A parity even", function(z) z:LD("A", 3) z:OR("A") end, { A=3, F={"-Z", "-N", "-H", "P", "-S", "-C"} } }, -- even number of bits = parity set
     { "OR A parity odd", function(z) z:LD("A", 7) z:OR("A") end, { A=7, F={"-Z", "-N", "-H", "-P", "-S", "-C"} } },
     { "OR A zero", function(z) z:LD("A", 0) z:OR("A") end, { A=0, F={"Z", "-N", "-H", "P", "-S", "-C"} } }, -- even number of bits = parity set
+
+
+-- 0xB8
+{ "CP B", function(z)
+        z:LD("A", 0x26)
+        z:LD("B", 0x02)
+        z:assemble("CP", "B")
+    end,
+    { A = 0x026, B=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP B zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("B", 0x26)
+        z:assemble("CP", "B")
+    end,
+    { A = 0x26, B=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP B half", function(z)
+        z:LD("A", 0x10)
+        z:LD("B", 0x02)
+        z:assemble("CP", "B")
+    end,
+    { A = 0x10, B=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP B carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("B", 0x02)
+        z:assemble("CP", "B")
+    end,
+    { A = 0x00, B=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP B overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("B", 0x02)
+        z:assemble("CP", "B")
+    end,
+    { A = 0x80, B=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0xB9
+{ "CP C", function(z)
+        z:LD("A", 0x26)
+        z:LD("C", 0x02)
+        z:assemble("CP", "C")
+    end,
+    { A = 0x026, C=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP C zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("C", 0x26)
+        z:assemble("CP", "C")
+    end,
+    { A = 0x26, C=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP C half", function(z)
+        z:LD("A", 0x10)
+        z:LD("C", 0x02)
+        z:assemble("CP", "C")
+    end,
+    { A = 0x10, C=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP C carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("C", 0x02)
+        z:assemble("CP", "C")
+    end,
+    { A = 0x00, C=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP C overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("C", 0x02)
+        z:assemble("CP", "C")
+    end,
+    { A = 0x80, C=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0xBA
+{ "CP D", function(z)
+        z:LD("A", 0x26)
+        z:LD("D", 0x02)
+        z:assemble("CP", "D")
+    end,
+    { A = 0x026, D=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP D zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("D", 0x26)
+        z:assemble("CP", "D")
+    end,
+    { A = 0x26, D=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP D half", function(z)
+        z:LD("A", 0x10)
+        z:LD("D", 0x02)
+        z:assemble("CP", "D")
+    end,
+    { A = 0x10, D=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP D carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("D", 0x02)
+        z:assemble("CP", "D")
+    end,
+    { A = 0x00, D=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP D overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("D", 0x02)
+        z:assemble("CP", "D")
+    end,
+    { A = 0x80, D=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0xBB
+{ "CP E", function(z)
+        z:LD("A", 0x26)
+        z:LD("E", 0x02)
+        z:assemble("CP", "E")
+    end,
+    { A = 0x026, E=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP E zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("E", 0x26)
+        z:assemble("CP", "E")
+    end,
+    { A = 0x26, E=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP E half", function(z)
+        z:LD("A", 0x10)
+        z:LD("E", 0x02)
+        z:assemble("CP", "E")
+    end,
+    { A = 0x10, E=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP E carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("E", 0x02)
+        z:assemble("CP", "E")
+    end,
+    { A = 0x00, E=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP E overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("E", 0x02)
+        z:assemble("CP", "E")
+    end,
+    { A = 0x80, E=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0xBC
+{ "CP H", function(z)
+        z:LD("A", 0x26)
+        z:LD("H", 0x02)
+        z:assemble("CP", "H")
+    end,
+    { A = 0x026, H=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP H zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("H", 0x26)
+        z:assemble("CP", "H")
+    end,
+    { A = 0x26, H=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP H half", function(z)
+        z:LD("A", 0x10)
+        z:LD("H", 0x02)
+        z:assemble("CP", "H")
+    end,
+    { A = 0x10, H=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP H carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("H", 0x02)
+        z:assemble("CP", "H")
+    end,
+    { A = 0x00, H=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP H overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("H", 0x02)
+        z:assemble("CP", "H")
+    end,
+    { A = 0x80, H=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+
+-- 0xBD
+{ "CP L", function(z)
+        z:LD("A", 0x26)
+        z:LD("L", 0x02)
+        z:assemble("CP", "L")
+    end,
+    { A = 0x026, L=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP L zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("L", 0x26)
+        z:assemble("CP", "L")
+    end,
+    { A = 0x26, L=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP L half", function(z)
+        z:LD("A", 0x10)
+        z:LD("L", 0x02)
+        z:assemble("CP", "L")
+    end,
+    { A = 0x10, L=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP L carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("L", 0x02)
+        z:assemble("CP", "L")
+    end,
+    { A = 0x00, L=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP L overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("L", 0x02)
+        z:assemble("CP", "L")
+    end,
+    { A = 0x80, L=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+-- 0xBE
+{ "CP (HL)", function(z)
+        z:LD("A", 0x26)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("CP", "(HL)")
+    end,
+    { A = 0x026, H=0x60, L=0, [0x6000]=2, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP (HL) zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x26)
+        z:assemble("CP", "(HL)")
+    end,
+    { A = 0x26, H=0x60, L=0, [0x6000]=0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP (HL) half", function(z)
+        z:LD("A", 0x10)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("CP", "(HL)")
+    end,
+    { A = 0x10, H=0x60, L=0, [0x6000]=2, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP (HL) carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("CP", "(HL)")
+    end,
+    { A = 0x00, H=0x60, L=0, [0x6000]=2, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP (HL) overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x02)
+        z:assemble("CP", "(HL)")
+    end,
+    { A = 0x80, H=0x60, L=0, [0x6000]=2, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+    
+    
+    -- 0xBF
+{ "CP A", function(z)
+        z:LD("A", 0x26)
+        z:assemble("CP", "A")
+    end,
+    { A = 0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP A zero", function(z)
+        z:LD("A", 0x00)
+        z:assemble("CP", "A")
+    end,
+    { A = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP A overflow", function(z)
+        z:LD("A", 0x80)
+        z:assemble("CP", "A")
+    end,
+    { A = 0x80, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+
+
 --[[
-    ["CP   B"] =         0xB8,
-    ["CP   C"] =         0xB9,
-    ["CP   D"] =         0xBA,
-    ["CP   E"] =         0xBB,
-    ["CP   H"] =         0xBC,
-    ["CP   L"] =         0xBD,
-    ["CP   (HL)"] =      0xBE,
-    ["CP   A"] =         0xBF,
     ["RET  NZ"] =        0xC0,
     --]]
         
