@@ -2458,7 +2458,36 @@ local basic_instruction_tests = {
 
     --[[
     ["CALL M,!nn!"] =    0xFC,
-    ["CP   !n!"] =       0xFE,
+    --]]
+        
+    -- 0xFE
+{ "CP n", function(z)
+        z:LD("A", 0x26)
+        z:assemble("CP", 0x02)
+    end,
+    { A = 0x026, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP n zero", function(z)
+        z:LD("A", 0x26)
+        z:assemble("CP", 0x26)
+    end,
+    { A = 0x26, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP n half", function(z)
+        z:LD("A", 0x10)
+        z:assemble("CP", 0x02)
+    end,
+    { A = 0x10, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP n carry", function(z)
+        z:LD("A", 0x00)
+        z:assemble("CP", 0x02)
+    end,
+    { A = 0x00, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP n overflow", function(z)
+        z:LD("A", 0x80)
+        z:assemble("CP", 0x02)
+    end,
+    { A = 0x80, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+    --[[
     ["RST  38H"] =       0xFF,
 --]]
 
