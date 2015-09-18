@@ -2045,16 +2045,6 @@ local basic_instruction_tests = {
     { A = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
 
 
-    --[[
-    ["SBC  A,B"] =       0x98,
-    ["SBC  A,C"] =       0x99,
-    ["SBC  A,D"] =       0x9A,
-    ["SBC  A,E"] =       0x9B,
-    ["SBC  A,H"] =       0x9C,
-    ["SBC  A,L"] =       0x9D,
-    ["SBC  A,(HL)"] =    0x9E,
-    ["SBC  A,A"] =       0x9F,
-    --]]
     
 -- 0x98
 { "SBC A,B zero", function(z)
@@ -2078,6 +2068,128 @@ local basic_instruction_tests = {
         z:assemble("SBC", "A", "B")
     end,
     { A = 0x00, B = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+-- 0x99
+{ "SBC A,C zero", function(z)
+        z:LD("A", 0x00) z:LD("C", 0x01) z:assemble("SUB", "A", "C")
+        z:LD("A", 0x02)
+        z:LD("C", 0x01)
+        z:assemble("SBC", "A", "C")
+    end,
+    { A = 0x00, C = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,C not zero", function(z)
+        z:LD("A", 0x01) z:LD("C", 0x00) z:assemble("SUB", "A", "C")
+        z:LD("A", 0x02)
+        z:LD("C", 0x01)
+        z:assemble("SBC", "A", "C")
+    end,
+    { A = 0x01, C = 0x01, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,C underflow", function(z)
+        z:LD("A", 0x00) z:LD("C", 0x01) z:assemble("SUB", "A", "C")
+        z:LD("A", 0x02)
+        z:LD("C", 0x01)
+        z:assemble("SBC", "A", "C")
+    end,
+    { A = 0x00, C = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+-- 0x9A
+{ "SBC A,D zero", function(z)
+        z:LD("A", 0x00) z:LD("D", 0x01) z:assemble("SUB", "A", "D")
+        z:LD("A", 0x02)
+        z:LD("D", 0x01)
+        z:assemble("SBC", "A", "D")
+    end,
+    { A = 0x00, D = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,D not zero", function(z)
+        z:LD("A", 0x01) z:LD("D", 0x00) z:assemble("SUB", "A", "D")
+        z:LD("A", 0x02)
+        z:LD("D", 0x01)
+        z:assemble("SBC", "A", "D")
+    end,
+    { A = 0x01, D = 0x01, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,D underflow", function(z)
+        z:LD("A", 0x00) z:LD("D", 0x01) z:assemble("SUB", "A", "D")
+        z:LD("A", 0x02)
+        z:LD("D", 0x01)
+        z:assemble("SBC", "A", "D")
+    end,
+    { A = 0x00, D = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+
+-- 0x9B
+{ "SBC A,E zero", function(z)
+        z:LD("A", 0x00) z:LD("E", 0x01) z:assemble("SUB", "A", "E")
+        z:LD("A", 0x02)
+        z:LD("E", 0x01)
+        z:assemble("SBC", "A", "E")
+    end,
+    { A = 0x00, E = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,E not zero", function(z)
+        z:LD("A", 0x01) z:LD("E", 0x00) z:assemble("SUB", "A", "E")
+        z:LD("A", 0x02)
+        z:LD("E", 0x01)
+        z:assemble("SBC", "A", "E")
+    end,
+    { A = 0x01, E = 0x01, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,E underflow", function(z)
+        z:LD("A", 0x00) z:LD("E", 0x01) z:assemble("SUB", "A", "E")
+        z:LD("A", 0x02)
+        z:LD("E", 0x01)
+        z:assemble("SBC", "A", "E")
+    end,
+    { A = 0x00, E = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+
+-- 0x9C
+{ "SBC A,H zero", function(z)
+        z:LD("A", 0x00) z:LD("H", 0x01) z:assemble("SUB", "A", "H")
+        z:LD("A", 0x02)
+        z:LD("H", 0x01)
+        z:assemble("SBC", "A", "H")
+    end,
+    { A = 0x00, H = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,H not zero", function(z)
+        z:LD("A", 0x01) z:LD("H", 0x00) z:assemble("SUB", "A", "H")
+        z:LD("A", 0x02)
+        z:LD("H", 0x01)
+        z:assemble("SBC", "A", "H")
+    end,
+    { A = 0x01, H = 0x01, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,H underflow", function(z)
+        z:LD("A", 0x00) z:LD("H", 0x01) z:assemble("SUB", "A", "H")
+        z:LD("A", 0x02)
+        z:LD("H", 0x01)
+        z:assemble("SBC", "A", "H")
+    end,
+    { A = 0x00, H = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+-- 0x9D
+{ "SBC A,L zero", function(z)
+        z:LD("A", 0x00) z:LD("L", 0x01) z:assemble("SUB", "A", "L")
+        z:LD("A", 0x02)
+        z:LD("L", 0x01)
+        z:assemble("SBC", "A", "L")
+    end,
+    { A = 0x00, L = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,L not zero", function(z)
+        z:LD("A", 0x01) z:LD("L", 0x00) z:assemble("SUB", "A", "L")
+        z:LD("A", 0x02)
+        z:LD("L", 0x01)
+        z:assemble("SBC", "A", "L")
+    end,
+    { A = 0x01, L = 0x01, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,L underflow", function(z)
+        z:LD("A", 0x00) z:LD("L", 0x01) z:assemble("SUB", "A", "L")
+        z:LD("A", 0x02)
+        z:LD("L", 0x01)
+        z:assemble("SBC", "A", "L")
+    end,
+    { A = 0x00, L = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+    --[[
+    ["SBC  A,(HL)"] =    0x9E,
+    ["SBC  A,A"] =       0x9F,
+    --]]
 
 
         -- 0xA0
