@@ -803,7 +803,7 @@ local function SUB_to_A_string(what)
     ]]
 end
 local function SBC_to_A_string(what)
-    return "CPU.A=".."CPU.A-" .. what .. [[-CPU.Carry
+    return "result=".."CPU.A-" .. what .. [[-CPU.Carry
     if result < 0 then
         CPU.Carry=1 result=result+256
     else
