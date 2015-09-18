@@ -466,6 +466,14 @@ local decode_first_byte = {
     -- 17 = RLA ... carry to bit 0, bit 7 to carry
     [0x17] = "CPU:get_F_only_SZV() CPU.A = CPU.A * 2 + CPU.Carry if CPU.A > 255 then CPU.A = CPU.A - 256 CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end",
     -- 27 = DAA
+    --[0x27] = [[ result = CPU:get_F() ]]
+    --if bit32.btest(result, Z80_N_FLAG) then
+    --else
+    --    if bit32.btest(result, Z80_C_FLAG) then
+    --    else
+    --    end
+    --end
+    
     -- 37 = SCF
     [0x37] = [[ CPU._F = bit32.band(CPU:get_F(), 0xFF-(Z80_N_FLAG + Z80_H_FLAG + Z80_C_FLAG)) + Z80_C_FLAG CPU.Carry = 1 ]],
 
