@@ -2056,6 +2056,30 @@ local basic_instruction_tests = {
     ["SBC  A,A"] =       0x9F,
     --]]
     
+-- 0x98
+{ "SBC A,B zero", function(z)
+        z:LD("A", 0x00) z:LD("B", 0x01) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:LD("B", 0x01)
+        z:assemble("SBC", "A", "B")
+    end,
+    { A = 0x00, B = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,B not zero", function(z)
+        z:LD("A", 0x01) z:LD("B", 0x00) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:LD("B", 0x01)
+        z:assemble("SBC", "A", "B")
+    end,
+    { A = 0x01, B = 0x01, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,B underflow", function(z)
+        z:LD("A", 0x00) z:LD("B", 0x01) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:LD("B", 0x01)
+        z:assemble("SBC", "A", "B")
+    end,
+    { A = 0x00, B = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+
         -- 0xA0
     { "AND B", function(z) z:LD("A", 0x8F) z:LD("B", 0x01) z:AND("B") end, { A=0x01, B=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
     { "AND B zero", function(z) z:LD("A", 0x80) z:LD("B", 0x01) z:AND("B") end, { A=0x00, B=0x01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
