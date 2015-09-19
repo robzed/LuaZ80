@@ -2186,9 +2186,32 @@ local basic_instruction_tests = {
     end,
     { A = 0x00, L = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
 
-    --[[
-    ["SBC  A,(HL)"] =    0x9E,
-    --]]
+-- 0x9E
+{ "SBC A,(HL) zero", function(z)
+        z:LD("A", 0x00) z:LD("B", 0x01) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x01)
+        z:assemble("SBC", "A", "(HL)")
+    end,
+    { A = 0x00, B = 0x01, H=0x60, L=0, [0x6000]=0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,(HL) not zero", function(z)
+        z:LD("A", 0x01) z:LD("B", 0x00) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x01)
+        z:assemble("SBC", "A", "(HL)")
+    end,
+    { A = 0x01, B = 0x00, H=0x60, L=0, [0x6000]=0x01, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,(HL) underflow", function(z)
+        z:LD("A", 0x00) z:LD("B", 0x01) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x01)
+        z:assemble("SBC", "A", "(HL)")
+    end,
+    { A = 0x00, B = 0x01, H=0x60, L=0, [0x6000]=0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
 
 -- 0x9F
 { "SBC A,A no borrow, zero", function(z)
