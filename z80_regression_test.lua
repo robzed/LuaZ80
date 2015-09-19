@@ -2188,8 +2188,21 @@ local basic_instruction_tests = {
 
     --[[
     ["SBC  A,(HL)"] =    0x9E,
-    ["SBC  A,A"] =       0x9F,
     --]]
+
+-- 0x9F
+{ "SBC A,A no borrow, zero", function(z)
+        z:LD("A", 0x01) z:LD("L", 0x00) z:assemble("SUB", "A", "L")
+        z:LD("A", 0x22)
+        z:assemble("SBC", "A", "A")
+    end,
+    { A = 0x00, L = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,A underflow", function(z)
+        z:LD("A", 0x00) z:LD("L", 0x01) z:assemble("SUB", "A", "L")
+        z:LD("A", 0x02)
+        z:assemble("SBC", "A", "A")
+    end,
+    { A = 0xFF, L = 0x01, F={ "S", "-Z", "H", "-V", "N", "C" } } }, 
 
 
         -- 0xA0
