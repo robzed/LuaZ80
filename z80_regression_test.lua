@@ -2582,6 +2582,19 @@ local basic_instruction_tests = {
     ["JP   !nn!"] =      0xC3,
     ["CALL NZ,!nn!"] =   0xC4,
     --]]
+
+-- 0xC3
+{ "JP nn", function(z)
+        z:LD("A", 0x01)         -- 0
+        z:assemble("JP", 9)     -- 2
+        z:LD("A", 0x20)         -- 5
+        z:assemble("INC", "A")   -- 7
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        end,
+        { A = 0x03, F={"-S", "-Z", "-H", "-V", "-N", "C"} } },
+    
     
     -- 0xC5
     { "PUSH BC", function(z) 
