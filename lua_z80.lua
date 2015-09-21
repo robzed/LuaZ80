@@ -981,8 +981,8 @@ decode_first_byte[0xfe] = function (memory, iaddr)
 local flag_index = {
     [0]="not bit32.btest(CPU:get_F(), Z80_Z_FLAG)",    -- NZ = Not Zero (Z_FLAG)
     "bit32.btest(CPU:get_F(), Z80_Z_FLAG)",        -- Z = Zero (Z_FLAG)
-    "not CPU.Carry",                            -- NC = Carry (C_FLAG)
-    "CPU.Carry",                                -- C = Carry (C_FLAG)
+    "CPU.Carry==0",                            -- NC = Carry (C_FLAG)
+    "CPU.Carry==1",                                -- C = Carry (C_FLAG)
 
     "not bit32.btest(CPU:get_F(), Z80_P_FLAG)",    -- PO = Parity Odd (P/V_FLAG)
     "bit32.btest(CPU:get_F(), Z80_P_FLAG)",        -- PE = Parity Even (P/V_FLAG)

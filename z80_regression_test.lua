@@ -2688,8 +2688,32 @@ local basic_instruction_tests = {
             z:assemble("POP", "DE")
         end, {SP=0x1, H=0x12, L=0x34, D=0x12, E=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
     
+    
+    -- 0xD2
+{ "JP NC, nn", function(z)
+        z:LD("A", 0x01)         -- 0
+        z:OR("A")               -- 2            // clears carr flag
+        z:assemble("JP", "NC", 10)     -- 3
+        z:LD("A", 0x20)         -- 6 
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x03, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "JP NC, nn   no jump", function(z)
+        z:LD("A", 0x10)         -- 0
+        z:assemble("SCF")       -- 2
+        z:assemble("JP", "NC", 10)     -- 4
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "C"} } },
+    
     --[[
-    ["JP   NC,!nn!"] =   0xD2,
     ["OUT  (!n!),A"] =   0xD3,
     ["CALL NC,!nn!"] =   0xD4,
     --]]
