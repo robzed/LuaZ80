@@ -2652,7 +2652,33 @@ local basic_instruction_tests = {
     ["RST  00H"] =       0xC7,
     ["RET  Z"] =         0xC8,
     ["RET"] =            0xC9,
-    ["JP   Z,!nn!"] =    0xCA,
+    --]]
+        
+    -- 0xCA
+{ "JP Z, nn", function(z)
+        z:LD("A", 0x01)         -- 0
+        z:OR("A")               -- 2
+        z:assemble("JP", "Z", 10)     -- 3
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "JP Z, nn   no jump", function(z)
+        z:LD("A", 0x00)         -- 0
+        z:OR("A")               -- 2
+        z:assemble("JP", "Z", 10)     -- 4
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x02, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
+    --[[
     ["CALL Z,!nn!"] =    0xCC,
     ["CALL !nn!"] =      0xCD,
 --]]
