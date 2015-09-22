@@ -2926,8 +2926,31 @@ local basic_instruction_tests = {
     ["RST  20H"] =       0xE7,
     ["RET  PE"] =        0xE8,
     ["JP   (HL)"] =      0xE9,
-    ["JP   PE,!nn!"] =   0xEA,
     --]]
+    
+-- 0xEA
+{ "JP PE, nn", function(z)
+        z:LD("A", 0x31)         -- 0
+        z:OR("A")               -- 2           odd number of bits = Parity clear
+        z:assemble("JP", "PE", 10)     -- 3
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "JP PE, nn   no jump", function(z)
+        z:LD("A", 0x22)         -- 0
+        z:OR("A")               -- 2           odd number of bits = Parity clear
+        z:assemble("JP", "PE", 10)     -- 4
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x33, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
     -- 0xEB
     {"EX DE, HL", function(z)
