@@ -3048,6 +3048,31 @@ local basic_instruction_tests = {
     --[[
     ["JP   M,!nn!"] =    0xFA,
     --]]
+    
+    -- 0xFA
+{ "JP M, nn", function(z)
+        z:LD("A", 0x31)         -- 0
+        z:OR("A")               -- 2
+        z:assemble("JP", "M", 10)     -- 3
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "JP M, nn   jump", function(z)
+        z:LD("A", 0xF0)         -- 0
+        z:OR("A")               -- 2
+        z:assemble("JP", "M", 10)     -- 4
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0xF2, F={"S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
     -- 0xFB
     { "EI", function(z) z:assemble("EI") end, { IFF1 = true, IFF2 = true } },
 
