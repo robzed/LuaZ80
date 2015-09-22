@@ -2985,9 +2985,31 @@ local basic_instruction_tests = {
             z:assemble("LD", "(0xFFFF)", "HL")
             z:assemble("POP", "AF")
         end, {SP=0x1, H=0x12, L=0x34, A=0x12, F=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
-    --[[
-    ["JP   P,!nn!"] =    0xF2,
-    --]]
+    
+-- 0xF2
+{ "JP P, nn", function(z)
+        z:LD("A", 0x31)         -- 0
+        z:OR("A")               -- 2
+        z:assemble("JP", "P", 10)     -- 3
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x33, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "JP P, nn   no jump", function(z)
+        z:LD("A", 0xF0)         -- 0
+        z:OR("A")               -- 2
+        z:assemble("JP", "P", 10)     -- 4
+        z:LD("A", 0x20)         -- 6
+        z:assemble("INC", "A")   -- 8
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        end,
+        { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
     -- 0xF3
     { "DI", function(z) z:assemble("DI") end, { IFF1 = false, IFF2 = false } },
     
