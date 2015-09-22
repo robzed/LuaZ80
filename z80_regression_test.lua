@@ -2941,8 +2941,8 @@ local basic_instruction_tests = {
         end,
         { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
 { "JP PE, nn   no jump", function(z)
-        z:LD("A", 0x22)         -- 0
-        z:OR("A")               -- 2           odd number of bits = Parity clear
+        z:LD("A", 0x06)         -- 0
+        z:OR("A")               -- 2           even number of bits = Parity set
         z:assemble("JP", "PE", 10)     -- 4
         z:LD("A", 0x20)         -- 6
         z:assemble("INC", "A")   -- 8
@@ -2950,7 +2950,7 @@ local basic_instruction_tests = {
         z:assemble("INC", "A")   -- 10
         z:assemble("INC", "A")   -- 11
         end,
-        { A = 0x33, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+        { A = 0x08, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
     -- 0xEB
     {"EX DE, HL", function(z)
