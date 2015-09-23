@@ -639,7 +639,7 @@ local decode_first_byte = {
     result=CPU.L CPU.L=CPU.L_ CPU.L_=result
     ]],
     -- E9 = JP (HL)
-    [0xE9] = "do CPU.PC = CPU.HL; return 'ok' end",
+    [0xE9] = "do CPU.PC = CPU.H*256+CPU.L; return 'ok' end",
     -- surely there must be a way of jumping internally without dropping out of 
     -- this lump?
     --[0xE9] = function(memory, iaddr)
