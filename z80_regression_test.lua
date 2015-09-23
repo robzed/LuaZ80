@@ -2925,8 +2925,21 @@ local basic_instruction_tests = {
     --[[
     ["RST  20H"] =       0xE7,
     ["RET  PE"] =        0xE8,
-    ["JP   (HL)"] =      0xE9,
     --]]
+    
+-- 0xE9
+{ "JP (HL)", function(z)
+        z:LD("HL", 10)      -- 0
+        z:LD("A", 0x01)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("JP", "(HL)")     -- 6
+        z:LD("A", 0x20)         -- 7
+        z:assemble("INC", "A")   -- 9
+        z:assemble("INC", "A")   -- 10
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        end,
+        { A = 0x04, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
 -- 0xEA
 { "JP PE, nn", function(z)
