@@ -2939,7 +2939,7 @@ local basic_instruction_tests = {
         z:assemble("INC", "A")   -- 11
         z:assemble("INC", "A")   -- 12
         end,
-        { A = 0x04, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+        { A = 0x04, L=10, H=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
 -- 0xEA
 { "JP PE, nn", function(z)
