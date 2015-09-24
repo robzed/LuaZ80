@@ -2680,8 +2680,21 @@ local basic_instruction_tests = {
     
     --[[
     ["CALL Z,!nn!"] =    0xCC,
-    ["CALL !nn!"] =      0xCD,
 --]]
+-- 0xCD
+{ "CALL nn", function(z)
+        z:LD("SP", 0x6000)      -- 0
+        z:LD("A", 0x01)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("CALL", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x03, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
  -- 0xCE
 { "ADC A,n  carry clear", function(z) z:OR("A") 
         z:LD("A", 0x00) z:assemble("ADD", "A", "A")
