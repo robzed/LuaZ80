@@ -2679,7 +2679,7 @@ local basic_instruction_tests = {
     --]]
         
     -- 0xCA
-{ "JP Z, nn", function(z)
+{ "JP Z, nn no jump", function(z)
         z:LD("A", 0x01)         -- 0
         z:OR("A")               -- 2
         z:assemble("JP", "Z", 10)     -- 3
@@ -2690,7 +2690,7 @@ local basic_instruction_tests = {
         z:assemble("INC", "A")   -- 11
         end,
         { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
-{ "JP Z, nn   no jump", function(z)
+{ "JP Z, nn   jump", function(z)
         z:LD("A", 0x00)         -- 0
         z:OR("A")               -- 2
         z:assemble("JP", "Z", 10)     -- 4
@@ -2706,7 +2706,7 @@ local basic_instruction_tests = {
     ["CALL Z,!nn!"] =    0xCC,
 --]]
 -- 0xCC
-{ "CALL Z, nn", function(z)
+{ "CALL Z, nn no jump", function(z)
         z:LD("SP", 0x6000)      -- 0
         z:LD("A", 0x01)         -- 3
         z:OR("A")               -- 5
@@ -2717,8 +2717,8 @@ local basic_instruction_tests = {
         z:assemble("INC", "A")   -- 13
         z:assemble("INC", "A")   --
         end,
-        { A = 0x24, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
-{ "CALL Z, nn   no jump", function(z)
+        { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "CALL Z, nn   jump", function(z)
         z:LD("SP", 0x6000)      -- 0
         z:LD("A", 0x00)         -- 3
         z:OR("A")               -- 5
@@ -2729,7 +2729,7 @@ local basic_instruction_tests = {
         z:assemble("INC", "A")   -- 13
         z:assemble("INC", "A")   --
         end,
-        { A = 0x02, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+        { A = 0x02, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
 
 
 -- 0xCD
