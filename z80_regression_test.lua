@@ -2705,6 +2705,33 @@ local basic_instruction_tests = {
     --[[
     ["CALL Z,!nn!"] =    0xCC,
 --]]
+-- 0xCC
+{ "CALL Z, nn", function(z)
+        z:LD("SP", 0x6000)      -- 0
+        z:LD("A", 0x01)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("CALL", "Z", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 
+        z:assemble("INC", "A")   -- 
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   --
+        end,
+        { A = 0x24, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "CALL Z, nn   no jump", function(z)
+        z:LD("SP", 0x6000)      -- 0
+        z:LD("A", 0x00)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("CALL", "Z", 13)     -- 6
+        z:LD("A", 0x20)         --
+        z:assemble("INC", "A")   --
+        z:assemble("INC", "A")   --
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   --
+        end,
+        { A = 0x02, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
+
 -- 0xCD
 { "CALL nn", function(z)
         z:LD("SP", 0x6000)      -- 0
