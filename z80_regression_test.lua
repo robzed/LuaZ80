@@ -3189,9 +3189,32 @@ local basic_instruction_tests = {
     -- 0xF3
     { "DI", function(z) z:assemble("DI") end, { IFF1 = false, IFF2 = false } },
     
-    --[[
-    ["CALL P,!nn!"] =    0xF4,
-    --]]
+-- 0xF4
+{ "CALL P, nn", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x31)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("CALL", "P", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x33, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "CALL P, nn   no jump", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0xF0)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("CALL", "P", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
     -- 0xF5
     { "PUSH AF", function(z) 
             -- assumes F = 0xff
