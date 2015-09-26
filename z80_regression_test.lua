@@ -2922,7 +2922,35 @@ local basic_instruction_tests = {
     
     --[[
     ["IN   A,(!n!)"] =   0xDB,
-    ["CALL C,!nn!"] =    0xDC,
+    --]]
+    
+    -- 0xDC
+{ "CALL C, nn", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x01)         -- 3
+        z:assemble("SCF")       -- 5
+        z:assemble("CALL", "C", 13)     -- 6
+        z:LD("A", 0x20)         -- 9 
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x03, SP=0x5FFE, [0x5FFE]=9, [0x6000]=0, F={"-S", "-Z", "-H", "-V", "-N", "C"} } },
+{ "CALL C, nn   no jump", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x10)         -- 3
+        z:OR("A")               -- 5            // clears carr flag
+        z:assemble("CALL", "C", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
+    --[[
     ["SBC  A,!n!"] =     0xDE,
     ["RST  18H"] =       0xDF,
     ["RET  PO"] =        0xE0,
