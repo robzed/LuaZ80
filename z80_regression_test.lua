@@ -2950,8 +2950,27 @@ local basic_instruction_tests = {
         end,
         { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
+-- 0xDE
+{ "SBC A,n zero", function(z)
+        z:LD("A", 0x00) z:LD("B", 0x01) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:assemble("SBC", "A", 1)
+    end,
+    { A = 0x00, B = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,n not zero", function(z)
+        z:LD("A", 0x01) z:LD("B", 0x00) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:assemble("SBC", "A", 1)
+    end,
+    { A = 0x01, B = 0x00, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,n underflow", function(z)
+        z:LD("A", 0x00) z:LD("B", 0x01) z:assemble("SUB", "A", "B")
+        z:LD("A", 0x02)
+        z:assemble("SBC", "A", 1)
+    end,
+    { A = 0x00, B = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
     --[[
-    ["SBC  A,!n!"] =     0xDE,
     ["RST  18H"] =       0xDF,
     ["RET  PO"] =        0xE0,
     --]]
