@@ -2806,9 +2806,34 @@ local basic_instruction_tests = {
     
     --[[
     ["OUT  (!n!),A"] =   0xD3,
-    ["CALL NC,!nn!"] =   0xD4,
     --]]
     
+-- 0xD4
+{ "CALL NC, nn", function(z)
+        z:LD("SP", 0x6000)      -- 0
+        z:LD("A", 0x01)         -- 3
+        z:OR("A")               -- 5            // clears carry flag
+        z:assemble("CALL", "NC", 13)     -- 3
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 
+        z:assemble("INC", "A")   -- 
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x03, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "CALL NC, nn   no jump", function(z)
+        z:LD("SP", 0x6000)      -- 0
+        z:LD("A", 0x10)         -- 3
+        z:assemble("SCF")       -- 5
+        z:assemble("CALL", "NC", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 
+        z:assemble("INC", "A")   -- 
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "C"} } },
+
         -- 0xD5
     { "PUSH DE", function(z) 
             z:assemble("LD", "DE", 0x4321)
