@@ -3114,10 +3114,32 @@ local basic_instruction_tests = {
     end, { H=0xCD, L=0xEF, D=0x56, E=0x78, 
             H=0x56, L=0x78, D=0xCD, E=0xEF} },
     
-    --[[
-    ["CALL PE,!nn!"] =   0xEC,
---]]
-
+-- 0xEC
+{ "CALL PE, nn no jump", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x31)         -- 0
+        z:OR("A")               -- 5           odd number of bits = Parity clear
+        z:assemble("CALL", "PE", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "CALL PE, nn   jump", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x06)         -- 3
+        z:OR("A")               -- 5           even number of bits = Parity set
+        z:assemble("CALL", "PE", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x08, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
 -- 0xEE
     { "XOR n", function(z) z:LD("A", 0x8F) z:XOR(0x01) end, { A=0x8E, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- odd number of bits = Parity clear
     { "XOR n zero", function(z) z:LD("A", 0x01) z:XOR(0x01) end, { A=0x00, F={"Z", "-N", "-H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
