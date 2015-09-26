@@ -3272,11 +3272,34 @@ local basic_instruction_tests = {
     -- 0xFB
     { "EI", function(z) z:assemble("EI") end, { IFF1 = true, IFF2 = true } },
 
-    --[[
-    ["CALL M,!nn!"] =    0xFC,
-    --]]
-        
-    -- 0xFE
+    
+-- 0xFC
+{ "CALL M, nn", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x31)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("CALL", "M", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "CALL M, nn   jump", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0xF0)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("CALL", "M", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0xF2, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
+-- 0xFE
 { "CP n", function(z)
         z:LD("A", 0x26)
         z:assemble("CP", 0x02)
