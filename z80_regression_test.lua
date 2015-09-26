@@ -3014,9 +3014,32 @@ local basic_instruction_tests = {
             z:assemble("EX", "(SP)", "HL")
         end, { SP=0xFFFF, H=0xAB, L=0xCD, A=0xAB, [0xFFFF]=0x34, [0x0000]=0x12 } },
 
-    --[[
-    ["CALL PO,!nn!"] =   0xE4,
-    --]]
+-- 0xE4
+{ "CALL PO, nn", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x31)         -- 3
+        z:OR("A")               -- 5           odd number of bits = Parity clear
+        z:assemble("CALL", "PO", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x33, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+{ "CALL PO, nn   no jump", function(z)
+        z:LD("SP", 0x6000)
+        z:LD("A", 0x22)         -- 3
+        z:OR("A")               -- 5           odd number of bits = Parity clear
+        z:assemble("CALL", "PO", 13)     -- 6
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
     
     -- 0xE5
     { "PUSH HL", function(z) 
