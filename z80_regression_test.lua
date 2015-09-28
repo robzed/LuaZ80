@@ -2673,18 +2673,17 @@ local basic_instruction_tests = {
  { "ADD A, n", function(z) z:LD("A", 0xFF) z:assemble("ADD", "A", 2) end,
      { A = 1, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
     
-    --[[
     -- 0xC7
 { "RST 00H", function(z)
-        z:LD("SP", 0x6000)      -- 0
-        z:LD("A", 0x01)         -- 3
-        z:OR("A")               -- 5
-        z:assemble("RST", "00H")   -- 6
-        z:assemble("INC", "A")   -- 0x07
+        -- rely on processor state A=0xFF SP=0xFFFF
+        z:assemble("INC", "A")
+        z:assemble("CP", 2)      -- 1  initially 0, one loop 1, two loop 2
+        z:assemble("JR", "Z", 1) -- 3
+        z:assemble("RST", "00H") -- 5
+        z:assemble("NOP")        -- 6
         end,
-        { A = 1+16+16+16+16+8, SP=0x5FFE, [0x5FFE]=7, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
-    --]]
-    
+        { A = 2, SP=0xFFFB, [0xFFFB]=6, [0xFFFC]=0, [0xFFFD]=6, [0xFFFE]=0, F={"-S", "Z", "-H", "-V", "N", "-C"} } },
+
     --[[
     ["RET  Z"] =         0xC8,
     ["RET"] =            0xC9,
