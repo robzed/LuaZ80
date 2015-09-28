@@ -3082,8 +3082,88 @@ local basic_instruction_tests = {
     { "AND n", function(z) z:LD("A", 0x8F) z:AND(0x01) end, { A=0x01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
     { "AND n zero", function(z) z:LD("A", 0x80) z:AND(0x01) end, { A=0x00, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
 
+-- 0xE7
+{ "RST 20H", function(z)
+        z:LD("SP", 0x6000)      -- 0
+        z:LD("A", 0x01)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("RST", "20H")   -- 6
+        z:LD("A", 0x80)         -- 7
+        z:assemble("INC", "A")   -- 0x09
+        z:assemble("INC", "A")   -- 0x0A
+        z:assemble("INC", "A")   -- 0x0B
+        z:assemble("INC", "A")   -- 0x0C
+        z:assemble("INC", "A")   -- 0x0D
+        z:assemble("INC", "A")   -- 0x0E
+        z:assemble("INC", "A")   -- 0x0F
+        z:assemble("INC", "A")   -- 0x10
+        z:assemble("INC", "A")   -- 0x11
+        z:assemble("INC", "A")   -- 0x12
+        z:assemble("INC", "A")   -- 0x13
+        z:assemble("INC", "A")   -- 0x14
+        z:assemble("INC", "A")   -- 0x15
+        z:assemble("INC", "A")   -- 0x16
+        z:assemble("INC", "A")   -- 0x17
+        z:assemble("INC", "A")   -- 0x18
+        z:assemble("INC", "A")   -- 0x19
+        z:assemble("INC", "A")   -- 0x1A
+        z:assemble("INC", "A")   -- 0x1B
+        z:assemble("INC", "A")   -- 0x1C
+        z:assemble("INC", "A")   -- 0x1D
+        z:assemble("INC", "A")   -- 0x1E
+        z:assemble("INC", "A")   -- 0x1F
+        z:assemble("INC", "A")   -- 0x20
+        z:assemble("INC", "A")   -- 0x21
+        z:assemble("INC", "A")   -- 0x22
+        z:assemble("INC", "A")   -- 0x23
+        z:assemble("INC", "A")   -- 0x24
+        z:assemble("INC", "A")   -- 0x25
+        z:assemble("INC", "A")   -- 0x26
+        z:assemble("INC", "A")   -- 0x27
+        z:assemble("INC", "A")   -- 0x28
+        z:assemble("INC", "A")   -- 0x29
+        z:assemble("INC", "A")   -- 0x2A
+        z:assemble("INC", "A")   -- 0x2B
+        z:assemble("INC", "A")   -- 0x2C
+        z:assemble("INC", "A")   -- 0x2D
+        z:assemble("INC", "A")   -- 0x2E
+        z:assemble("INC", "A")   -- 0x2F
+        z:assemble("INC", "A")   -- 0x30
+        z:assemble("INC", "A")   -- 0x31
+        z:assemble("INC", "A")   -- 0x32
+        z:assemble("INC", "A")   -- 0x33
+        z:assemble("INC", "A")   -- 0x34
+        z:assemble("INC", "A")   -- 0x35
+        z:assemble("INC", "A")   -- 0x36
+        z:assemble("INC", "A")   -- 0x37
+        z:assemble("INC", "A")   -- 0x38
+        z:assemble("INC", "A")   -- 0x39
+        z:assemble("INC", "A")   -- 0x3A
+        z:assemble("INC", "A")   -- 0x3B
+        z:assemble("INC", "A")   -- 0x3C
+        z:assemble("INC", "A")   -- 0x3D
+        z:assemble("INC", "A")   -- 0x3E
+        z:assemble("INC", "A")   -- 0x3F
+        z:assemble("INC", "A")   -- 0x40
+        z:assemble("INC", "A")   -- 0x41
+        z:assemble("INC", "A")   -- 0x42
+        z:assemble("INC", "A")   -- 0x43
+        z:assemble("INC", "A")   -- 0x44
+        z:assemble("INC", "A")   -- 0x45
+        z:assemble("INC", "A")   -- 0x46
+        z:assemble("INC", "A")   -- 0x47
+        z:assemble("INC", "A")   -- 0x48
+        z:assemble("INC", "A")   -- 0x49
+        z:assemble("INC", "A")   -- 0x4A
+        z:assemble("INC", "A")   -- 0x4B
+        z:assemble("INC", "A")   -- 0x4C
+        z:assemble("INC", "A")   -- 0x4D
+        z:assemble("INC", "A")   -- 0x4E
+        z:assemble("INC", "A")   -- 0x4F
+        end,
+        { A = 1+16+16+16, SP=0x5FFE, [0x5FFE]=7, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+    
     --[[
-    ["RST  20H"] =       0xE7,
     ["RET  PE"] =        0xE8,
     --]]
     
