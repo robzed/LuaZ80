@@ -2672,8 +2672,20 @@ local basic_instruction_tests = {
      { A = 0x80, F={"S", "-Z", "H", "V", "-N", "-C"}} },
  { "ADD A, n", function(z) z:LD("A", 0xFF) z:assemble("ADD", "A", 2) end,
      { A = 1, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+    
     --[[
-    ["RST  00H"] =       0xC7,
+    -- 0xC7
+{ "RST 00H", function(z)
+        z:LD("SP", 0x6000)      -- 0
+        z:LD("A", 0x01)         -- 3
+        z:OR("A")               -- 5
+        z:assemble("RST", "00H")   -- 6
+        z:assemble("INC", "A")   -- 0x07
+        end,
+        { A = 1+16+16+16+16+8, SP=0x5FFE, [0x5FFE]=7, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+    --]]
+    
+    --[[
     ["RET  Z"] =         0xC8,
     ["RET"] =            0xC9,
     --]]
