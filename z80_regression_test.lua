@@ -2562,7 +2562,23 @@ local basic_instruction_tests = {
 --[[
     ["RET  NZ"] =        0xC0,
     --]]
-        
+    
+-- 0xC0
+{ "RET NZ", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 1)            -- 7
+    z:assemble("CP", 0)     -- 8
+    z:assemble("RET", "NZ") -- 10
+    z:assemble("INC", "A")  -- 11
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x6000, A=1, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "N", "-C"} } },
+
+
+
   -- 0xC1
     { "POP BC", function(z)
             z:assemble("LD", "SP", 0x6000)
