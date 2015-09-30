@@ -2576,6 +2576,18 @@ local basic_instruction_tests = {
     z:assemble("NOP")       -- 13
     z:assemble("NOP")       -- 14
     end, {SP=0x6000, A=1, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "N", "-C"} } },
+{ "RET NZ no return", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 0)            -- 7
+    z:assemble("CP", 0)     -- 8
+    z:assemble("RET", "NZ") -- 10
+    z:assemble("INC", "A")  -- 11       -- resets N flag
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x5FFE, A=1, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
 
 
 
