@@ -2558,10 +2558,6 @@ local basic_instruction_tests = {
     end,
     { A = 0x80, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
 
-
---[[
-    ["RET  NZ"] =        0xC0,
-    --]]
     
 -- 0xC0
 { "RET NZ", function(z)
@@ -2712,8 +2708,33 @@ local basic_instruction_tests = {
         end,
         { A = 2, SP=0xFFFB, [0xFFFB]=6, [0xFFFC]=0, [0xFFFD]=6, [0xFFFE]=0, F={"-S", "Z", "-H", "-V", "N", "-C"} } },
 
+-- 0xC8
+{ "RET Z", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 0)            -- 7
+    z:assemble("CP", 0)     -- 8
+    z:assemble("RET", "Z") -- 10
+    z:assemble("INC", "A")  -- 11
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x6000, A=0, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "Z", "-H", "-V", "N", "-C"} } },
+{ "RET NZ no return", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 1)            -- 7
+    z:assemble("CP", 0)     -- 8
+    z:assemble("RET", "Z") -- 10
+    z:assemble("INC", "A")  -- 11       -- resets N flag
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x5FFE, A=2, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
     --[[
-    ["RET  Z"] =         0xC8,
     ["RET"] =            0xC9,
     --]]
         
