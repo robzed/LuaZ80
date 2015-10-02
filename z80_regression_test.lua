@@ -2721,7 +2721,7 @@ local basic_instruction_tests = {
     z:assemble("NOP")       -- 13
     z:assemble("NOP")       -- 14
     end, {SP=0x6000, A=0, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "Z", "-H", "-V", "N", "-C"} } },
-{ "RET NZ no return", function(z)
+{ "RET Z no return", function(z)
     z:LD("SP", 0x6000)      -- 0
     z:LD("BC", 14)          -- 3
     z:PUSH("BC")            -- 6
@@ -2734,10 +2734,19 @@ local basic_instruction_tests = {
     z:assemble("NOP")       -- 14
     end, {SP=0x5FFE, A=2, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
 
-    --[[
-    ["RET"] =            0xC9,
-    --]]
-        
+-- 0xC9
+{ "RET", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 12)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 0)            -- 7
+    z:assemble("RET") -- 8
+    z:assemble("INC", "A")  -- 9
+    z:assemble("NOP")       -- 10
+    z:assemble("NOP")       -- 11
+    z:assemble("NOP")       -- 12
+    end, {SP=0x6000, A=0, B=0, C=12, [0x5FFE]=12, [0x5FFF]=0 } },
+
     -- 0xCA
 { "JP Z, nn no jump", function(z)
         z:LD("A", 0x01)         -- 0
