@@ -3137,9 +3137,35 @@ local basic_instruction_tests = {
         end,
         { A = 1+16+16+16+16, SP=0x5FFE, [0x5FFE]=7, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
-    --[[
-    ["RET  C"] =         0xD8,
-    --]]
+-- 0xD8
+{ "RET C", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 0)            -- 7
+    z:assemble("SCF")       -- 8
+    z:assemble("NOP")
+    z:assemble("RET", "C") -- 10
+    z:assemble("INC", "A")  -- 11
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x6000, A=0, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"S", "Z", "-H", "V", "-N", "C"} } },
+{ "RET C no return", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 1)            -- 7
+    z:assemble("OR", 0)     -- 8        -- clear carry
+    z:assemble("RET", "C") -- 10
+    z:assemble("INC", "A")  -- 11       -- resets N flag
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x5FFE, A=2, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
+    
+    
     -- 0xD9
     {"EXX", function(z)
         z:LD("HL", 0x1234)
