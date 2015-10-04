@@ -3932,10 +3932,34 @@ local basic_instruction_tests = {
         end,
         { A = 1+16+16, SP=0x5FFE, [0x5FFE]=7, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
-    --[[
-    ["RET  M"] =         0xF8,
-    --]]
     
+-- 0xF8
+{ "RET M", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 0xF0)            -- 7
+    z:assemble("CP", 0)     -- 8        -- test for odd/even
+    z:assemble("RET", "M") -- 10
+    z:assemble("INC", "A")  -- 11
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x6000, A=0xF0, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"S", "-Z", "-H", "-V", "N", "-C"} } },
+{ "RET M no return", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 1)            -- 7
+    z:assemble("CP", 0)     -- 8        -- test for odd/even
+    z:assemble("RET", "M") -- 10
+    z:assemble("INC", "A")  -- 11       -- resets N flag
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x5FFE, A=2, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
+
     -- 0xF9
     { "LD SP,HL", function(z) z:assemble("LD", "HL", 0x1234) z:assemble("LD", "SP", "HL") end, { H=0x12, L=0x34, SP=0x1234 } },
     
