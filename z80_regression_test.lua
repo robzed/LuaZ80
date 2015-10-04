@@ -3391,7 +3391,7 @@ local basic_instruction_tests = {
 { "JP PO, nn   no jump", function(z)
         z:LD("A", 0x22)         -- 0
         z:OR("A")               -- 2           odd number of bits = Parity clear
-        z:assemble("JP", "PO", 10)     -- 4
+        z:assemble("JP", "PO", 10)     -- 3
         z:LD("A", 0x20)         -- 6
         z:assemble("INC", "A")   -- 8
         z:assemble("INC", "A")   -- 9
@@ -3550,10 +3550,33 @@ local basic_instruction_tests = {
         end,
         { A = 1+16+16+16, SP=0x5FFE, [0x5FFE]=7, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
-    --[[
-    ["RET  PE"] =        0xE8,
-    --]]
-    
+-- 0xE8
+{ "RET PE", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 0)            -- 7
+    z:assemble("OR", 0)     -- 8        -- test for odd/even
+    z:assemble("RET", "PE") -- 10
+    z:assemble("INC", "A")  -- 11
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x6000, A=0, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "Z", "-H", "V", "-N", "-C"} } },
+{ "RET PE no return", function(z)
+    z:LD("SP", 0x6000)      -- 0
+    z:LD("BC", 14)          -- 3
+    z:PUSH("BC")            -- 6
+    z:LD("A", 1)            -- 7
+    z:assemble("OR", 0)     -- 8        -- test for odd/even
+    z:assemble("RET", "PE") -- 10
+    z:assemble("INC", "A")  -- 11       -- resets N flag
+    z:assemble("NOP")       -- 12
+    z:assemble("NOP")       -- 13
+    z:assemble("NOP")       -- 14
+    end, {SP=0x5FFE, A=2, B=0, C=14, [0x5FFE]=14, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
+
 -- 0xE9
 { "JP (HL)", function(z)
         z:LD("HL", 10)      -- 0
