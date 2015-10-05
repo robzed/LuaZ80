@@ -3233,6 +3233,10 @@ local basic_instruction_tests = {
         end,
         { A = 0x24, SP=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
+------------------------------------------------------------------------------
+-- 0xDD < extended op-codes
+------------------------------------------------------------------------------
+
 -- 0xDE
 { "SBC A,n zero", function(z)
         z:LD("A", 0x00) z:LD("B", 0x01) z:assemble("SUB", "A", "B")
@@ -3648,7 +3652,11 @@ local basic_instruction_tests = {
         z:assemble("INC", "A")   -- 14
         end,
         { A = 0x08, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
-    
+
+------------------------------------------------------------------------------
+-- 0xED < extended op-codes
+------------------------------------------------------------------------------
+
 -- 0xEE
     { "XOR n", function(z) z:LD("A", 0x8F) z:XOR(0x01) end, { A=0x8E, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- odd number of bits = Parity clear
     { "XOR n zero", function(z) z:LD("A", 0x01) z:XOR(0x01) end, { A=0x00, F={"Z", "-N", "-H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
@@ -4017,7 +4025,12 @@ local basic_instruction_tests = {
         z:assemble("INC", "A")   -- 14
         end,
         { A = 0xF2, SP=0x5FFE, [0x5FFE]=9, [0x5FFF]=0, F={"S", "-Z", "-H", "-V", "-N", "-C"} } },
-    
+
+------------------------------------------------------------------------------
+-- 0xFD < extended op-codes
+------------------------------------------------------------------------------
+
+
 -- 0xFE
 { "CP n", function(z)
         z:LD("A", 0x26)
