@@ -168,7 +168,8 @@ function Z80CPU:initialize()
     self._newA = 0
     self._subtract = false
     
-    
+    self._inputs = {}
+    self._outputs = {}
     self.simple_flags = {}
     for A = 0,255 do
         self.simple_flags[A] = bit32.band(A,0xa8)    -- create the sign, bit5, bit3
@@ -178,6 +179,17 @@ function Z80CPU:initialize()
     end
 
 end
+
+function Z80CPU:register_input(address_mask, address_state, target_function, target_userdata)
+    local io = { address_mask, address_state, target_function, target_userdata }
+    table.insert(self._inputs, io)
+end
+
+function Z80CPU:register_output(address_mask, address_state, target_function, target_userdata)
+    local io = { address_mask, address_state, target_function, target_userdata }
+    table.insert(self._outputs, io)
+end
+
 
 -- Flags are complex
 -- http://rk.nvg.ntnu.no/sinclair/faq/tech_z80.html#RREG
