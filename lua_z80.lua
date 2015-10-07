@@ -181,12 +181,12 @@ function Z80CPU:initialize()
 end
 
 function Z80CPU:register_input(address_mask, address_state, target_function, target_userdata)
-    local io = { address_mask, address_state, target_function, target_userdata }
+    local io = { mask=address_mask, state=address_state, f=target_function, ud=target_userdata }
     table.insert(self._inputs, io)
 end
 
 function Z80CPU:register_output(address_mask, address_state, target_function, target_userdata)
-    local io = { address_mask, address_state, target_function, target_userdata }
+    local io = { mask=address_mask, state=address_state, f=target_function, ud=target_userdata }
     table.insert(self._outputs, io)
 end
 
@@ -361,6 +361,16 @@ local function write_to_address_command_string(source, dest_address, next_pc, op
     [[ addr=%s %sif jit.write_allowed[addr] then memory[addr]=%s  
     if jit:code_write_check(addr) then CPU.PC = 0x%x return 'invalidate' end end]], 
     dest_address, optional_flag_check_code, source, next_pc)
+end
+
+
+local function port_output_string(addr_hi, addr_lo, data)
+    return string.format(
+        -- run all output sources, not just first
+        [[ for _,pd in CPU._outputs do 
+if bit32.band(pd.mask, addr_hi*256+addr_lo) == pd.state then 
+    pd.f(pd.ud, addr, %s) 
+end end]], addr_hi, addr_lo, data)
 end
 
 local decode_instruction
@@ -569,6 +579,11 @@ local decode_first_byte = {
         end,
         
     -- D3 = OUT (xx),A
+    [0xD3] = function(memory, iaddr)
+            local addr = memory[iaddr]; iaddr = inc_address(iaddr);
+            return port_output_string("CPU.A", addr, "CPU.A"), iaddr
+        end,
+    
     -- E3 = EX (SP), HL
     [0xE3] = function(memory, iaddr)
             -- seems like candidate for faster implementation! (2 extra copies, extra calculation of SP+1)
