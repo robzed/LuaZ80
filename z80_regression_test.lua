@@ -2983,7 +2983,12 @@ local basic_instruction_tests = {
     --[[
     ["OUT  (!n!),A"] =   0xD3,
     --]]
-    
+-- 0xD3
+{ "OUT (n), A", function(z)
+        z:LD("A", 0x22)
+        z:assemble("OUT","(0x12)", "A")
+        end, { A = 0x22 } },
+
 -- 0xD4
 { "CALL NC, nn", function(z)
         z:LD("SP", 0x6000)      -- 0

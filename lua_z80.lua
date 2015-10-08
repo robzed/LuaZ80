@@ -367,7 +367,7 @@ end
 local function port_output_string(addr_hi, addr_lo, data)
     return string.format(
         -- run all output sources, not just first
-        [[ for _,pd in CPU._outputs do 
+        [[ for _,pd in ipairs(CPU._outputs) do 
 if bit32.band(pd.mask, addr_hi*256+addr_lo) == pd.state then 
     pd.f(pd.ud, addr, %s) 
 end end]], addr_hi, addr_lo, data)
