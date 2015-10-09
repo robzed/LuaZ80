@@ -114,7 +114,7 @@ local function block_of_halts(number)
     return t
 end
 
-local function run_code(initial_memory, code)
+local function run_code(initial_memory, code, post_setup)
     -- make the JIT compiler and memory
     local jit = Z80JIT:new()
     local time_start = os.clock()
@@ -136,6 +136,9 @@ local function run_code(initial_memory, code)
     
     -- now make a CPU to run the code
     local cpu = Z80CPU:new()
+    if post_setup then
+        post_setup(cpu, jit)
+    end
     local time_start = os.clock()
     local old_state = get_state(jit, cpu)
     local time_end = os.clock()
@@ -387,7 +390,7 @@ local function compare_state(old_state, new_state)
 end
 
 
-local function test(code, checks)
+local function test(code, checks, post_setup)
     local time_start = os.clock()
     local initial_mem = block_of_halts(2048)
     local time_end = os.clock()
@@ -397,7 +400,7 @@ local function test(code, checks)
     if not checks.PC then
         checks.PC = end_addr + 1 -- +1 for halt instruction
     end
-    local old_state, new_state = run_code(initial_mem, binary)
+    local old_state, new_state = run_code(initial_mem, binary, post_setup)
 
     check_changes(old_state, new_state, checks)
     local time_start = os.clock()
@@ -412,7 +415,7 @@ local function run_batch(tests)
     for i, one_test in pairs(tests) do
         print(string.format("Running test %i of %i - %s", i, num_tests, one_test[1]))
         local time_start = os.clock()
-        test(one_test[2], one_test[3])
+        test(one_test[2], one_test[3], one_test[4])
         local time_end = os.clock()
         if TIMING_ON then print("Took", time_end - time_start) end
         
@@ -2980,14 +2983,34 @@ local basic_instruction_tests = {
         end,
         { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "C"} } },
     
-    --[[
-    ["OUT  (!n!),A"] =   0xD3,
-    --]]
 -- 0xD3
-{ "OUT (n), A", function(z)
+{ "OUT (n), A no outputs", function(z, CPU)
         z:LD("A", 0x22)
         z:assemble("OUT","(0x12)", "A")
         end, { A = 0x22 } },
+
+{ "OUT (n), A checked", function(z)
+        z:LD("A", 0x22)
+        z:assemble("OUT","(0xFE)", "A")
+        end, 
+        { A = 0x22 },
+        function (CPU, JIT)
+            CPU:register_output(0xff, 254, 
+                function(ud, h, l ,d) print(ud, h, l, d) end, 
+                "OUTPUT DATA")
+        end
+    },
+{ "OUT (n), A checked, not output", function(z)
+        z:LD("A", 0x22)
+        z:assemble("OUT","(0x22)", "A")
+        end, 
+        { A = 0x22 },
+        function (CPU, JIT)
+            CPU:register_output(0xff, 254, 
+                function(ud, h, l ,d) print(ud, h, l, d) end, 
+                "OUTPUT DATA")
+        end
+    },
 
 -- 0xD4
 { "CALL NC, nn", function(z)
@@ -3261,6 +3284,7 @@ local basic_instruction_tests = {
         z:assemble("SBC", "A", 1)
     end,
     { A = 0x00, B = 0x01, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
 
 -- 0xDF
 { "RST 18H", function(z)
