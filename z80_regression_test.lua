@@ -3021,7 +3021,22 @@ local basic_instruction_tests = {
                 "OUTPUT DATA")
         end
     },
-
+{ "OUT (n), A single bit checked", function(z)
+        z:LD("A", 0x77)
+        z:assemble("OUT","(0x73)", "A")
+        end, 
+        { A = 0x77 },
+        function (CPU, JIT)
+            CPU:register_output(0x80, 0x00, 
+                function(ud, h, l ,d) 
+                    if ud ~= 1234 or h ~= 0x77 or l ~= 0x73 or d ~= 0x77 then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    end
+                end,
+                1234)
+        end
+    },
 -- 0xD4
 { "CALL NC, nn", function(z)
         z:LD("SP", 0x6000)      -- 0
