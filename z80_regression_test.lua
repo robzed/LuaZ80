@@ -2996,7 +2996,12 @@ local basic_instruction_tests = {
         { A = 0x22 },
         function (CPU, JIT)
             CPU:register_output(0xff, 254, 
-                function(ud, h, l ,d) print(ud, h, l, d) end, 
+                function(ud, h, l ,d) 
+                    if ud ~= "OUTPUT DATA" or h ~= 0x22 or l ~= 0xFE or d ~= 0x22 then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    end
+                end,
                 "OUTPUT DATA")
         end
     },
@@ -3007,7 +3012,12 @@ local basic_instruction_tests = {
         { A = 0x22 },
         function (CPU, JIT)
             CPU:register_output(0xff, 254, 
-                function(ud, h, l ,d) print(ud, h, l, d) end, 
+                function(ud, h, l ,d) 
+                    if ud ~= "OUTPUT DATA" or h ~= 0x22 or l ~= 0xFE or d ~= 0x22 then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    end
+                end,
                 "OUTPUT DATA")
         end
     },
