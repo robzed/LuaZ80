@@ -3257,9 +3257,6 @@ local basic_instruction_tests = {
         end,
         { A = 0x24, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
     
-    --[[
-    ["IN   A,(!n!)"] =   0xDB,
-    --]]
 -- 0xDB
 { "IN   A,(!n!)", function(z)
         z:LD("A", 0x11)

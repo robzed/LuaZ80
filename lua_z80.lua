@@ -373,6 +373,16 @@ if bit32.band(pd.mask, %s*256+%s) == pd.state then
 end end]], addr_hi, addr_lo, addr_hi, addr_lo, data)
 end
 
+local function port_input_string(addr_hi, addr_lo, target_register)
+    return string.format(
+        -- run first matching input source only
+        [[ %s=0xFF for _,pd in ipairs(CPU._outputs) do 
+if bit32.band(pd.mask, %s*256+%s) == pd.state then 
+    %s = pd.f(pd.ud, %s, %s) 
+    break
+end end]], target_register, addr_hi, addr_lo, target_register, addr_hi, addr_lo)
+end
+
 local decode_instruction
 
 local decode_first_byte = {
@@ -683,6 +693,11 @@ local decode_first_byte = {
                 return decode_instruction(memory, iaddr, decode_CB_instructions)
         end,
     -- DB = IN A, (xx)
+    [0xDB] = function(memory, iaddr)
+            local addr = memory[iaddr]; iaddr = inc_address(iaddr);
+            return port_input_string("CPU.A", addr, "CPU.A"), iaddr
+        end,
+
     -- EB = EX DE, HL
     [0xEB] = "result=CPU.D CPU.D=CPU.H CPU.H=result result=CPU.E CPU.E=CPU.L CPU.L=result",
     -- FB = EI
