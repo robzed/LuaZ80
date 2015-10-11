@@ -3260,7 +3260,25 @@ local basic_instruction_tests = {
     --[[
     ["IN   A,(!n!)"] =   0xDB,
     --]]
-    
+-- 0xDB
+{ "IN   A,(!n!)", function(z)
+        z:LD("A", 0x11)
+        z:assemble("IN", "A", "(0x22)")
+    end,
+    { A = 0x33 }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x11 or l ~= 0x22 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+
     -- 0xDC
 { "CALL C, nn", function(z)
         z:LD("SP", 0x6000)
