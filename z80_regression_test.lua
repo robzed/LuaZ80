@@ -151,6 +151,7 @@ local function run_code(initial_memory, code, post_setup)
     until status ~= "ok"
     if status ~= "halt" then
         print("Failed to Halt")
+        print("Status:", status)
         os.exit(1)
     end
     local time_end = os.clock()
