@@ -3275,6 +3275,40 @@ local basic_instruction_tests = {
             "INPUT DATA")
     end
     },
+{ "IN   A,(!n!) no input", function(z)
+        z:LD("A", 0x11)
+        z:assemble("IN", "A", "(0x21)")
+    end,
+    { A = 0xFF }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x11 or l ~= 0x22 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   A,(!n!) single bit", function(z)
+        z:LD("A", 0x99)
+        z:assemble("IN", "A", "(0x21)")
+    end,
+    { A = 0x66 }, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x66
+            end,
+            "INPUT DATA")
+    end
+    },
 
     -- 0xDC
 { "CALL C, nn", function(z)
