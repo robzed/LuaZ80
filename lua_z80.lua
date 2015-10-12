@@ -367,6 +367,7 @@ end
 local function port_output_string(addr_hi, addr_lo, data)
     return string.format(
         -- run all output sources, not just first
+        -- @todo:could precalculate specific outputs on registration?
         [[ for _,pd in ipairs(CPU._outputs) do 
 if bit32.band(pd.mask, %s*256+%s) == pd.state then 
     pd.f(pd.ud, %s, %s, %s) 
@@ -376,7 +377,8 @@ end
 local function port_input_string(addr_hi, addr_lo, target_register)
     return string.format(
         -- run first matching input source only
-        [[ %s=0xFF for _,pd in ipairs(CPU._outputs) do 
+        -- @todo:could precalculate specific input on registration?
+        [[ %s=0xFF for _,pd in ipairs(CPU._inputs) do 
 if bit32.band(pd.mask, %s*256+%s) == pd.state then 
     %s = pd.f(pd.ud, %s, %s) 
     break
