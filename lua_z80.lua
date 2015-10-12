@@ -378,11 +378,11 @@ local function port_input_string(addr_hi, addr_lo, target_register)
     return string.format(
         -- run first matching input source only
         -- @todo:could precalculate specific input on registration?
-        [[ %s=0xFF for _,pd in ipairs(CPU._inputs) do 
+        [[ result = 0xFF for _,pd in ipairs(CPU._inputs) do 
 if bit32.band(pd.mask, %s*256+%s) == pd.state then 
-    %s = pd.f(pd.ud, %s, %s) 
+    result = pd.f(pd.ud, %s, %s) 
     break
-end end]], target_register, addr_hi, addr_lo, target_register, addr_hi, addr_lo)
+end end %s = result]], addr_hi, addr_lo, addr_hi, addr_lo, target_register)
 end
 
 local decode_instruction
