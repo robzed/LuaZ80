@@ -500,11 +500,27 @@ local decode_first_byte = {
     -- 17 = RLA ... carry to bit 0, bit 7 to carry
     [0x17] = "CPU:get_F_only_SZV() CPU.A = CPU.A * 2 + CPU.Carry if CPU.A > 255 then CPU.A = CPU.A - 256 CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end",
     -- 27 = DAA
+    -- @todo: look for more effient ways of implementing this, e.g. table lookup
     --[0x27] = [[ result = CPU:get_F() ]]
     --if bit32.btest(result, Z80_N_FLAG) then
+    --    if bit32.btest(result, Z80_C_FLAG) then
+    --        if bit32.btest(result, Z80_H_FLAG) then
+    --        else
+    --        end
+    --    else
+    --        if bit32.btest(result, Z80_H_FLAG) then
+    --        else
+    --        end
+    --    end
     --else
     --    if bit32.btest(result, Z80_C_FLAG) then
+    --        if bit32.btest(result, Z80_H_FLAG) then
+    --        else
+    --        end
     --    else
+    --        if bit32.btest(result, Z80_H_FLAG) then
+    --        else
+    --        end
     --    end
     --end
     
