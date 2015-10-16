@@ -190,32 +190,43 @@ function Z80CPU:register_output(address_mask, address_state, target_function, ta
     table.insert(self._outputs, io)
 end
 
-function Z80CPU:DAA()
-    -- @todo: look for more effient ways of implementing this, e.g. table lookup
+function Z80CPU:DAA(zflags)
+    -- @todo: look for more efficent ways of implementing this, e.g. table lookup
     local flags = self:get_F()
-    local upper = bit32.rshift(self.A, 4)
     local lower = bit32.band(self.A, 0x0F)
+    local result = self.A
+    local half_flag_result = 0
+    -- subtract instructions
     if bit32.btest(flags, Z80_N_FLAG) then
-        if bit32.btest(flags, Z80_C_FLAG) then
-            if bit32.btest(flags, Z80_H_FLAG) then
-            else
-            end
-        else
-            if bit32.btest(flags, Z80_H_FLAG) then
-            else
+        if lower > 9 or bit32.btest(flags, Z80_H_FLAG) then
+            result = result - 6
+            if result < 0 then
+                result = result + 255
             end
         end
-    else
-        if bit32.btest(flags, Z80_C_FLAG) then
-            if bit32.btest(flags, Z80_H_FLAG) then
-            else
+        if result > 0x90 or bit32.btest(flags, Z80_C_FLAG) then
+        end
+        if result < 0 then
+        end
+    else    -- add instructions
+        if lower > 9 or bit32.btest(flags, Z80_H_FLAG) then
+            result = result + 6
+            if bit32.band(result, 0x0F) < 6 then
+                half_flag_result = Z80_H_FLAG
             end
+        end
+        if result > 0x90 or bit32.btest(flags, Z80_C_FLAG) then
+            result = result + 0x60
+        end
+        if result > 255 then
+            self.Carry=1 result=result-256
         else
-            if bit32.btest(flags, Z80_H_FLAG) then
-            else
-            end
+            self.Carry=0
         end
     end
+    -- @todo: check half carry operation
+    self._F = zflags[result] + self.Carry + half_flag_result + bit32.band(flags, Z80_N_FLAG)
+    self.A = result
 end
 
 -- Flags are complex
@@ -527,7 +538,7 @@ local decode_first_byte = {
     -- 17 = RLA ... carry to bit 0, bit 7 to carry
     [0x17] = "CPU:get_F_only_SZV() CPU.A = CPU.A * 2 + CPU.Carry if CPU.A > 255 then CPU.A = CPU.A - 256 CPU._F = CPU._F + 1 CPU.Carry = 1 else CPU.Carry = 0 end",
     -- 27 = DAA
-    [0x27] = "CPU:DAA()",
+    [0x27] = "CPU:DAA(zflags)",
     
     -- 37 = SCF
     [0x37] = [[ CPU._F = bit32.band(CPU:get_F(), 0xFF-(Z80_N_FLAG + Z80_H_FLAG + Z80_C_FLAG)) + Z80_C_FLAG CPU.Carry = 1 ]],

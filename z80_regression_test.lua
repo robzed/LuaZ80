@@ -939,80 +939,95 @@ local basic_instruction_tests = {
 
 -- 0x27
 { "DAA 00inc", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0)
     z:assemble("INC", "A")
     z:assemble("DAA")
 end, { A=0x01, F= { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
 { "DAA FFinc", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0xFF)
     z:assemble("INC", "A")
     z:assemble("DAA")
-end, { A=0x00, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
+end, { A=0x06, F= { "-S", "-Z", "-H", "V", "-N", "-C" } } },
 { "DAA 99inc", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x99)
     z:assemble("INC", "A")
     z:assemble("DAA")
-end, { A=0x00, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
+end, { A=0x00, F= { "-S", "Z", "-H", "V", "-N", "C" } } },
 { "DAA 90inc", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x90)
     z:assemble("INC", "A")
     z:assemble("DAA")
 end, { A=0x91, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
 { "DAA 09inc", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x09)
     z:assemble("INC", "A")
     z:assemble("DAA")
 end, { A=0x10, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
 
 { "DAA 01dec", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 1)
     z:assemble("DEC", "A")
     z:assemble("DAA")
-end, { A=0x00, F= { "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+end, { A=0x00, F= { "-S", "-Z", "-H", "V", "-N", "-C" } } },
 { "DAA FEdec", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0xFE)
     z:assemble("DEC", "A")
     z:assemble("DAA")
-end, { A=0x99, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
+end, { A=0x99, F= { "-S", "Z", "-H", "V", "-N", "C" } } },
 { "DAA 00dec", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x00)
     z:assemble("DEC", "A")
     z:assemble("DAA")
-end, { A=0x99, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
+end, { A=0x99, F= { "-S", "Z", "-H", "V", "-N", "C" } } },
 { "DAA 91dec", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x91)
     z:assemble("DEC", "A")
     z:assemble("DAA")
-end, { A=0x90, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
+end, { A=0x90, F= { "-S", "Z", "-H", "V", "-N", "C" } } },
 { "DAA 90dec", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x90)
     z:assemble("DEC", "A")
     z:assemble("DAA")
 end, { A=0x89, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
 { "DAA 10dec", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x10)
     z:assemble("DEC", "A")
     z:assemble("DAA")
-end, { A=0x09, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
+end, { A=0x09, F= { "-S", "Z", "-H", "V", "-N", "C" } } },
 { "DAA 09dec", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x09)
     z:assemble("DEC", "A")
     z:assemble("DAA")
 end, { A=0x08, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
 
 { "DAA 11add09", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x11)
     z:assemble("ADD", "A", 0x09)
     z:assemble("DAA")
 end, { A=0x20, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
 
 { "DAA 11sub09", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x11)
     z:assemble("SUB", "A", 0x09)
     z:assemble("DAA")
 end, { A=0x02, F= { "-S", "Z", "-H", "-V", "-N", "C" } } },
 
 { "DAA 09neg", function(z)
+    z:assemble("OR", "A")       -- clear carry
     z:LD("A", 0x09)
     z:assemble("NEG")
     z:assemble("DAA")
