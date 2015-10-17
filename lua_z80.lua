@@ -193,38 +193,35 @@ end
 function Z80CPU:DAA(zflags)
     -- @todo: look for more efficent ways of implementing this, e.g. table lookup
     local flags = self:get_F()
-    local lower = bit32.band(self.A, 0x0F)
     local result = self.A
     local half_flag_result = 0
+    local offset = 0
+    if bit32.band(result, 0x0F) > 9 then
+        half_flag_result = Z80_H_FLAG
+        offset =  6
+    end
+    if bit32.btest(flags, Z80_H_FLAG) then
+        offset =  6
+    end
+    if result > 0x99 or self.Carry == 1 then
+        offset = offset + 0x60
+    end
     -- subtract instructions
     if bit32.btest(flags, Z80_N_FLAG) then
-        if lower > 9 or bit32.btest(flags, Z80_H_FLAG) then
-            result = result - 6
-            if result < 0 then
-                result = result + 255
-            end
-        end
-        if result > 0x90 or bit32.btest(flags, Z80_C_FLAG) then
-        end
+        result = result - offset
         if result < 0 then
+            self.Carry=1 result=result+256
+        else
+            self.Carry=0
         end
     else    -- add instructions
-        if lower > 9 or bit32.btest(flags, Z80_H_FLAG) then
-            result = result + 6
-            if bit32.band(result, 0x0F) < 6 then
-                half_flag_result = Z80_H_FLAG
-            end
-        end
-        if result > 0x90 or bit32.btest(flags, Z80_C_FLAG) then
-            result = result + 0x60
-        end
+        result = result + offset
         if result > 255 then
             self.Carry=1 result=result-256
         else
             self.Carry=0
         end
     end
-    -- @todo: check half carry operation
     self._F = zflags[result] + self.Carry + half_flag_result + bit32.band(flags, Z80_N_FLAG)
     self.A = result
 end
