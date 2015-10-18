@@ -190,17 +190,18 @@ function Z80CPU:register_output(address_mask, address_state, target_function, ta
     table.insert(self._outputs, io)
 end
 
+-- DAA badly documented in Z80 UM & Zaks? Yep!
+-- http://stackoverflow.com/questions/8119577/z80-daa-instruction
+-- http://z80-heaven.wikidot.com/instructions-set:daa
+-- http://datasheets.chipdb.org/Zilog/Z80/z80-documented-0.90.pdf
 function Z80CPU:DAA(zflags)
     -- @todo: look for more efficent ways of implementing this, e.g. table lookup
     local flags = self:get_F()
     local result = self.A
     local half_flag_result = 0
     local offset = 0
-    if bit32.band(result, 0x0F) > 9 then
-        half_flag_result = Z80_H_FLAG
-        offset =  6
-    end
-    if bit32.btest(flags, Z80_H_FLAG) then
+    local lower = bit32.band(result, 0x0F)
+    if lower > 9 or bit32.btest(flags, Z80_H_FLAG) then
         offset =  6
     end
     if result > 0x99 or self.Carry == 1 then
@@ -208,18 +209,27 @@ function Z80CPU:DAA(zflags)
     end
     -- subtract instructions
     if bit32.btest(flags, Z80_N_FLAG) then
+        if lower < bit32.band(0xF, offset) then
+            half_flag_result = Z80_H_FLAG
+        end
         result = result - offset
         if result < 0 then
             self.Carry=1 result=result+256
-        else
-            self.Carry=0
+            
+        -- carry is never reset!
+        --else
+        --    self.Carry=0
         end
     else    -- add instructions
+        if lower > 9 then
+            half_flag_result = Z80_H_FLAG
+        end
         result = result + offset
         if result > 255 then
             self.Carry=1 result=result-256
-        else
-            self.Carry=0
+        -- carry is never reset!
+        --else
+        --    self.Carry=0
         end
     end
     self._F = zflags[result] + self.Carry + half_flag_result + bit32.band(flags, Z80_N_FLAG)
