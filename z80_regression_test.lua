@@ -4447,10 +4447,38 @@ end, { A=0x00, F= { "-S", "Z", "-H", "V", "N", "C" } } },
 
 }
 
+
+ED_instruction_tests = {
+    
+-- 0xED 0x44
+{ "NEG", function(z)
+        z:LD("A", 0x01)
+        z:assemble("NEG")
+    end,
+    { A = 0xFF, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "NEG", function(z)
+        z:LD("A", 0x00)
+        z:assemble("NEG")
+    end,
+    { A = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "NEG", function(z)
+        z:LD("A", 0x80)
+        z:assemble("NEG")
+    end,
+    { A = 0x80, F={ "S", "-Z", "-H", "V", "N", "C" } } },
+{ "NEG", function(z)
+        z:LD("A", 0xFE)
+        z:assemble("NEG")
+    end,
+    { A = 0x02, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
+
+}
+
+
 run_batch(basic_instruction_tests)
 --run_batch(temp_test)
 --run_batch(CB_instruction_tests)
---run_batch(ED_instruction_tests)
+run_batch(ED_instruction_tests)
 --run_batch(DD_instruction_tests)
 --run_batch(FD_instruction_tests)
 --run_batch(DDCB_instruction_tests)
