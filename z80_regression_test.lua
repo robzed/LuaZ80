@@ -4474,6 +4474,17 @@ ED_instruction_tests = {
 
 }
 
+CB_instruction_tests = {
+
+{ "SET 0, A", function(z)
+        z:LD("A", 0x00)
+        z:assemble("SET", 0, "A")
+    end, { A = 0x01 } },
+
+
+}
+
+
 
 run_batch(basic_instruction_tests)
 --run_batch(temp_test)
