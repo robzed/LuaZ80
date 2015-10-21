@@ -1045,6 +1045,8 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 dest_op = "(!nn!)"
             elseif src_op == "(!n!)" then
                 src_op = "(!nn!)"
+            elseif dest_op == "!r!" and type(dest) == "number" then
+                dest_op = tostring(dest)
             else
                 self:set_error(string.format("invalid operands in %s (dest op='%s' source op='%s')",instruction,dest_op,src_op))
                 break
