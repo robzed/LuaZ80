@@ -332,10 +332,39 @@ local function inc_address(address)
     return address
 end
 
+-- (HL) becomes lua.memory[CPU.H*256+CPU.L]
+local reg_index = {[0]="CPU.B","CPU.C","CPU.D","CPU.E","CPU.H","CPU.L","memory[CPU.H*256+CPU.L]","CPU.A"}
+
+local function _is_single_reg(reg)
+    return #reg == 5        -- simple, but effective
+end
+
 
 -- CB = rotates, shifts, bit set/reset/testing
 local decode_CB_instructions = {
 }
+
+-- populate
+--    SET b, r
+for reg = 0, 7 do
+    local reg_string = reg_index[reg]            -- not speed critical
+    for bit = 0, 7 do
+        local bitmask = 2 ^ bit
+        if _is_single_reg(reg_string) then
+            -- no memory write check for single reg write
+            -- SET b, r
+            decode_CB_instructions[0xC0 + 8* bit + reg] = string.format("%s=bit32.bor(%s, %s)",reg_string, reg_string, bitmask)
+        else
+            -- SET n,(HL)
+            --decode_CB_instructions[0xC0 + 8* bit + reg] = string.format("%s=bit32.bor(%s, %s)",reg_string, reg_string, bitmask)
+            --decode_first_byte[i] = function(memory, iaddr)
+            --        return string.format([[addr = CPU.H*256+CPU.L;if jit.write_allowed[addr] then memory[addr]=%s 
+            --        if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], from_reg, iaddr), iaddr            
+            --    end
+        end
+    end
+end
+
 
 -- DD = IX register
 local decode_DD_instructions = {
@@ -777,12 +806,6 @@ local decode_first_byte = {
 }
 
 
--- (HL) becomes lua.memory[CPU.H*256+CPU.L]
-local reg_index = {[0]="CPU.B","CPU.C","CPU.D","CPU.E","CPU.H","CPU.L","memory[CPU.H*256+CPU.L]","CPU.A"}
-
-local function _is_single_reg(reg)
-    return #reg == 5        -- simple, but effective
-end
 --
 -- populate the load instructions
 --

@@ -4480,15 +4480,39 @@ CB_instruction_tests = {
         z:LD("A", 0x00)
         z:assemble("SET", 0, "A")
     end, { A = 0x01 } },
+{ "SET 0, A", function(z)
+        z:LD("A", 0xFF)
+        z:assemble("SET", 0, "A")
+    end, { A = 0xFF } },
+{ "SET 1, A", function(z)
+        z:LD("A", 0x00)
+        z:assemble("SET", 1, "A")
+    end, { A = 0x02 } },
+{ "SET 2, A", function(z)
+        z:LD("A", 0x00)
+        z:assemble("SET", 2, "A")
+    end, { A = 0x04 } },
+{ "SET 4, A", function(z)
+        z:LD("A", 0x0F)
+        z:assemble("SET", 4, "A")
+    end, { A = 0x1F } },
+{ "SET 6, A", function(z)
+        z:LD("A", 0x00)
+        z:assemble("SET", 6, "A")
+    end, { A = 0x40 } },
+{ "SET 7, A", function(z)
+        z:LD("A", 0x00)
+        z:assemble("SET", 7, "A")
+    end, { A = 0x80 } },
 
 
 }
 
 
 
-run_batch(basic_instruction_tests)
+--run_batch(basic_instruction_tests)
 --run_batch(temp_test)
---run_batch(CB_instruction_tests)
+run_batch(CB_instruction_tests)
 run_batch(ED_instruction_tests)
 --run_batch(DD_instruction_tests)
 --run_batch(FD_instruction_tests)
