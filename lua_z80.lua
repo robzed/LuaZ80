@@ -346,14 +346,18 @@ local decode_CB_instructions = {
 
 -- populate
 --    SET b, r
+--    RES b, r
 for reg = 0, 7 do
     local reg_string = reg_index[reg]            -- not speed critical
     for bit = 0, 7 do
         local bitmask = 2 ^ bit
+        local invbitmask = 255 - bitmask
         if _is_single_reg(reg_string) then
             -- no memory write check for single reg write
             -- SET b, r
             decode_CB_instructions[0xC0 + 8* bit + reg] = string.format("%s=bit32.bor(%s, %s)",reg_string, reg_string, bitmask)
+            -- RES b, r
+            decode_CB_instructions[0x80 + 8* bit + reg] = string.format("%s=bit32.band(%s, %s)",reg_string, reg_string, invbitmask)
         else
             -- SET n,(HL)
             --decode_CB_instructions[0xC0 + 8* bit + reg] = string.format("%s=bit32.bor(%s, %s)",reg_string, reg_string, bitmask)

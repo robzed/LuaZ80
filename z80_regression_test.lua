@@ -4505,12 +4505,43 @@ CB_instruction_tests = {
         z:assemble("SET", 7, "A")
     end, { A = 0x80 } },
 
+-----------------------------------------
+
+{ "RES 0, A", function(z)
+        z:LD("A", 0xFF)
+        z:assemble("RES", 0, "A")
+    end, { A = 0xFE } },
+{ "RES 0, A", function(z)
+        z:LD("A", 0x00)
+        z:assemble("RES", 0, "A")
+    end, { A = 0x00 } },
+{ "RES 1, A", function(z)
+        z:LD("A", 0xFE)
+        z:assemble("RES", 1, "A")
+    end, { A = 0xFC } },
+{ "RES 2, A", function(z)
+        z:LD("A", 0xFF)
+        z:assemble("RES", 2, "A")
+    end, { A = 0xFB } },
+{ "RES 4, A", function(z)
+        z:LD("A", 0xF0)
+        z:assemble("RES", 4, "A")
+    end, { A = 0xE0 } },
+{ "RES 6, A", function(z)
+        z:LD("A", 0xFF)
+        z:assemble("RES", 6, "A")
+    end, { A = 0xBF } },
+{ "RES 7, A", function(z)
+        z:LD("A", 0xFF)
+        z:assemble("RES", 7, "A")
+    end, { A = 0x7F } },
+
 
 }
 
 
 
---run_batch(basic_instruction_tests)
+run_batch(basic_instruction_tests)
 --run_batch(temp_test)
 run_batch(CB_instruction_tests)
 run_batch(ED_instruction_tests)
