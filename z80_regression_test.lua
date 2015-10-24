@@ -4504,6 +4504,32 @@ CB_instruction_tests = {
         z:LD("A", 0x00)
         z:assemble("SET", 7, "A")
     end, { A = 0x80 } },
+-----------------------------------------
+{ "SET 2, B", function(z)
+        z:LD("B", 0x00)
+        z:assemble("SET", 2, "B")
+    end, { B = 0x04 } },
+{ "SET 2, C", function(z)
+        z:LD("C", 0x00)
+        z:assemble("SET", 2, "C")
+    end, { C = 0x04 } },
+{ "SET 2, D", function(z)
+        z:LD("D", 0x00)
+        z:assemble("SET", 2, "D")
+    end, { D = 0x04 } },
+{ "SET 2, E", function(z)
+        z:LD("E", 0x00)
+        z:assemble("SET", 2, "E")
+    end, { E = 0x04 } },
+{ "SET 2, H", function(z)
+        z:LD("H", 0x00)
+        z:assemble("SET", 2, "H")
+    end, { H = 0x04 } },
+{ "SET 2, L", function(z)
+        z:LD("L", 0x00)
+        z:assemble("SET", 2, "L")
+    end, { L = 0x04 } },
+
 
 -----------------------------------------
 
@@ -4535,6 +4561,32 @@ CB_instruction_tests = {
         z:LD("A", 0xFF)
         z:assemble("RES", 7, "A")
     end, { A = 0x7F } },
+
+-----------------------------------------
+{ "RES 2, B", function(z)
+        z:LD("B", 0xFF)
+        z:assemble("RES", 2, "B")
+    end, { B = 0xFB } },
+{ "RES 2, C", function(z)
+        z:LD("C", 0xFF)
+        z:assemble("RES", 2, "C")
+    end, { C = 0xFB } },
+{ "RES 2, D", function(z)
+        z:LD("D", 0xFF)
+        z:assemble("RES", 2, "D")
+    end, { D = 0xFB } },
+{ "RES 2, E", function(z)
+        z:LD("E", 0xFF)
+        z:assemble("RES", 2, "E")
+    end, { E = 0xFB } },
+{ "RES 2, H", function(z)
+        z:LD("H", 0xFF)
+        z:assemble("RES", 2, "H")
+    end, { H = 0xFB } },
+{ "RES 2, L", function(z)
+        z:LD("L", 0xFF)
+        z:assemble("RES", 2, "L")
+    end, { L = 0xFB } },
 
 
 }
