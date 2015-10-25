@@ -4505,6 +4505,42 @@ CB_instruction_tests = {
         z:assemble("SET", 7, "A")
     end, { A = 0x80 } },
 -----------------------------------------
+{ "SET 0, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x00)
+        z:assemble("SET", 0, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x01 } },
+{ "SET 0, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xFF)
+        z:assemble("SET", 0, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0xFF } },
+{ "SET 1, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x00)
+        z:assemble("SET", 1, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x02 } },
+{ "SET 2, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x00)
+        z:assemble("SET", 2, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x04 } },
+{ "SET 4, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x0F)
+        z:assemble("SET", 4, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x1F } },
+{ "SET 6, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x00)
+        z:assemble("SET", 6, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x40 } },
+{ "SET 7, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x00)
+        z:assemble("SET", 7, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x80 } },
+-----------------------------------------
 { "SET 2, B", function(z)
         z:LD("B", 0x00)
         z:assemble("SET", 2, "B")
