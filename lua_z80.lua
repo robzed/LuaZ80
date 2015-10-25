@@ -360,11 +360,15 @@ for reg = 0, 7 do
             decode_CB_instructions[0x80 + 8* bit + reg] = string.format("%s=bit32.band(%s, %s)",reg_string, reg_string, invbitmask)
         else
             -- SET n,(HL)
-            --decode_CB_instructions[0xC0 + 8* bit + reg] = string.format("%s=bit32.bor(%s, %s)",reg_string, reg_string, bitmask)
-            --decode_first_byte[i] = function(memory, iaddr)
-            --        return string.format([[addr = CPU.H*256+CPU.L;if jit.write_allowed[addr] then memory[addr]=%s 
-            --        if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], from_reg, iaddr), iaddr            
-            --    end
+            decode_CB_instructions[0xC0 + 8* bit + reg] = function(memory, iaddr)
+                    return string.format([[addr = CPU.H*256+CPU.L;if jit.write_allowed[addr] then memory[addr]=bit32.bor(memory[addr], %s)
+                    if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], bitmask, iaddr), iaddr
+                end
+            -- RES n,(HL)
+            decode_CB_instructions[0x80 + 8* bit + reg] = function(memory, iaddr)
+                    return string.format([[addr = CPU.H*256+CPU.L;if jit.write_allowed[addr] then memory[addr]=bit32.band(memory[addr], %s)
+                    if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], invbitmask, iaddr), iaddr
+                end
         end
     end
 end
