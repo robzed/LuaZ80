@@ -4624,6 +4624,43 @@ CB_instruction_tests = {
         z:assemble("RES", 2, "L")
     end, { L = 0xFB } },
 
+-----------------------------------------
+
+{ "RES 0, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xFF)
+        z:assemble("RES", 0, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0xFE } },
+{ "RES 0, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x00)
+        z:assemble("RES", 0, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x00 } },
+{ "RES 1, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xFE)
+        z:assemble("RES", 1, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0xFC } },
+{ "RES 2, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xFF)
+        z:assemble("RES", 2, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0xFB } },
+{ "RES 4, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xF0)
+        z:assemble("RES", 4, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0xE0 } },
+{ "RES 6, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xFF)
+        z:assemble("RES", 6, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0xBF } },
+{ "RES 7, (HL)", function(z)
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xFF)
+        z:assemble("RES", 7, "(HL)")
+    end, { H=0x60, L=0, [0x6000] = 0x7F } },
 
 }
 
