@@ -344,6 +344,13 @@ end
 local decode_CB_instructions = {
 }
 
+--  BIT n,r
+-- *Z513*0-  PV as Z, S set only if n=7 and b7 of r set
+-- Behaves much like AND r,2^n, except Carry is unchanged.
+local function BIT_string(bitmask, what)
+    return string.format("CPU._F = zflags[bit32.band(%s, %s)]+Z80_H_FLAG+CPU.Carry", bitmask, what)
+end
+
 -- populate
 --    SET b, r
 --    RES b, r
@@ -358,6 +365,8 @@ for reg = 0, 7 do
             decode_CB_instructions[0xC0 + 8* bit + reg] = string.format("%s=bit32.bor(%s, %s)",reg_string, reg_string, bitmask)
             -- RES b, r
             decode_CB_instructions[0x80 + 8* bit + reg] = string.format("%s=bit32.band(%s, %s)",reg_string, reg_string, invbitmask)
+            -- BIT b, r
+            decode_CB_instructions[0x80 + 8* bit + reg] = BIT_string(bitmask, reg)
         else
             -- SET n,(HL)
             decode_CB_instructions[0xC0 + 8* bit + reg] = function(memory, iaddr)
@@ -369,6 +378,8 @@ for reg = 0, 7 do
                     return string.format([[addr = CPU.H*256+CPU.L;if jit.write_allowed[addr] then memory[addr]=bit32.band(memory[addr], %s)
                     if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], invbitmask, iaddr), iaddr
                 end
+            -- BIT b, (HL)
+            decode_CB_instructions[0x80 + 8* bit + reg] = BIT_string(bitmask, reg)
         end
     end
 end
