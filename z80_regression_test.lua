@@ -4476,6 +4476,24 @@ ED_instruction_tests = {
 
 CB_instruction_tests = {
 
+{ "BIT 0, B", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0x00)
+        z:assemble("BIT", 0, "B")
+        end, { B = 0x00, F={ "-S", "Z", "H", "V", "-N", "-C" } } },
+{ "BIT 0, B carry", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x00)
+        z:assemble("BIT", 0, "B")
+        end, { B = 0x00, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 0, B bit set", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x01)
+        z:assemble("BIT", 0, "B")
+        end, { B = 0x01, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+        
 { "SET 0, A", function(z)
         z:LD("A", 0x00)
         z:assemble("SET", 0, "A")
