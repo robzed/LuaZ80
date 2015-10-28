@@ -366,7 +366,7 @@ for reg = 0, 7 do
             -- RES b, r
             decode_CB_instructions[0x80 + 8* bit + reg] = string.format("%s=bit32.band(%s, %s)",reg_string, reg_string, invbitmask)
             -- BIT b, r
-            decode_CB_instructions[0x40 + 8* bit + reg] = BIT_string(bitmask, reg)
+            decode_CB_instructions[0x40 + 8* bit + reg] = BIT_string(bitmask, reg_string)
         else
             -- SET n,(HL)
             decode_CB_instructions[0xC0 + 8* bit + reg] = function(memory, iaddr)
@@ -379,7 +379,7 @@ for reg = 0, 7 do
                     if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], invbitmask, iaddr), iaddr
                 end
             -- BIT b, (HL)
-            decode_CB_instructions[0x40 + 8* bit + reg] = BIT_string(bitmask, reg)
+            decode_CB_instructions[0x40 + 8* bit + reg] = BIT_string(bitmask, reg_string)
         end
     end
 end
