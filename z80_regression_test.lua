@@ -4492,6 +4492,26 @@ CB_instruction_tests = {
         z:LD("B", 0x01)
         z:assemble("BIT", 0, "B")
         end, { B = 0x01, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+{ "BIT 1, B bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x01)
+        z:assemble("BIT", 1, "B")
+        end, { B = 0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 1, B bit set FF", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xFF)
+        z:assemble("BIT", 1, "B")
+        end, { B = 0xFF, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+{ "BIT 1, B single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x02)
+        z:assemble("BIT", 1, "B")
+        end, { B = 0x02, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+{ "BIT 7, B single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x80)
+        z:assemble("BIT", 7, "B")
+        end, { B = 0x80, F={ "S", "-Z", "H", "-V", "-N", "C" } } },
 
         
 { "SET 0, A", function(z)
