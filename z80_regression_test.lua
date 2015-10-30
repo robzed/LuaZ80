@@ -4513,6 +4513,73 @@ CB_instruction_tests = {
         z:assemble("BIT", 7, "B")
         end, { B = 0x80, F={ "S", "-Z", "H", "-V", "-N", "C" } } },
 
+
+{ "BIT 2, C bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0x01)
+        z:assemble("BIT", 2, "C")
+        end, { C = 0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 2, C single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0x04)
+        z:assemble("BIT", 2, "C")
+        end, { C = 0x04, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+{ "BIT 3, D bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0x01)
+        z:assemble("BIT", 3, "D")
+        end, { D = 0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 3, C single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0x08)
+        z:assemble("BIT", 3, "D")
+        end, { D = 0x08, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+{ "BIT 4, E bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0x01)
+        z:assemble("BIT", 4, "E")
+        end, { E = 0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 4, E single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0x10)
+        z:assemble("BIT", 4, "E")
+        end, { E = 0x10, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+{ "BIT 5, H bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0x01)
+        z:assemble("BIT", 5, "H")
+        end, { H = 0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 5, H single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0x20)
+        z:assemble("BIT", 5, "H")
+        end, { H = 0x20, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+{ "BIT 6, L bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0x01)
+        z:assemble("BIT", 6, "L")
+        end, { L = 0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 6, L single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0x40)
+        z:assemble("BIT", 6, "L")
+        end, { L = 0x40, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
+{ "BIT 6, A bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0x01)
+        z:assemble("BIT", 6, "A")
+        end, { A = 0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 6, A single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0x40)
+        z:assemble("BIT", 6, "A")
+        end, { A = 0x40, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
         
 { "SET 0, A", function(z)
         z:LD("A", 0x00)
