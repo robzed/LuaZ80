@@ -4580,6 +4580,19 @@ CB_instruction_tests = {
         z:assemble("BIT", 6, "A")
         end, { A = 0x40, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
 
+{ "BIT 5, (HL) bit clear", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x01)
+        z:assemble("BIT", 5, "(HL)")
+        end, { H = 0x60, L = 0, [0x6000]=0x01, F={ "-S", "Z", "H", "V", "-N", "C" } } },
+{ "BIT 5, (HL) single bit set", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x20)
+        z:assemble("BIT", 5, "(HL)")
+        end, { H = 0x60, L = 0, [0x6000]=0x20, F={ "-S", "-Z", "H", "-V", "-N", "C" } } },
+
         
 { "SET 0, A", function(z)
         z:LD("A", 0x00)
