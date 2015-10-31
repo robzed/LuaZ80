@@ -4789,13 +4789,19 @@ DD_instruction_tests = {
         end, { IX = 0x1234 } },
 }
 
+FD_instruction_tests = {
+    { "LD IY, nn", function(z)
+            z:LD("IY", 0x1234)
+        end, { IY = 0x1234 } },
+}
+
 
 run_batch(basic_instruction_tests)
 --run_batch(temp_test)
 run_batch(CB_instruction_tests)
 run_batch(ED_instruction_tests)
 run_batch(DD_instruction_tests)
---run_batch(FD_instruction_tests)
+run_batch(FD_instruction_tests)
 --run_batch(DDCB_instruction_tests)
 --run_batch(FDCB_instruction_tests)
 --run_batch(memory_invalidation_tests)
