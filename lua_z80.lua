@@ -387,6 +387,7 @@ end
 
 -- DD = IX register
 local decode_DD_instructions = {
+    [0x21] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=%s", memory[iaddr]*256+byte1), inc_address(iaddr) end,
 }
 
 -- FD = IY register
