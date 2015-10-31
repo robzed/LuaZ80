@@ -4783,12 +4783,18 @@ CB_instruction_tests = {
 }
 
 
+DD_instruction_tests = {
+    { "LD IX, nn", function(z)
+            z:LD("IX", 0x1234)
+        end, { IX = 0x1234 } },
+}
+
 
 run_batch(basic_instruction_tests)
 --run_batch(temp_test)
 run_batch(CB_instruction_tests)
 run_batch(ED_instruction_tests)
---run_batch(DD_instruction_tests)
+run_batch(DD_instruction_tests)
 --run_batch(FD_instruction_tests)
 --run_batch(DDCB_instruction_tests)
 --run_batch(FDCB_instruction_tests)
