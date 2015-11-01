@@ -4787,6 +4787,11 @@ DD_instruction_tests = {
     { "LD IX, nn", function(z)
             z:LD("IX", 0x1234)
         end, { IX = 0x1234 } },
+    
+    { "LD IXL, n", function(z)
+            z:LD("IX", 0x1111)
+            z:LD("IXL", 0x22)
+            end, { IX = 0x1122 } },
 }
 
 FD_instruction_tests = {
