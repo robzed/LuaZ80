@@ -390,6 +390,8 @@ local decode_DD_instructions = {
     [0x21] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=%s", memory[iaddr]*256+byte1), inc_address(iaddr) end,
     [0x26] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=(CPU.IX%%256)+%s", 256*byte1), iaddr end,
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=bit32.band(0xFF00, CPU.IX)+%s", byte1), iaddr end,
+    [0x44] = "CPU.B=bit32.band(CPU.IX, 0xFF00)/256",
+    [0x45] = "CPU.B=CPU.IX%256",
 }
 
 -- FD = IY register
@@ -397,6 +399,8 @@ local decode_FD_instructions = {
     [0x21] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=%s", memory[iaddr]*256+byte1), inc_address(iaddr) end,
     [0x26] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=(CPU.IY%%256)+%s", 256*byte1), iaddr end,
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=bit32.band(0xFF00, CPU.IY)+%s", byte1), iaddr end,
+    [0x44] = "CPU.B=bit32.band(CPU.IY, 0xFF00)/256",
+    [0x45] = "CPU.B=CPU.IY%256",
 }
 
 -- extended instructions

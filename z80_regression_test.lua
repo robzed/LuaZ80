@@ -4797,6 +4797,17 @@ DD_instruction_tests = {
             z:LD("IX", 0x1111)
             z:LD("IXL", 0x22)
             end, { IX = 0x1122 } },
+    
+    { "LD B, IXH", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("B", "IXH")
+        end, { B = 0x12, IX=0x1234 } },
+    
+    { "LD B, IXL", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("B", "IXL")
+        end, { B = 0x34, IX=0x1234 } },
+
 }
 
 FD_instruction_tests = {
@@ -4813,7 +4824,18 @@ FD_instruction_tests = {
             z:LD("IY", 0x1111)
             z:LD("IYL", 0x22)
             end, { IY = 0x1122 } },
-}
+
+    { "LD B, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("B", "IYH")
+        end, { B = 0x12, IY=0x1234 } },
+    
+    { "LD B, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("B", "IYL")
+        end, { B = 0x34, IY=0x1234 } },
+
+}   
 
 
 run_batch(basic_instruction_tests)
