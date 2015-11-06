@@ -392,6 +392,8 @@ local decode_DD_instructions = {
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=bit32.band(0xFF00, CPU.IX)+%s", byte1), iaddr end,
     [0x44] = "CPU.B=bit32.band(CPU.IX, 0xFF00)/256",
     [0x45] = "CPU.B=CPU.IX%256",
+    [0x4C] = "CPU.C=bit32.band(CPU.IX, 0xFF00)/256",
+    [0x4D] = "CPU.C=CPU.IX%256",
 }
 
 -- FD = IY register
