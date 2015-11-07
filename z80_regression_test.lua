@@ -4845,8 +4845,22 @@ FD_instruction_tests = {
             z:LD("B", "IYL")
         end, { B = 0x34, IY=0x1234 } },
 
+    { "LD C, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("C", "IYH")
+        end, { C = 0x12, IY=0x1234 } },
+    
+    { "LD C, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("C", "IYL")
+        end, { C = 0x34, IY=0x1234 } },
+
 }   
 
+----------------------------------------------------------------------------
+--
+-- These lines select the tests to run
+--
 
 run_batch(basic_instruction_tests)
 --run_batch(temp_test)
