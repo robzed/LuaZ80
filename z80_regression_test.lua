@@ -4818,6 +4818,16 @@ DD_instruction_tests = {
             z:LD("C", "IXL")
         end, { C = 0x34, IX=0x1234 } },
 
+    { "LD D, IXH", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("D", "IXH")
+        end, { D = 0x12, IX=0x1234 } },
+    
+    { "LD D, IXL", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("D", "IXL")
+        end, { D = 0x34, IX=0x1234 } },
+
 }
 
 FD_instruction_tests = {
@@ -4854,6 +4864,16 @@ FD_instruction_tests = {
             z:LD("IY", 0x1234)
             z:LD("C", "IYL")
         end, { C = 0x34, IY=0x1234 } },
+    
+    { "LD D, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("D", "IYH")
+        end, { D = 0x12, IY=0x1234 } },
+    
+    { "LD D, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("D", "IYL")
+        end, { D = 0x34, IY=0x1234 } },
 
 }   
 
@@ -4862,10 +4882,10 @@ FD_instruction_tests = {
 -- These lines select the tests to run
 --
 
-run_batch(basic_instruction_tests)
+--run_batch(basic_instruction_tests)
 --run_batch(temp_test)
-run_batch(CB_instruction_tests)
-run_batch(ED_instruction_tests)
+--run_batch(CB_instruction_tests)
+--run_batch(ED_instruction_tests)
 run_batch(DD_instruction_tests)
 run_batch(FD_instruction_tests)
 --run_batch(DDCB_instruction_tests)
