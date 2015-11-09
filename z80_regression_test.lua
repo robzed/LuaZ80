@@ -4828,6 +4828,15 @@ DD_instruction_tests = {
             z:LD("D", "IXL")
         end, { D = 0x34, IX=0x1234 } },
 
+    { "LD E, IXH", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("E", "IXH")
+        end, { E = 0x12, IX=0x1234 } },
+    
+    { "LD E, IXL", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("E", "IXL")
+        end, { E = 0x34, IX=0x1234 } },
 }
 
 FD_instruction_tests = {
@@ -4874,6 +4883,16 @@ FD_instruction_tests = {
             z:LD("IY", 0x1234)
             z:LD("D", "IYL")
         end, { D = 0x34, IY=0x1234 } },
+
+    { "LD E, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("E", "IYH")
+        end, { E = 0x12, IY=0x1234 } },
+    
+    { "LD E, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("E", "IYL")
+        end, { E = 0x34, IY=0x1234 } },
 
 }   
 
