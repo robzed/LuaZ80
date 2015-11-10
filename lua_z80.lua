@@ -398,6 +398,8 @@ local decode_DD_instructions = {
     [0x55] = "CPU.D=CPU.IX%256",
     [0x5C] = "CPU.E=bit32.band(CPU.IX, 0xFF00)/256",
     [0x5D] = "CPU.E=CPU.IX%256",
+    [0x64] = "", -- LD IXH, IXH
+    [0x6D] = "", -- LD IXL, IXL
 }
 
 -- FD = IY register
@@ -413,6 +415,8 @@ local decode_FD_instructions = {
     [0x55] = "CPU.D=CPU.IY%256",
     [0x5C] = "CPU.E=bit32.band(CPU.IY, 0xFF00)/256",
     [0x5D] = "CPU.E=CPU.IY%256",
+    [0x64] = "", -- LD IYH, IYH
+    [0x6D] = "", -- LD IYL, IYL
 }
 
 -- extended instructions
