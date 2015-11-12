@@ -419,6 +419,8 @@ local decode_FD_instructions = {
     [0x5D] = "CPU.E=CPU.IY%256",
     [0x64] = "", -- LD IYH, IYH
     [0x6D] = "", -- LD IYL, IYL
+    [0x7C] = "CPU.A=bit32.band(CPU.IY, 0xFF00)/256",
+    [0x7D] = "CPU.A=CPU.IY%256",
 }
 
 -- extended instructions

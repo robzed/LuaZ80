@@ -4924,6 +4924,16 @@ FD_instruction_tests = {
             z:LD("IY", 0x1234)
             z:LD("IYL", "IYL")
         end, { IY=0x1234 } },
+
+    { "LD A, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("A", "IYH")
+        end, { A = 0x12, IY=0x1234 } },
+    
+    { "LD A, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("A", "IYL")
+        end, { A = 0x34, IY=0x1234 } },
 }   
 
 ----------------------------------------------------------------------------
