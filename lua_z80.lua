@@ -400,6 +400,7 @@ local decode_DD_instructions = {
     [0x5D] = "CPU.E=CPU.IX%256",
     [0x64] = "", -- LD IXH, IXH
     [0x65] = "CPU.IX=(CPU.IX%256)*0x101",
+    [0x67] = "CPU.IX=CPU.IX%256+CPU.A*256", -- LD IXH, A
     [0x6C] = "temp=bit32.band(CPU.IX, 0xFF00) CPU.IX=temp/256+temp",
     [0x6D] = "", -- LD IXL, IXL
     [0x6F] = "CPU.IX=bit32.band(CPU.IX, 0xFF00)+CPU.A", -- LD IXL, A
