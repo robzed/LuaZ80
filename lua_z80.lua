@@ -423,8 +423,10 @@ local decode_FD_instructions = {
     [0x5D] = "CPU.E=CPU.IY%256",
     [0x64] = "", -- LD IYH, IYH
     [0x65] = "CPU.IY=(CPU.IY%256)*0x101",
+    [0x67] = "CPU.IY=CPU.IY%256+CPU.A*256", -- LD IYH, A
     [0x6C] = "temp=bit32.band(CPU.IY, 0xFF00) CPU.IY=temp/256+temp",
     [0x6D] = "", -- LD IYL, IYL
+    [0x6F] = "CPU.IY=bit32.band(CPU.IY, 0xFF00)+CPU.A", -- LD IYL, A
     [0x7C] = "CPU.A=bit32.band(CPU.IY, 0xFF00)/256",
     [0x7D] = "CPU.A=CPU.IY%256",
 }
