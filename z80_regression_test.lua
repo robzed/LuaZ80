@@ -4868,6 +4868,31 @@ DD_instruction_tests = {
             z:LD("IXL", "IXH")
         end, { IX=0x1212 } },
     
+    -- 0x60
+    { "LD IXH, B", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("B", 0x99)
+            z:LD("IXH", "B")
+        end, { B=0x99, IX=0x9934 } },
+    -- 0x61
+    { "LD IXH, C", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("C", 0x99)
+            z:LD("IXH", "C")
+        end, { C=0x99, IX=0x9934 } },
+    -- 0x62
+    { "LD IXH, D", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("D", 0x99)
+            z:LD("IXH", "D")
+        end, { D=0x99, IX=0x9934 } },
+    -- 0x63
+    { "LD IXH, E", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("E", 0x99)
+            z:LD("IXH", "E")
+        end, { E=0x99, IX=0x9934 } },
+
     -- 0x67
     { "LD IXH, A", function(z)
             z:LD("IX", 0x1234)
@@ -4969,7 +4994,32 @@ FD_instruction_tests = {
             z:LD("IYL", "IYH")
         end, { IY=0x1212 } },
     
-        -- 0x67
+        -- 0x60
+    { "LD IYH, B", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("B", 0x99)
+            z:LD("IYH", "B")
+        end, { B=0x99, IY=0x9934 } },
+    -- 0x61
+    { "LD IYH, C", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("C", 0x99)
+            z:LD("IYH", "C")
+        end, { C=0x99, IY=0x9934 } },
+    -- 0x62
+    { "LD IYH, D", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("D", 0x99)
+            z:LD("IYH", "D")
+        end, { D=0x99, IY=0x9934 } },
+    -- 0x63
+    { "LD IYH, E", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("E", 0x99)
+            z:LD("IYH", "E")
+        end, { E=0x99, IY=0x9934 } },
+
+    -- 0x67
     { "LD IYH, A", function(z)
             z:LD("IY", 0x1234)
             z:LD("A", 0x99)

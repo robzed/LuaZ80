@@ -398,8 +398,15 @@ local decode_DD_instructions = {
     [0x55] = "CPU.D=CPU.IX%256",
     [0x5C] = "CPU.E=bit32.band(CPU.IX, 0xFF00)/256",
     [0x5D] = "CPU.E=CPU.IX%256",
+    
+    [0x60] = "CPU.IX=CPU.IX%256+CPU.B*256", -- LD IXH, B
+    [0x61] = "CPU.IX=CPU.IX%256+CPU.C*256", -- LD IXH, C
+    [0x62] = "CPU.IX=CPU.IX%256+CPU.D*256", -- LD IXH, D
+    [0x63] = "CPU.IX=CPU.IX%256+CPU.E*256", -- LD IXH, E
+    
     [0x64] = "", -- LD IXH, IXH
     [0x65] = "CPU.IX=(CPU.IX%256)*0x101",
+    
     [0x67] = "CPU.IX=CPU.IX%256+CPU.A*256", -- LD IXH, A
     [0x6C] = "temp=bit32.band(CPU.IX, 0xFF00) CPU.IX=temp/256+temp",
     [0x6D] = "", -- LD IXL, IXL
@@ -421,8 +428,15 @@ local decode_FD_instructions = {
     [0x55] = "CPU.D=CPU.IY%256",
     [0x5C] = "CPU.E=bit32.band(CPU.IY, 0xFF00)/256",
     [0x5D] = "CPU.E=CPU.IY%256",
+    
+    [0x60] = "CPU.IY=CPU.IY%256+CPU.B*256", -- LD IYH, B
+    [0x61] = "CPU.IY=CPU.IY%256+CPU.C*256", -- LD IYH, C
+    [0x62] = "CPU.IY=CPU.IY%256+CPU.D*256", -- LD IYH, D
+    [0x63] = "CPU.IY=CPU.IY%256+CPU.E*256", -- LD IYH, E
+    
     [0x64] = "", -- LD IYH, IYH
     [0x65] = "CPU.IY=(CPU.IY%256)*0x101",
+    
     [0x67] = "CPU.IY=CPU.IY%256+CPU.A*256", -- LD IYH, A
     [0x6C] = "temp=bit32.band(CPU.IY, 0xFF00) CPU.IY=temp/256+temp",
     [0x6D] = "", -- LD IYL, IYL
