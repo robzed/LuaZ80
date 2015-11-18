@@ -4784,10 +4784,22 @@ CB_instruction_tests = {
 
 
 DD_instruction_tests = {
+    -- 0x21
     { "LD IX, nn", function(z)
             z:LD("IX", 0x1234)
         end, { IX = 0x1234 } },
     
+    -- 0x23
+    { "INC IX", function(z)
+            z:LD("IX", 0x1234)
+            z:assemble("INC", "IX")
+        end, { IX = 0x1235 } },
+        
+    { "INC IX rollover", function(z)
+            z:LD("IX", 0xFFFF)
+            z:assemble("INC", "IX")
+        end, { IX = 0 } },
+
     { "LD IXH, n", function(z)
         z:LD("IX", 0x1234)
         z:LD("IXH", 0x56)
