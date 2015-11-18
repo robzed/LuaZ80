@@ -4910,10 +4910,22 @@ DD_instruction_tests = {
 }
 
 FD_instruction_tests = {
+    -- 0x21
     { "LD IY, nn", function(z)
             z:LD("IY", 0x1234)
         end, { IY = 0x1234 } },
     
+    -- 0x23
+    { "INC IY", function(z)
+            z:LD("IY", 0x1234)
+            z:assemble("INC", "IY")
+        end, { IY = 0x1235 } },
+        
+    { "INC IY rollover", function(z)
+            z:LD("IY", 0xFFFF)
+            z:assemble("INC", "IY")
+        end, { IY = 0 } },
+
     { "LD IYH, n", function(z)
         z:LD("IY", 0x1234)
         z:LD("IYH", 0x56)
