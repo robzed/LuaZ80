@@ -4805,6 +4805,17 @@ DD_instruction_tests = {
         z:LD("IXH", 0x56)
         end, { IX = 0x5634 } },
 
+    -- 0x2B
+    { "DEC IX", function(z)
+            z:LD("IX", 0x1234)
+            z:assemble("DEC", "IX")
+        end, { IX = 0x1233 } },
+        
+    { "DEC IX rollover", function(z)
+            z:LD("IX", 0)
+            z:assemble("DEC", "IX")
+        end, { IX = 0xFFFF } },
+    
     { "LD IXL, n", function(z)
             z:LD("IX", 0x1111)
             z:LD("IXL", 0x22)
@@ -4942,6 +4953,17 @@ FD_instruction_tests = {
         z:LD("IY", 0x1234)
         z:LD("IYH", 0x56)
         end, { IY = 0x5634 } },
+
+    -- 0x2B
+    { "DEC IY", function(z)
+            z:LD("IY", 0x1234)
+            z:assemble("DEC", "IY")
+        end, { IY = 0x1233 } },
+        
+    { "DEC IY rollover", function(z)
+            z:LD("IY", 0)
+            z:assemble("DEC", "IY")
+        end, { IY = 0xFFFF } },
     
     { "LD IYL, n", function(z)
             z:LD("IY", 0x1111)
