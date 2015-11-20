@@ -4472,6 +4472,16 @@ ED_instruction_tests = {
     end,
     { A = 0x02, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
 
+-- 0xED 0x4B
+{   "LD   BC,(xxxx)", function(z)
+        z:LD("A", 0x34)
+        z:LD("(0x6000)", "A")
+        z:LD("A", 0x12)
+        z:LD("(0x6001)", "A")
+        z:LD("BC", 0x6000)
+        z:LD("A", 0xFF)
+        z:LD("BC","(0x6000)")
+    end, { B=0x12, C=0x34, A=0xFF, [0x6000]=0x34, [0x6001]=0x12 } },
 }
 
 CB_instruction_tests = {
@@ -5089,7 +5099,7 @@ FD_instruction_tests = {
 --run_batch(basic_instruction_tests)
 --run_batch(temp_test)
 --run_batch(CB_instruction_tests)
---run_batch(ED_instruction_tests)
+run_batch(ED_instruction_tests)
 run_batch(DD_instruction_tests)
 run_batch(FD_instruction_tests)
 --run_batch(DDCB_instruction_tests)

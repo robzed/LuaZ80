@@ -480,8 +480,19 @@ local decode_ED_instructions = {
             CPU._newA = result
             CPU._subtract = true
             CPU.A = result
-            ]]
+            ]],
+            
+    --LD   BC,(xxxx)
+    [0x4B] = function(memory, iaddr)
+            -- safe to pre-read because a lump write in this returns immediately invalidates lump
+            local byte1 = memory[iaddr]; iaddr = inc_address(iaddr); local byte2 = memory[iaddr]; iaddr = inc_address(iaddr)
+            local target = byte1 + 256*byte2
+            return string.format(
+            "CPU.C = memory[0x%x] CPU.B = memory[0x%x]", target, (target+1)%65536 ), iaddr
+        end,
 }
+
+
 local function call_code_string(return_addr, target)
     return string.format( [[
         CPU.SP = (CPU.SP-1)%%65536
