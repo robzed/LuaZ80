@@ -453,6 +453,19 @@ local decode_FD_instructions = {
     [0x7D] = "CPU.A=CPU.IY%256",
 }
 
+local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc, pre_code)
+    pre_code = pre_code or ""
+    return string.format(
+    -- we only do write_checks for invalid if the write was allowed. 
+    -- we return after both writes have been attempted.
+    [[%s addr=%s if jit.write_allowed[addr] then memory[addr]=%s
+    if jit:code_write_check(addr) then addr = nil end end
+    addr2=%s if jit.write_allowed[addr2] then memory[addr2]=%s
+    if jit:code_write_check(addr2) then addr = nil end end
+    if addr == nil then CPU.PC = 0x%x return 'invalidate' end ]], 
+    pre_code, dest_address1, source1, dest_address2, source2, next_pc)
+end
+
 -- extended instructions
 local decode_ED_instructions = {
 
@@ -482,6 +495,13 @@ local decode_ED_instructions = {
             CPU.A = result
             ]],
             
+    --LD   (xxxx),BC
+    [0x43] = function(memory, iaddr)
+            local addr = memory[iaddr]; iaddr = inc_address(iaddr);
+            addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
+            return write_2bytes_to_address_command_string("CPU.C", "CPU.B", string.format("0x%x", addr), string.format("0x%x", (addr+1)%65536), iaddr), iaddr
+        end,
+
     --LD   BC,(xxxx)
     [0x4B] = function(memory, iaddr)
             -- safe to pre-read because a lump write in this returns immediately invalidates lump
@@ -528,18 +548,7 @@ local function call_code_string(return_addr, target)
             math.floor(return_addr/256), return_addr%256, target, target, target)
 end
 
-local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc, pre_code)
-    pre_code = pre_code or ""
-    return string.format(
-    -- we only do write_checks for invalid if the write was allowed. 
-    -- we return after both writes have been attempted.
-    [[%s addr=%s if jit.write_allowed[addr] then memory[addr]=%s
-    if jit:code_write_check(addr) then addr = nil end end
-    addr2=%s if jit.write_allowed[addr2] then memory[addr2]=%s
-    if jit:code_write_check(addr2) then addr = nil end end
-    if addr == nil then CPU.PC = 0x%x return 'invalidate' end ]], 
-    pre_code, dest_address1, source1, dest_address2, source2, next_pc)
-end
+
 
 local function write_to_address_command_string(source, dest_address, next_pc, optional_flag_check_code)
     -- e.g. dest_address = CPU.H*256+CPU.L

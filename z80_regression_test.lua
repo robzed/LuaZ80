@@ -4450,6 +4450,12 @@ end, { A=0x00, F= { "-S", "Z", "-H", "V", "N", "C" } } },
 
 ED_instruction_tests = {
     
+-- 0xED 0x43
+{ "LD   (xxxx),BC", function(z)
+        z:LD("BC", 0x1234)
+        z:LD("(0x6000)", "BC")
+    end, { B = 0x12, C = 0x34, [0x6000]=0x34, [0x6001]=0x12 } },
+    
 -- 0xED 0x44
 { "NEG", function(z)
         z:LD("A", 0x01)
