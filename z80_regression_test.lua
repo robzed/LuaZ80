@@ -4488,6 +4488,13 @@ ED_instruction_tests = {
         z:LD("A", 0xFF)
         z:LD("BC","(0x6000)")
     end, { B=0x12, C=0x34, A=0xFF, [0x6000]=0x34, [0x6001]=0x12 } },
+
+-- 0xED 53
+{ "LD (xxxx),DE", function(z)
+        z:LD("DE", 0x1234)
+        z:LD("(0x6000)", "DE")
+    end, { D = 0x12, E = 0x34, [0x6000]=0x34, [0x6001]=0x12 } },
+        
 -- 0xED 0x5B
 {   "LD   DE,(xxxx)", function(z)
         z:LD("A", 0x34)
@@ -4499,6 +4506,7 @@ ED_instruction_tests = {
         z:LD("DE","(0x6000)")
     end, { D=0x12, E=0x34, A=0xFF, [0x6000]=0x34, [0x6001]=0x12 } },
 -- 0xED 0x6B
+
 {   "LD   HL,(xxxx) ... ED 6B", function(z)
         z:LD("A", 0x34)
         z:LD("(0x6000)", "A")
