@@ -526,6 +526,7 @@ local decode_ED_instructions = {
             return string.format(
             "CPU.E = memory[0x%x] CPU.D = memory[0x%x]", target, (target+1)%65536 ), iaddr
         end,
+    
     --LD  HL,(xxxx)
     [0x6B] = function(memory, iaddr)
             -- safe to pre-read because a lump write in this returns immediately invalidates lump
@@ -534,6 +535,14 @@ local decode_ED_instructions = {
             return string.format(
             "CPU.L = memory[0x%x] CPU.H = memory[0x%x]", target, (target+1)%65536 ), iaddr
         end,
+    
+    -- LD   (xxxx),SP
+    [0x73] = function(memory, iaddr)
+            local addr = memory[iaddr]; iaddr = inc_address(iaddr);
+            addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
+            return write_2bytes_to_address_command_string("(CPU.SP%256)", "bit32.rshift(CPU.SP, 8)", string.format("0x%x", addr), string.format("0x%x", (addr+1)%65536), iaddr), iaddr
+        end,
+
     --LD   SP,(xxxx)
     [0x7B] = function(memory, iaddr)
             -- safe to pre-read because a lump write in this returns immediately invalidates lump
