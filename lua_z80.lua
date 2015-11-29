@@ -356,6 +356,18 @@ end
 --    RES b, r
 for reg = 0, 7 do
     local reg_string = reg_index[reg]            -- not speed critical
+    
+    if _is_single_reg(reg_string) then
+    -- no memory write check for single reg write
+    
+    -- RLC r ... bit 7 to carry and bit 0
+    decode_CB_instructions[0x00 + reg] = string.format(
+        "CPU:get_F_only_SZV() result=%s*2 if result>255 then result=result-255 CPU.Carry=1 else CPU.Carry=0 end CPU._F=zflags[result]+CPU.Carry %s=result",
+        reg_string, reg_string)
+    else
+    end
+    
+    -- bit ops
     for bit = 0, 7 do
         local bitmask = 2 ^ bit
         local invbitmask = 255 - bitmask

@@ -4543,6 +4543,38 @@ ED_instruction_tests = {
 
 CB_instruction_tests = {
 
+-- 0x00
+{ "RLC B (b=0)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0)
+        z:assemble("RLC", "B")
+    end, { B = 0x00, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "RLC B (b=1)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 1)
+        z:assemble("RLC", "B")
+    end, { B = 0x02, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RLC B (b=0x80)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x80)
+        z:assemble("RLC", "B")
+    end, { B = 0x01, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RLC B (b=0xff)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xff)
+        z:assemble("RLC", "B")
+    end, { B = 0xFF, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RLC B (b=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xA5)
+        z:assemble("RLC", "B")
+    end, { B = 0x4B, F={ "-S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RLC B (b=0x40)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x40)
+        z:assemble("RLC", "B")
+    end, { B = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+
 { "BIT 0, B", function(z)
         z:assemble("SCF")
         z:assemble("CCF")
@@ -5155,7 +5187,7 @@ FD_instruction_tests = {
 
 --run_batch(basic_instruction_tests)
 --run_batch(temp_test)
---run_batch(CB_instruction_tests)
+run_batch(CB_instruction_tests)
 run_batch(ED_instruction_tests)
 run_batch(DD_instruction_tests)
 run_batch(FD_instruction_tests)
