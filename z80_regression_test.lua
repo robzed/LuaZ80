@@ -4636,7 +4636,69 @@ CB_instruction_tests = {
         z:LD("D", 0x40)
         z:assemble("RLC", "D")
     end, { D = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
--- 0x06
+-- 0x03
+{ "RLC E (E=0)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0)
+        z:assemble("RLC", "E")
+    end, { E = 0x00, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "RLC E (E=1)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 1)
+        z:assemble("RLC", "E")
+    end, { E = 0x02, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RLC E (E=0x80)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0x80)
+        z:assemble("RLC", "E")
+    end, { E = 0x01, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RLC E (E=0xff)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0xff)
+        z:assemble("RLC", "E")
+    end, { E = 0xFF, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RLC E (E=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0xA5)
+        z:assemble("RLC", "E")
+    end, { E = 0x4b, F={ "-S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RLC E (E=0x40)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0x40)
+        z:assemble("RLC", "E")
+    end, { E = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+-- 0x04
+{ "RLC H (H=0)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0)
+        z:assemble("RLC", "H")
+    end, { H = 0x00, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "RLC H (H=1)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 1)
+        z:assemble("RLC", "H")
+    end, { H = 0x02, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RLC H (H=0x80)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0x80)
+        z:assemble("RLC", "H")
+    end, { H = 0x01, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RLC H (H=0xff)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0xff)
+        z:assemble("RLC", "H")
+    end, { H = 0xFF, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RLC H (H=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0xA5)
+        z:assemble("RLC", "H")
+    end, { H = 0x4b, F={ "-S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RLC H (H=0x40)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0x40)
+        z:assemble("RLC", "H")
+    end, { H = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+-- 0x05
 { "RLC L (L=0)", function(z)
         z:assemble("SCF")
         z:LD("L", 0)
@@ -4667,6 +4729,8 @@ CB_instruction_tests = {
         z:LD("L", 0x40)
         z:assemble("RLC", "L")
     end, { L = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+-- 0x06
+
 -- 0x07
 { "RLC A (A=0)", function(z)
         z:assemble("SCF")
