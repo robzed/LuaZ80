@@ -4731,12 +4731,18 @@ CB_instruction_tests = {
     end, { L = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 -- 0x06
-{ "RLC (HL) ((HL)=0xA5)", function(z)
+{ "RLC (HL) (HL)=0xA5", function(z)
         z:assemble("SCF")
         z:LD("HL", 0x6000)
         z:LD("(HL)", 0xA5)
         z:assemble("RLC", "(HL)")
     end, { H=0x60, L=0x00, [0x6000] = 0x4b, F={ "-S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RLC (HL) (HL)=0x80 (L=0x40)", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x40)
+        z:assemble("RLC", "(HL)")
+    end, { H=0x60, L=0x00, [0x6000] = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 -- 0x07
 { "RLC A (A=0)", function(z)
