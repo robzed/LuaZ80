@@ -4776,6 +4776,37 @@ CB_instruction_tests = {
         z:assemble("RLC", "A")
     end, { A = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
 
+-- 0x08
+{ "RRC B (B=0)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0)
+        z:assemble("RRC", "B")
+    end, { B = 0x00, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "RRC B (B=2)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 2)
+        z:assemble("RRC", "B")
+    end, { B = 0x01, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RRC B (B=0x01)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x01)
+        z:assemble("RRC", "B")
+    end, { B = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RRC B (B=0xff)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xff)
+        z:assemble("RRC", "B")
+    end, { B = 0xFF, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RRC B (B=0xA5)", function(z) -- 0x10100101 >> 11010010
+        z:assemble("SCF")
+        z:LD("B", 0xA5)
+        z:assemble("RRC", "B")
+    end, { B = 0xd2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RRC B (B=0x80)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x80)
+        z:assemble("RRC", "B")
+    end, { B = 0x40, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 { "BIT 0, B", function(z)
         z:assemble("SCF")
