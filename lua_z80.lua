@@ -370,8 +370,13 @@ for reg = 0, 7 do
         reg_string, reg_string)
     else
     -- RLC (HL) ... bit 7 to carry and bit 0
-    decode_CB_instructions[0x00 + reg] = function(memoruy, iaddr) return string.format(
+    decode_CB_instructions[0x00 + reg] = function(memory, iaddr) return string.format(
         [[CPU:get_F_only_SZV() addr=CPU.H*256+CPU.L;result=memory[addr]*2 if result>255 then result=result-255 CPU.Carry=1 else CPU.Carry=0 end CPU._F=zflags[result]+CPU.Carry 
+        if jit.write_allowed[addr] then memory[addr]=result if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], iaddr), iaddr end
+
+    -- RRC (HL) ... bit 7 to carry and bit 0
+    decode_CB_instructions[0x08 + reg] = function(memory, iaddr) return string.format(
+        [[CPU:get_F_only_SZV() addr=CPU.H*256+CPU.L; result=memory[addr] if (result%%2)==1 then result=(result+255)/2 CPU.Carry=1 else result=result/2 CPU.Carry=0 end CPU._F=zflags[result]+CPU.Carry 
         if jit.write_allowed[addr] then memory[addr]=result if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], iaddr), iaddr end
     end
     
