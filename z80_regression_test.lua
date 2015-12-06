@@ -411,10 +411,10 @@ local function test(code, checks, post_setup)
 end
 
 
-local function run_batch(tests)
+local function run_batch(test_name, tests)
     local num_tests = #tests
     for i, one_test in pairs(tests) do
-        print(string.format("Running test %i of %i - %s", i, num_tests, one_test[1]))
+        print(string.format("Running test %s - %i of %i - %s", test_name, i, num_tests, one_test[1]))
         local time_start = os.clock()
         test(one_test[2], one_test[3], one_test[4])
         local time_end = os.clock()
@@ -5671,16 +5671,16 @@ FD_instruction_tests = {
 -- These lines select the tests to run
 --
 
---run_batch(basic_instruction_tests)
---run_batch(temp_test)
-run_batch(CB_instruction_tests)
-run_batch(ED_instruction_tests)
-run_batch(DD_instruction_tests)
-run_batch(FD_instruction_tests)
---run_batch(DDCB_instruction_tests)
---run_batch(FDCB_instruction_tests)
---run_batch(memory_invalidation_tests)
---run_batch(more_advanced_tests)
---run_batch(interrupt_test)
---run_batch(R_reg_test)
---run_batch(Carry_Flag_seperate_from_F_flag_interactions_test)
+--run_batch("0xnn", basic_instruction_tests)
+--run_batch("temp", temp_test)
+run_batch("0xCBnn", CB_instruction_tests)
+run_batch("0xEDnn", ED_instruction_tests)
+run_batch("0xDDnn", DD_instruction_tests)
+run_batch("0xFFnn", FD_instruction_tests)
+--run_batch("0xDDCBnn", DDCB_instruction_tests)
+--run_batch("0xFDCBnn", FDCB_instruction_tests)
+--run_batch("", memory_invalidation_tests)
+--run_batch("", more_advanced_tests)
+--run_batch("", interrupt_test)
+--run_batch("", R_reg_test)
+--run_batch("", Carry_Flag_seperate_from_F_flag_interactions_test)
