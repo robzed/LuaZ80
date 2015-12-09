@@ -5293,6 +5293,39 @@ CB_instruction_tests = {
     end, { A = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
 
 
+-- 0x18
+{ "RR B (B=0)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0)
+        z:assemble("RR", "B")
+    end, { B = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RR B (B=1)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 1)
+        z:assemble("RR", "B")
+    end, { B = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR B (B=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0x1)
+        z:assemble("RR", "B")
+    end, { B = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "RR B (B=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0xff)
+        z:assemble("RR", "B")
+    end, { B = 0x7F, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR B (B=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xA5) -- 1010 0101
+        z:assemble("RR", "B")
+    end, { B = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RR B (B=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x02)
+        z:assemble("RR", "B")
+    end, { B = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
 
 
 
