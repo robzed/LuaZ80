@@ -368,9 +368,13 @@ for reg = 0, 7 do
     decode_CB_instructions[0x08 + reg] = string.format(
         "CPU:get_F_only_SZV() result=%s if (result %% 2) == 1 then result=(result+255)/2 CPU.Carry=1 else result=result/2 CPU.Carry=0 end CPU._F=zflags[result]+CPU.Carry %s=result",
         reg_string, reg_string)
-    -- RL r ... bit 7 to carry and bit 0
+    -- RL r
     decode_CB_instructions[0x10 + reg] = string.format(
         "CPU:get_F_only_SZV() result=%s*2+CPU.Carry if result>255 then result=result-256 CPU.Carry=1 else CPU.Carry=0 end CPU._F=zflags[result]+CPU.Carry %s=result",
+        reg_string, reg_string)
+    -- RR r
+    decode_CB_instructions[0x18 + reg] = string.format(
+        "CPU:get_F_only_SZV() result=%s temp=result%%2 result=(result-temp)/2+CPU.Carry*128 CPU.Carry=temp CPU._F=zflags[result]+CPU.Carry %s=result",
         reg_string, reg_string)
     
     else
