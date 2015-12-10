@@ -5328,6 +5328,216 @@ CB_instruction_tests = {
     end, { B = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
 
 
+-- 0x19
+{ "RR C (C=0)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0)
+        z:assemble("RR", "C")
+    end, { C = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RR C (C=1)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 1)
+        z:assemble("RR", "C")
+    end, { C = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR C (C=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("C", 0x1)
+        z:assemble("RR", "C")
+    end, { C = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "RR C (C=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("C", 0xff)
+        z:assemble("RR", "C")
+    end, { C = 0x7F, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR C (C=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0xA5) -- 1010 0101
+        z:assemble("RR", "C")
+    end, { C = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RR C (C=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0x02)
+        z:assemble("RR", "C")
+    end, { C = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+
+
+-- 0x1A
+{ "RR D (D=0)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0)
+        z:assemble("RR", "D")
+    end, { D = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RR D (D=1)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 1)
+        z:assemble("RR", "D")
+    end, { D = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR D (D=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("D", 0x1)
+        z:assemble("RR", "D")
+    end, { D = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "RR D (D=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("D", 0xff)
+        z:assemble("RR", "D")
+    end, { D = 0x7F, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR D (D=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0xA5) -- 1010 0101
+        z:assemble("RR", "D")
+    end, { D = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RR D (D=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0x02)
+        z:assemble("RR", "D")
+    end, { D = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+
+
+-- 0x1B
+{ "RR E (E=0)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0)
+        z:assemble("RR", "E")
+    end, { E = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RR E (E=1)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 1)
+        z:assemble("RR", "E")
+    end, { E = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR E (E=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("E", 0x1)
+        z:assemble("RR", "E")
+    end, { E = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "RR E (E=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("E", 0xff)
+        z:assemble("RR", "E")
+    end, { E = 0x7F, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR E (E=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0xA5) -- 1010 0101
+        z:assemble("RR", "E")
+    end, { E = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RR E (E=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0x02)
+        z:assemble("RR", "E")
+    end, { E = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+
+
+-- 0x1C
+{ "RR H (H=0)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0)
+        z:assemble("RR", "H")
+    end, { H = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RR H (H=1)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 1)
+        z:assemble("RR", "H")
+    end, { H = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR H (H=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("H", 0x1)
+        z:assemble("RR", "H")
+    end, { H = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "RR H (H=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("H", 0xff)
+        z:assemble("RR", "H")
+    end, { H = 0x7F, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR H (H=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0xA5) -- 1010 0101
+        z:assemble("RR", "H")
+    end, { H = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RR H (H=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0x02)
+        z:assemble("RR", "H")
+    end, { H = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+
+
+-- 0x1D
+{ "RR L (L=0)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0)
+        z:assemble("RR", "L")
+    end, { L = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RR L (L=1)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 1)
+        z:assemble("RR", "L")
+    end, { L = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR L (L=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("L", 0x1)
+        z:assemble("RR", "L")
+    end, { L = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "RR L (L=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("L", 0xff)
+        z:assemble("RR", "L")
+    end, { L = 0x7F, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR L (L=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0xA5) -- 1010 0101
+        z:assemble("RR", "L")
+    end, { L = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RR L (L=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0x02)
+        z:assemble("RR", "L")
+    end, { L = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+
+
+-- 0x1F
+{ "RR A (A=0)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0)
+        z:assemble("RR", "A")
+    end, { A = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "RR A (A=1)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 1)
+        z:assemble("RR", "A")
+    end, { A = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR A (A=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("A", 0x1)
+        z:assemble("RR", "A")
+    end, { A = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "RR A (A=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("A", 0xff)
+        z:assemble("RR", "A")
+    end, { A = 0x7F, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "RR A (A=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0xA5) -- 1010 0101
+        z:assemble("RR", "A")
+    end, { A = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "RR A (A=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0x02)
+        z:assemble("RR", "A")
+    end, { A = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+
+
 
 
 { "BIT 0, B", function(z)
