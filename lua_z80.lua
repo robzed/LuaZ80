@@ -376,6 +376,10 @@ for reg = 0, 7 do
     decode_CB_instructions[0x18 + reg] = string.format(
         "CPU:get_F_only_SZV() result=%s temp=result%%2 result=(result-temp)/2+CPU.Carry*128 CPU.Carry=temp CPU._F=zflags[result]+CPU.Carry %s=result",
         reg_string, reg_string)
+    -- SLA r ... bit 7 to carry
+    decode_CB_instructions[0x20 + reg] = string.format(
+        "CPU:get_F_only_SZV() result=%s*2 if result>255 then result=result-256 CPU.Carry=1 else CPU.Carry=0 end CPU._F=zflags[result]+CPU.Carry %s=result",
+        reg_string, reg_string)
     
     else
     -- RLC (HL) ... bit 7 to carry and bit 0

@@ -5564,6 +5564,37 @@ CB_instruction_tests = {
     end, { A = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
 
 
+-- 0x20
+{ "SLA B (B=0)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0)
+        z:assemble("SLA", "B")
+    end, { B = 0x00, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SLA B (B=1)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 1)
+        z:assemble("SLA", "B")
+    end, { B = 0x02, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "SLA B (B=0x80)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x80)
+        z:assemble("SLA", "B")
+    end, { B = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SLA B (B=0xff)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xff)
+        z:assemble("SLA", "B")
+    end, { B = 0xFE, F={ "S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "SLA B (B=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xA5)
+        z:assemble("SLA", "B")
+    end, { B = 0x4a, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "SLA B (B=0x40)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x40)
+        z:assemble("SLA", "B")
+    end, { B = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 
 { "BIT 0, B", function(z)
