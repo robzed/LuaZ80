@@ -402,6 +402,10 @@ for reg = 0, 7 do
         [[CPU:get_F_only_SZV() addr=CPU.H*256+CPU.L; result=memory[addr] temp=result%%2 result=(result-temp)/2+CPU.Carry*128 CPU.Carry=temp CPU._F=zflags[result]+CPU.Carry
         if jit.write_allowed[addr] then memory[addr]=result if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], iaddr), iaddr end
 
+    -- SLA (HL) ... bit 7 to carry
+    decode_CB_instructions[0x20 + reg] = function(memory, iaddr) return string.format(
+        [[CPU:get_F_only_SZV() addr=CPU.H*256+CPU.L;result=memory[addr]*2 if result>255 then result=result-256 CPU.Carry=1 else CPU.Carry=0 end CPU._F=zflags[result]+CPU.Carry 
+        if jit.write_allowed[addr] then memory[addr]=result if jit:code_write_check(addr) then CPU.PC = 0x%x; return 'invalidate' end end]], iaddr), iaddr end
     end
 
     -- bit ops

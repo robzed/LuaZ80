@@ -4541,7 +4541,7 @@ ED_instruction_tests = {
     end, { SP=0x1234, A=0xFF, [0x6000]=0x34, [0x6001]=0x12 } },
 }
 
-CB_instruction_tests = {
+CB_instruction_tests = { ---[[
 
 -- 0x00
 { "RLC B (B=0)", function(z)
@@ -5761,6 +5761,25 @@ CB_instruction_tests = {
         z:assemble("SLA", "L")
     end, { L = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
 
+-- 0x26
+{ "SLA (HL) (HL)=0xA5", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xA5)  -- C <- | 7..... 0 |    1010 0101  << C + 0100 1010
+        z:assemble("SLA", "(HL)")
+    end, { H=0x60, L=0x00, [0x6000] = 0x4a, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "SLA (HL) (HL)=0x40", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x40)
+        z:assemble("SLA", "(HL)")
+    end, { H=0x60, L=0x00, [0x6000] = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "SLA (HL) (HL)=0x80", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x80)
+        z:assemble("SLA", "(HL)")
+    end, { H=0x60, L=0x00, [0x6000] = 0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
 
 -- 0x27
 { "SLA A (A=0)", function(z)
