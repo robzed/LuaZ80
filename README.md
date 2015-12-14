@@ -62,7 +62,9 @@ You'll need Lua 5.2. I assume you know how to run a file from lua - it's basical
 
     lua filename.lua
 
-I suggest running 'lua_z80_test.lua'. This will create some standard code and run it via a simple Z80 debugger. (The Z80 debugger is used if Z80_debugger_enabled is set to true at the top of the file). NOTE: The Z80 debugger issues VT100/ANSI escape sequenes to position the cursor. You might want to change this for some platforms. For debugger help type ? or help in the debugger.
+You can run the unit tests by running the file 'z80_regression_test.lua'. Some might be disabled temporarly for speed - see the bottom of that file. There is usually more than one test per instruction.
+
+I also suggest running 'lua_z80_test.lua'. This will create some standard code and run it via a simple Z80 debugger. (The Z80 debugger is used if Z80_debugger_enabled is set to true at the top of the file). NOTE: The Z80 debugger issues VT100/ANSI escape sequenes to position the cursor. You might want to change this for some platforms. For debugger help type ? or help in the debugger.
 
 If you have a Lua debugger (say the one in the excellent [ZeroBrane Studio][1] or [Eclipse LDT][2]) then you may single step the Lua code to get a good idea how the code works. Changing Z80_debugger_enabled to false at the top of 'lua_z80_test.lua' is a good idea, because this will just run the code, and avoid you have to step through the Z80 debugger code and avoid it emitting VT100/ANSI escape sequences and/or reading commands on every instruction.
 
