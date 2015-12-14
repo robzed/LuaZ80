@@ -5811,9 +5811,48 @@ CB_instruction_tests = { ---[[
         z:assemble("SCF")
         z:LD("A", 0x40)
         z:assemble("SLA", "A")
-    end, { A = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+    end, { A = 0x80, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } }, 
 
 
+-- 0x28
+{ "SRA B (B=0)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0)
+        z:assemble("SRA", "B")
+    end, { B = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRA B (B=1)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 1)
+        z:assemble("SRA", "B")
+    end, { B = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA B (B=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0x1)
+        z:assemble("SRA", "B")
+    end, { B = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA B (B=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0xff)
+        z:assemble("SRA", "B")
+    end, { B = 0xff, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA B (B=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0xfe)
+        z:assemble("SRA", "B")
+    end, { B = 0xff, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SRA B (B=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xA5) -- 1010 0101   >> 11010010 C
+        z:assemble("SRA", "B")
+    end, { B = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA B (B=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x02)
+        z:assemble("SRA", "B")
+    end, { B = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 { "BIT 0, B", function(z)
         z:assemble("SCF")
