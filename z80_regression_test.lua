@@ -5854,6 +5854,248 @@ CB_instruction_tests = { ---[[
         z:assemble("SRA", "B")
     end, { B = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
 
+-- 0x29
+{ "SRA C (C=0)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0)
+        z:assemble("SRA", "C")
+    end, { C = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRA C (C=1)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 1)
+        z:assemble("SRA", "C")
+    end, { C = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA C (C=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("C", 0x1)
+        z:assemble("SRA", "C")
+    end, { C = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA C (C=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("C", 0xff)
+        z:assemble("SRA", "C")
+    end, { C = 0xff, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA C (C=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("C", 0xfe)
+        z:assemble("SRA", "C")
+    end, { C = 0xff, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SRA C (C=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0xA5) -- 1010 0101   >> 11010010 C
+        z:assemble("SRA", "C")
+    end, { C = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA C (C=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("C", 0x02)
+        z:assemble("SRA", "C")
+    end, { C = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+
+-- 0x2A
+{ "SRA D (D=0)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0)
+        z:assemble("SRA", "D")
+    end, { D = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRA D (D=1)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 1)
+        z:assemble("SRA", "D")
+    end, { D = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA D (D=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("D", 0x1)
+        z:assemble("SRA", "D")
+    end, { D = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA D (D=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("D", 0xff)
+        z:assemble("SRA", "D")
+    end, { D = 0xff, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA D (D=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("D", 0xfe)
+        z:assemble("SRA", "D")
+    end, { D = 0xff, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SRA D (D=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0xA5) -- 1010 0101   >> 11010010 C
+        z:assemble("SRA", "D")
+    end, { D = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA D (D=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("D", 0x02)
+        z:assemble("SRA", "D")
+    end, { D = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+
+-- 0x2B
+{ "SRA E (E=0)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0)
+        z:assemble("SRA", "E")
+    end, { E = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRA E (E=1)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 1)
+        z:assemble("SRA", "E")
+    end, { E = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA E (E=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("E", 0x1)
+        z:assemble("SRA", "E")
+    end, { E = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA E (E=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("E", 0xff)
+        z:assemble("SRA", "E")
+    end, { E = 0xff, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA E (E=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("E", 0xfe)
+        z:assemble("SRA", "E")
+    end, { E = 0xff, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SRA E (E=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0xA5) -- 1010 0101   >> 11010010 C
+        z:assemble("SRA", "E")
+    end, { E = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA E (E=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("E", 0x02)
+        z:assemble("SRA", "E")
+    end, { E = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+
+-- 0x2C
+{ "SRA H (H=0)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0)
+        z:assemble("SRA", "H")
+    end, { H = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRA H (H=1)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 1)
+        z:assemble("SRA", "H")
+    end, { H = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA H (H=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("H", 0x1)
+        z:assemble("SRA", "H")
+    end, { H = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA H (H=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("H", 0xff)
+        z:assemble("SRA", "H")
+    end, { H = 0xff, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA H (H=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("H", 0xfe)
+        z:assemble("SRA", "H")
+    end, { H = 0xff, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SRA H (H=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0xA5) -- 1010 0101   >> 11010010 C
+        z:assemble("SRA", "H")
+    end, { H = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA H (H=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("H", 0x02)
+        z:assemble("SRA", "H")
+    end, { H = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+
+-- 0x2D
+{ "SRA L (L=0)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0)
+        z:assemble("SRA", "L")
+    end, { L = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRA L (L=1)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 1)
+        z:assemble("SRA", "L")
+    end, { L = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA L (L=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("L", 0x1)
+        z:assemble("SRA", "L")
+    end, { L = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA L (L=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("L", 0xff)
+        z:assemble("SRA", "L")
+    end, { L = 0xff, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA L (L=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("L", 0xfe)
+        z:assemble("SRA", "L")
+    end, { L = 0xff, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SRA L (L=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0xA5) -- 1010 0101   >> 11010010 C
+        z:assemble("SRA", "L")
+    end, { L = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA L (L=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("L", 0x02)
+        z:assemble("SRA", "L")
+    end, { L = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+
+-- 0x2F
+{ "SRA A (A=0)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0)
+        z:assemble("SRA", "A")
+    end, { A = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRA A (A=1)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 1)
+        z:assemble("SRA", "A")
+    end, { A = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA A (A=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("A", 0x1)
+        z:assemble("SRA", "A")
+    end, { A = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRA A (A=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("A", 0xff)
+        z:assemble("SRA", "A")
+    end, { A = 0xff, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA A (A=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("A", 0xfe)
+        z:assemble("SRA", "A")
+    end, { A = 0xff, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SRA A (A=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0xA5) -- 1010 0101   >> 11010010 C
+        z:assemble("SRA", "A")
+    end, { A = 0xD2, F={ "S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SRA A (A=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("A", 0x02)
+        z:assemble("SRA", "A")
+    end, { A = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+
+
+
 { "BIT 0, B", function(z)
         z:assemble("SCF")
         z:assemble("CCF")
