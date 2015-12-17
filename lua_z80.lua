@@ -385,6 +385,11 @@ for reg = 0, 7 do
         "CPU:get_F_only_SZV() result=%s CPU.Carry=result%%2 result=((result-CPU.Carry)/2)+bit32.band(result,128) CPU._F=zflags[result]+CPU.Carry %s=result",
         reg_string, reg_string)
     
+    -- SRL r
+    decode_CB_instructions[0x38 + reg] = string.format(
+        "CPU:get_F_only_SZV() result=%s CPU.Carry=result%%2 result=((result-CPU.Carry)/2) CPU._F=zflags[result]+CPU.Carry %s=result",
+        reg_string, reg_string)
+
     else
     -- RLC (HL) ... bit 7 to carry and bit 0
     decode_CB_instructions[0x00 + reg] = function(memory, iaddr) return string.format(

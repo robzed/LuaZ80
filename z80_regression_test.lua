@@ -6131,6 +6131,48 @@ CB_instruction_tests = { ---[[
 
 
 
+-- 0x38
+{ "SRL B (B=0)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0)
+        z:assemble("SRL", "B")
+    end, { B = 0, F={ "-S", "Z", "-H", "V", "-N", "-C" } } },
+{ "SRL B (B=1)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 1)
+        z:assemble("SRL", "B")
+    end, { B = 0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRL B (B=0x1)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0x1)
+        z:assemble("SRL", "B")
+    end, { B = 0x0, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{ "SRL B (B=0xff)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0xff)
+        z:assemble("SRL", "B")
+    end, { B = 0x7f, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "SRL B (B=0xfe)", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("B", 0xfe)
+        z:assemble("SRL", "B")
+    end, { B = 0x7f, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "SRL B (B=0xA5)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0xA5) -- 1010 0101   >> 01010010 C
+        z:assemble("SRL", "B")
+    end, { B = 0x52, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+{ "SRL B (B=0x02)", function(z)
+        z:assemble("SCF")
+        z:LD("B", 0x02)
+        z:assemble("SRL", "B")
+    end, { B = 1, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+
+
+
 { "BIT 0, B", function(z)
         z:assemble("SCF")
         z:assemble("CCF")
