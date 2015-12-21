@@ -6161,6 +6161,26 @@ CB_instruction_tests = { ---[[
         z:assemble("SLS", "B")
     end, { B = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
 
+-- 0x36
+{ "SLS (HL) (HL)=0xA5", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0xA5)  -- C <- | 7..... 0 |    1010 0101  << C + 0100 1010
+        z:assemble("SLS", "(HL)")
+    end, { H=0x60, L=0x00, [0x6000] = 0x4b, F={ "-S", "-Z", "-H", "V", "-N", "C" } } },
+{ "SLS (HL) (HL)=0x40", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x40)
+        z:assemble("SLS", "(HL)")
+    end, { H=0x60, L=0x00, [0x6000] = 0x81, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+{ "SLS (HL) (HL)=0x80", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0x6000)
+        z:LD("(HL)", 0x80)
+        z:assemble("SLS", "(HL)")
+    end, { H=0x60, L=0x00, [0x6000] = 0x01, F={ "-S", "-Z", "-H", "-V", "-N", "C" } } },
+
 
 -- 0x38
 { "SRL B (B=0)", function(z)
