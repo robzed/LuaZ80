@@ -45,7 +45,7 @@ Nothing properly :-) I'm certainly after some more help - this is very much a si
 
 I'm creating a more up to date status in docs/status.md but in summary: 
 
-- Quite a few op-codes. (All single byte, see z80_regression_test.lua)
+- Quite a few op-codes. (All single byte, all CBxx 2 byte, and more ... see z80_regression_test.lua)
 - A basic debugger/monitor (similar to the old HiSoft DevPac Monitor in some ways)
 - The disassembler (but there might be bugs or gaps)
 - The parts of a crude assembler that can be used to assemble Z80 mnemonics from Lua.
