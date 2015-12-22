@@ -4449,7 +4449,71 @@ end, { A=0x00, F= { "-S", "Z", "-H", "V", "N", "C" } } },
 
 
 ED_instruction_tests = {
-    
+
+--[[
+In the IN A and OUT n, A instructions, the I/O device’s n address appears in the 
+lower half of the address bus (A7–A0), while the Accumulator content is 
+transferred in the upper half of the address bus. In all Register Indirect 
+input output instructions, including block I/O transfers, the contents of the 
+C Register are transferred to the lower half of the address bus (device 
+address) while the contents of Register B are transferred to the upper half of 
+the address bus. 
+--]]
+--0xED 0x40
+{ "IN   B,(C)", function(z)
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "B", "(C)")
+    end,
+    { B = 0x33, C = 0x34 }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+--[[
+{ "IN   B,(C) no input", function(z)
+        z:LD("A", 0x11)
+        z:assemble("IN", "A", "(0x21)")
+    end,
+    { A = 0xFF }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x11 or l ~= 0x22 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   B,(C) single bit", function(z)
+        z:LD("A", 0x99)
+        z:assemble("IN", "A", "(0x21)")
+    end,
+    { A = 0x66 }, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x66
+            end,
+            "INPUT DATA")
+    end
+},
+--]]
+
 -- 0xED 0x43
 { "LD   (xxxx),BC", function(z)
         z:LD("BC", 0x1234)
@@ -7303,7 +7367,7 @@ FD_instruction_tests = {
 
 --run_batch("0xnn", basic_instruction_tests)
 --run_batch("temp", temp_test)
-run_batch("0xCBnn", CB_instruction_tests)
+--run_batch("0xCBnn", CB_instruction_tests)
 run_batch("0xEDnn", ED_instruction_tests)
 run_batch("0xDDnn", DD_instruction_tests)
 run_batch("0xFFnn", FD_instruction_tests)

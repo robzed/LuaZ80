@@ -547,11 +547,38 @@ local function write_2bytes_to_address_command_string(source1, source2, dest_add
     pre_code, dest_address1, source1, dest_address2, source2, next_pc)
 end
 
+local function port_output_string(addr_hi, addr_lo, data)
+    return string.format(
+        -- run all output sources, not just first
+        -- @todo:could precalculate specific outputs on registration?
+        [[ for _,pd in ipairs(CPU._outputs) do 
+if bit32.band(pd.mask, %s*256+%s) == pd.state then 
+    pd.f(pd.ud, %s, %s, %s) 
+end end]], addr_hi, addr_lo, addr_hi, addr_lo, data)
+end
+
+local function port_input_string(addr_hi, addr_lo, target_register)
+    return string.format(
+        -- run first matching input source only
+        -- @todo:could precalculate specific input on registration?
+        [[ result = 0xFF for _,pd in ipairs(CPU._inputs) do 
+if bit32.band(pd.mask, %s*256+%s) == pd.state then 
+    result = pd.f(pd.ud, %s, %s) 
+    break
+end end %s = result]], addr_hi, addr_lo, addr_hi, addr_lo, target_register)
+end
+
+
 -- extended instructions
 local decode_ED_instructions = {
 
     -- Debug instruction, writes to host stdout .. ED ED
     [0xED] = "io.write(string.char(CPU.A))",    -- fake function for debugging
+
+    -- ED 40 = IN B, (C)
+    [0x40] = function(memory, iaddr)
+            return port_input_string("CPU.B", "CPU.C", "CPU.B"), iaddr
+        end,
 
     -- NEG (like 0-A)  ... we actually use subtract code. Might be easier to generate flags manually.
     --
@@ -665,27 +692,6 @@ local function write_to_address_command_string(source, dest_address, next_pc, op
     dest_address, optional_flag_check_code, source, next_pc)
 end
 
-
-local function port_output_string(addr_hi, addr_lo, data)
-    return string.format(
-        -- run all output sources, not just first
-        -- @todo:could precalculate specific outputs on registration?
-        [[ for _,pd in ipairs(CPU._outputs) do 
-if bit32.band(pd.mask, %s*256+%s) == pd.state then 
-    pd.f(pd.ud, %s, %s, %s) 
-end end]], addr_hi, addr_lo, addr_hi, addr_lo, data)
-end
-
-local function port_input_string(addr_hi, addr_lo, target_register)
-    return string.format(
-        -- run first matching input source only
-        -- @todo:could precalculate specific input on registration?
-        [[ result = 0xFF for _,pd in ipairs(CPU._inputs) do 
-if bit32.band(pd.mask, %s*256+%s) == pd.state then 
-    result = pd.f(pd.ud, %s, %s) 
-    break
-end end %s = result]], addr_hi, addr_lo, addr_hi, addr_lo, target_register)
-end
 
 local decode_instruction
 
