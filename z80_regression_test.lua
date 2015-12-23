@@ -4477,16 +4477,16 @@ the address bus.
             "INPUT DATA")
     end
 },
---[[
+
 { "IN   B,(C) no input", function(z)
-        z:LD("A", 0x11)
-        z:assemble("IN", "A", "(0x21)")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "B", "(C)")
     end,
-    { A = 0xFF }, 
+    { B = 0xFF, C = 0x34 },
     function(CPU, JIT)
         CPU:register_input(0xff, 0x22, 
             function(ud, h, l) 
-                if ud ~= "INPUT DATA" or h ~= 0x11 or l ~= 0x22 then
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
                     print("IN TEST FAILED: ", ud, h, l) 
                     os.exit(1)
                 end
@@ -4496,10 +4496,10 @@ the address bus.
     end
     },
 { "IN   B,(C) single bit", function(z)
-        z:LD("A", 0x99)
-        z:assemble("IN", "A", "(0x21)")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "B", "(C)")
     end,
-    { A = 0x66 }, 
+    { B = 0x66, C = 0x21}, 
     function(CPU, JIT)
         CPU:register_input(0x02, 0x00, 
             function(ud, h, l) 
@@ -4512,7 +4512,7 @@ the address bus.
             "INPUT DATA")
     end
 },
---]]
+
 
 -- 0xED 0x43
 { "LD   (xxxx),BC", function(z)
