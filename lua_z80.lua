@@ -557,7 +557,11 @@ if bit32.band(pd.mask, %s*256+%s) == pd.state then
 end end]], addr_hi, addr_lo, addr_hi, addr_lo, data)
 end
 
-local function port_input_string(addr_hi, addr_lo, target_register)
+local function port_input_string(addr_hi, addr_lo, target_register, flags_required)
+    local flags_code = ""
+    if flags_required then
+        flags_code = "CPU._F=zflags[result]+CPU.Carry "
+    end
     return string.format(
         -- run first matching input source only
         -- @todo:could precalculate specific input on registration?
@@ -565,22 +569,23 @@ local function port_input_string(addr_hi, addr_lo, target_register)
 if bit32.band(pd.mask, %s*256+%s) == pd.state then 
     result = pd.f(pd.ud, %s, %s) 
     break
-end end %s = result]], addr_hi, addr_lo, addr_hi, addr_lo, target_register)
+end end %s%s=result]], addr_hi, addr_lo, addr_hi, addr_lo, flags_code, target_register)
 end
 
 
 -- extended instructions
 local decode_ED_instructions = {
 
-    -- Debug instruction, writes to host stdout .. ED ED
-    [0xED] = "io.write(string.char(CPU.A))",    -- fake function for debugging
+    -- ED 40 = IN B, (C) ... see below
+    -- ED 48 = IN D, (C) ... see below
+    -- ED 50 = IN D, (C) ... see below
+    -- ED 58 = IN E, (C) ... see below
+    -- ED 60 = IN H, (C) ... see below
+    -- ED 68 = IN L, (C) ... see below
+    -- ED 70 = IN F, (C) ... see below
+    -- ED 78 = IN A, (C) ... see below
 
-    -- ED 40 = IN B, (C)
-    [0x40] = function(memory, iaddr)
-            return port_input_string("CPU.B", "CPU.C", "CPU.B"), iaddr
-        end,
-
-    -- NEG (like 0-A)  ... we actually use subtract code. Might be easier to generate flags manually.
+    -- ED 44 = NEG (like 0-A)  ... we actually use subtract code. Might be easier to generate flags manually.
     --
     -- From Z80 user manual:
     -- S is set if result is negative; reset otherwise
@@ -666,7 +671,21 @@ local decode_ED_instructions = {
             return string.format(
             "CPU.SP = memory[0x%x] + 256*memory[0x%x]", target, (target+1)%65536 ), iaddr
         end,
+        
+    -- Debug instruction, writes to host stdout .. ED ED
+    [0xED] = "io.write(string.char(CPU.A))",    -- fake function for debugging
+
 }
+
+IN_OUT_reg_list = { "CPU.B", "CPU.C", "CPU.D", "CPU.E", "CPU.H", "CPU.L", "temp", "CPU.A" }
+
+for i = 0, 7 do
+    local reg = IN_OUT_reg_list[i+1]
+    -- ED 40 = IN B, (C), ED 48 = IN C, (C) ... etc.
+    decode_ED_instructions[0x40+i*8] = function(memory, iaddr)
+            return port_input_string("CPU.B", "CPU.C", reg, true), iaddr
+        end
+end
 
 
 local function call_code_string(return_addr, target)
@@ -1494,6 +1513,7 @@ function z80_compile(memory, address, number_number_instructions_to_compile, pre
     --newlump.code, newlump.error = loadstring(source)
     if newlump.code == nil then
         print("COMPILE ERROR", newlump.error)
+        print(source)
         local mstart, mend = newlump.error:find(":%d+:")
         if mstart then
             newlump.error_line = tonumber(newlump.error:sub(mstart+1, mend-1))

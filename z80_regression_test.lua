@@ -4461,10 +4461,11 @@ the address bus.
 --]]
 --0xED 0x40
 { "IN   B,(C)", function(z)
+        z:assemble("SCF")
         z:LD("BC", 0x1234)
         z:assemble("IN", "B", "(C)")
     end,
-    { B = 0x33, C = 0x34 }, 
+    { B = 0x33, C = 0x34, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
     function(CPU, JIT)
         CPU:register_input(0xff, 0x34, 
             function(ud, h, l) 
@@ -4479,10 +4480,12 @@ the address bus.
 },
 
 { "IN   B,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
         z:LD("BC", 0x1234)
         z:assemble("IN", "B", "(C)")
     end,
-    { B = 0xFF, C = 0x34 },
+    { B = 0xFF, C = 0x34, F={"S", "-Z", "-H", "V", "-N", "-C"} },
     function(CPU, JIT)
         CPU:register_input(0xff, 0x22, 
             function(ud, h, l) 
@@ -4496,10 +4499,12 @@ the address bus.
     end
     },
 { "IN   B,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
         z:LD("BC", 0x9921)
         z:assemble("IN", "B", "(C)")
     end,
-    { B = 0x66, C = 0x21}, 
+    { B = 0x01, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
     function(CPU, JIT)
         CPU:register_input(0x02, 0x00, 
             function(ud, h, l) 
@@ -4507,7 +4512,7 @@ the address bus.
                     print("IN TEST FAILED: ", ud, h, l) 
                     os.exit(1)
                 end
-                return 0x66
+                return 0x01
             end,
             "INPUT DATA")
     end
