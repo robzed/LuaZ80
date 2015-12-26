@@ -4478,7 +4478,24 @@ the address bus.
             "INPUT DATA")
     end
 },
-
+{ "IN   B,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "B", "(C)")
+    end,
+    { B = 0, C = 0x34, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
 { "IN   B,(C) no input", function(z)
         z:assemble("SCF")
         z:assemble("CCF")
@@ -4505,6 +4522,545 @@ the address bus.
         z:assemble("IN", "B", "(C)")
     end,
     { B = 0x01, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x01
+            end,
+            "INPUT DATA")
+    end
+},
+
+
+--0xED 0x48
+{ "IN   C,(C)", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "C", "(C)")
+    end,
+    { C = 0x33, B=0x12, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   C,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "C", "(C)")
+    end,
+    { C = 0, B=0x12, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   C,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "C", "(C)")
+    end,
+    { C = 0xFF, B=0x12, F={"S", "-Z", "-H", "V", "-N", "-C"} },
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   C,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "C", "(C)")
+    end,
+    { C = 0x01, B=0x99, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x01
+            end,
+            "INPUT DATA")
+    end
+},
+
+
+--0xED 0x50
+{ "IN   D,(C)", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "D", "(C)")
+    end,
+    { D = 0x33, B=0x12, C = 0x34, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   D,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "D", "(C)")
+    end,
+    { D = 0, B=0x12, C = 0x34, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   D,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "D", "(C)")
+    end,
+    { D = 0xFF, B=0x12, C = 0x34, F={"S", "-Z", "-H", "V", "-N", "-C"} },
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   D,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "D", "(C)")
+    end,
+    { D = 0x01, B=0x99, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x01
+            end,
+            "INPUT DATA")
+    end
+},
+
+
+--0xED 0x58
+{ "IN   E,(C)", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "E", "(C)")
+    end,
+    { E = 0x33, B=0x12, C = 0x34, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   E,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "E", "(C)")
+    end,
+    { E = 0, B=0x12, C = 0x34, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   E,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "E", "(C)")
+    end,
+    { E = 0xFF, B=0x12, C = 0x34, F={"S", "-Z", "-H", "V", "-N", "-C"} },
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   E,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "E", "(C)")
+    end,
+    { E = 0x01, B=0x99, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x01
+            end,
+            "INPUT DATA")
+    end
+},
+
+
+--0xED 0x60
+{ "IN   H,(C)", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "H", "(C)")
+    end,
+    { H = 0x33, B=0x12, C = 0x34, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   H,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "H", "(C)")
+    end,
+    { H = 0, B=0x12, C = 0x34, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   H,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "H", "(C)")
+    end,
+    { H = 0xFF, B=0x12, C = 0x34, F={"S", "-Z", "-H", "V", "-N", "-C"} },
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   H,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "H", "(C)")
+    end,
+    { H = 0x01, B=0x99, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x01
+            end,
+            "INPUT DATA")
+    end
+},
+
+
+--0xED 0x68
+{ "IN   L,(C)", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "L", "(C)")
+    end,
+    { L = 0x33, B=0x12, C = 0x34, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   L,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "L", "(C)")
+    end,
+    { L = 0, B=0x12, C = 0x34, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   L,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "L", "(C)")
+    end,
+    { L = 0xFF, B=0x12, C = 0x34, F={"S", "-Z", "-H", "V", "-N", "-C"} },
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   L,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "L", "(C)")
+    end,
+    { L = 0x01, B =0x99, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x01
+            end,
+            "INPUT DATA")
+    end
+},
+
+
+--0xED 0x70
+{ "IN   F,(C)", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "F", "(C)")
+    end,
+    { B = 0x12, C = 0x34, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   F,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "F", "(C)")
+    end,
+    { B = 0x12, C = 0x34, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   F,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "F", "(C)")
+    end,
+    { B = 0x12, C = 0x34, F={"S", "-Z", "-H", "V", "-N", "-C"} },
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   F,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "F", "(C)")
+    end,
+    { B = 0x99, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
+    function(CPU, JIT)
+        CPU:register_input(0x02, 0x00, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x99 or l ~= 0x21 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x01
+            end,
+            "INPUT DATA")
+    end
+},
+
+
+--0xED 0x78
+{ "IN   A,(C)", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "A", "(C)")
+    end,
+    { A = 0x33, B=0x12, C = 0x34, F={"-S", "-Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   A,(C) zero", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "A", "(C)")
+    end,
+    { A = 0, B=0x12, C = 0x34, F={"-S", "Z", "-H", "V", "-N", "C"} }, 
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x34, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0
+            end,
+            "INPUT DATA")
+    end
+},
+{ "IN   A,(C) no input", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x1234)
+        z:assemble("IN", "A", "(C)")
+    end,
+    { A = 0xFF, B=0x12, C = 0x34, F={"S", "-Z", "-H", "V", "-N", "-C"} },
+    function(CPU, JIT)
+        CPU:register_input(0xff, 0x22, 
+            function(ud, h, l) 
+                if ud ~= "INPUT DATA" or h ~= 0x12 or l ~= 0x34 then
+                    print("IN TEST FAILED: ", ud, h, l) 
+                    os.exit(1)
+                end
+                return 0x33
+            end,
+            "INPUT DATA")
+    end
+    },
+{ "IN   A,(C) single bit", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("BC", 0x9921)
+        z:assemble("IN", "A", "(C)")
+    end,
+    { A = 0x01, B=0x99, C = 0x21, F={"-S", "-Z", "-H", "-V", "-N", "-C"}}, 
     function(CPU, JIT)
         CPU:register_input(0x02, 0x00, 
             function(ud, h, l) 
