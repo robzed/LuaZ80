@@ -577,13 +577,22 @@ end
 local decode_ED_instructions = {
 
     -- ED 40 = IN B, (C) ... see below
-    -- ED 48 = IN D, (C) ... see below
+    -- ED 48 = IN C, (C) ... see below
     -- ED 50 = IN D, (C) ... see below
     -- ED 58 = IN E, (C) ... see below
     -- ED 60 = IN H, (C) ... see below
     -- ED 68 = IN L, (C) ... see below
     -- ED 70 = IN F, (C) ... see below
     -- ED 78 = IN A, (C) ... see below
+    
+    -- ED 41 = OUT (C), B ... see below
+    -- ED 49 = OUT (C), C ... see below
+    -- ED 51 = OUT (C), D ... see below
+    -- ED 59 = OUT (C), E ... see below
+    -- ED 61 = OUT (C), H ... see below
+    -- ED 69 = OUT (C), L ... see below
+    -- ED 71 = OUT (C), F ... see below
+    -- ED 79 = OUT (C), A ... see below
 
     -- ED 44 = NEG (like 0-A)  ... we actually use subtract code. Might be easier to generate flags manually.
     --
@@ -677,14 +686,37 @@ local decode_ED_instructions = {
 
 }
 
-IN_OUT_reg_list = { "CPU.B", "CPU.C", "CPU.D", "CPU.E", "CPU.H", "CPU.L", "temp", "CPU.A" }
+IN_reg_list = { "CPU.B", "CPU.C", "CPU.D", "CPU.E", "CPU.H", "CPU.L", "temp", "CPU.A" }
 
+--  "The IN (C), F instructions is only usefull if you test bits
+-- which have the same number as a flag in the F-register because
+-- some older Z80 lock up otherwise." -- http://www.z80.info/z80undoc.htm
 for i = 0, 7 do
-    local reg = IN_OUT_reg_list[i+1]
+    local reg = IN_reg_list[i+1]
     -- ED 40 = IN B, (C), ED 48 = IN C, (C) ... etc.
     decode_ED_instructions[0x40+i*8] = function(memory, iaddr)
             return port_input_string("CPU.B", "CPU.C", reg, true), iaddr
         end
+end
+
+OUT_reg_list = { "CPU.B", "CPU.C", "CPU.D", "CPU.E", "CPU.H", "CPU.L", "CPU.F", "CPU.A" }
+
+--  "I also have doubts about the usefullness and correctness of
+-- the OUT (C),F instruction." -- http://www.z80.info/z80undoc.htm
+--
+-- I'm sure the OUT (C), F is broken ... it's unclear what it should do...
+-- I wonder if it should be left as undefined?
+for i = 0, 7 do
+    local reg = OUT_reg_list[i+1]
+    
+    if reg ~= "CPU.F" then  -- leave OUT (C), F undefined.
+        
+      -- ED 41 = OUT (C), B ED 49 = OUT (C), C ... etc.
+      decode_ED_instructions[0x41+i*8] = function(memory, iaddr)
+              return port_output_string("CPU.B", "CPU.C", reg), iaddr
+          end
+          
+    end
 end
 
 
