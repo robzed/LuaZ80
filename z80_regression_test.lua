@@ -5085,7 +5085,7 @@ the address bus.
         z:LD("BC", 0x22FE)
         z:assemble("OUT","(C)", "B")
         end, 
-        { B = 0x22, C=0xFE },
+        { B = 0x22, C=0xFE, IX=0x22 },  -- we hack the CPU state to automatically test the output worked
         function (CPU, JIT)
             CPU:register_output(0xff, 254, 
                 function(ud, h, l ,d) 
@@ -5093,7 +5093,7 @@ the address bus.
                         print("OUT TEST FAILED: ", ud, h, l, d) 
                         os.exit(1)
                     else
-                        print("Test OK")
+                        CPU.IX = d
                     end
                 end,
                 "OUTPUT DATA")
@@ -5125,7 +5125,7 @@ the address bus.
         z:LD("BC", 0x7773)
         z:assemble("OUT","(C)", "B")
         end, 
-        { B = 0x77, C=0x73 },
+        { B = 0x77, C=0x73, IX=0x77 },  -- we hack the CPU state to automatically test the output worked
         function (CPU, JIT)
             CPU:register_output(0x80, 0x00, 
                 function(ud, h, l ,d) 
@@ -5133,7 +5133,72 @@ the address bus.
                         print("OUT TEST FAILED: ", ud, h, l, d) 
                         os.exit(1)
                     else
-                        print("Test OK")
+                        CPU.IX = d
+                    end
+                end,
+                1234)
+        end
+    },
+
+-- 0x49
+{ "OUT (C), C no outputs", function(z, CPU)
+        z:LD("BC", 0x2212)
+        z:assemble("OUT","(C)", "C")
+        end, { B = 0x22, C = 0x12 } },
+
+{ "OUT (C), C checked", function(z)
+        z:LD("BC", 0x22FE)
+        z:assemble("OUT","(C)", "C")
+        end, 
+        { B = 0x22, C=0xFE, IX=0xFE },  -- we hack the CPU state to automatically test the output worked
+        function (CPU, JIT)
+            CPU:register_output(0xff, 254, 
+                function(ud, h, l ,d) 
+                    if ud ~= "OUTPUT DATA" or h ~= 0x22 or l ~= 0xFE or d ~= 0xFE then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    else
+                        CPU.IX = d
+                    end
+                end,
+                "OUTPUT DATA")
+        end
+    },
+    
+{ "OUT (C), C checked, not output", function(z)
+        z:LD("BC", 0x2222)
+        z:assemble("OUT","(C)", "C")
+        end, 
+        { B = 0x22, C=0x22 },
+        function (CPU, JIT)
+            CPU:register_output(0xff, 254, 
+                function(ud, h, l ,d) 
+                    if ud ~= "OUTPUT DATA" or h ~= 0x22 or l ~= 0xFE or d ~= 0x22 then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    else
+                        print("Test OUTPUTTED unexpectedly")
+                        os.exit(1)
+                    end
+                end,
+                "OUTPUT DATA")
+        end
+    },
+    
+
+{ "OUT (C), C single bit checked", function(z)
+        z:LD("BC", 0x7773)
+        z:assemble("OUT","(C)", "C")
+        end, 
+        { B = 0x77, C=0x73, IX=0x73 },  -- we hack the CPU state to automatically test the output worked
+        function (CPU, JIT)
+            CPU:register_output(0x80, 0x00, 
+                function(ud, h, l ,d) 
+                    if ud ~= 1234 or h ~= 0x77 or l ~= 0x73 or d ~= 0x73 then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    else
+                        CPU.IX = d
                     end
                 end,
                 1234)
