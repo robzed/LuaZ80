@@ -5488,6 +5488,76 @@ the address bus.
     },
 
 
+-- 0x79
+{ "OUT (C), A no outputs", function(z, CPU)
+        z:LD("BC", 0x2212)
+        z:LD("A", 0x36)
+        z:assemble("OUT","(C)", "A")
+        end, { B = 0x22, C = 0x12, A=0x36 } },
+
+{ "OUT (C), A checked", function(z)
+        z:LD("BC", 0x22FE)
+        z:LD("A", 0x37)
+        z:assemble("OUT","(C)", "A")
+        end, 
+        { B = 0x22, C=0xFE, IX=0x37, A=0x37 },  -- we hack the CPU state to automatically test the output worked
+        function (CPU, JIT)
+            CPU:register_output(0xff, 254, 
+                function(ud, h, l ,d) 
+                    if ud ~= "OUTPUT DATA" or h ~= 0x22 or l ~= 0xFE or d ~= 0x37 then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    else
+                        CPU.IX = d
+                    end
+                end,
+                "OUTPUT DATA")
+        end
+    },
+    
+{ "OUT (C), A checked, not output", function(z)
+        z:LD("BC", 0x2222)
+        z:LD("A", 0x38)
+        z:assemble("OUT","(C)", "A")
+        end, 
+        { B = 0x22, C=0x22, A=0x38 },
+        function (CPU, JIT)
+            CPU:register_output(0xff, 254, 
+                function(ud, h, l ,d) 
+                    if ud ~= "OUTPUT DATA" or h ~= 0x22 or l ~= 0xFE or d ~= 0x38 then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    else
+                        print("Test OUTPUTTED unexpectedly")
+                        os.exit(1)
+                    end
+                end,
+                "OUTPUT DATA")
+        end
+    },
+    
+
+{ "OUT (C), A single bit checked", function(z)
+        z:LD("BC", 0x7773)
+        z:LD("A", 0x3A)
+        z:assemble("OUT","(C)", "A")
+        end, 
+        { B = 0x77, C=0x73, IX=0x3A, A=0x3A },  -- we hack the CPU state to automatically test the output worked
+        function (CPU, JIT)
+            CPU:register_output(0x80, 0x00, 
+                function(ud, h, l ,d) 
+                    if ud ~= 1234 or h ~= 0x77 or l ~= 0x73 or d ~= 0x3A then
+                        print("OUT TEST FAILED: ", ud, h, l, d) 
+                        os.exit(1)
+                    else
+                        CPU.IX = d
+                    end
+                end,
+                1234)
+        end
+    },
+
+
 
 
 
