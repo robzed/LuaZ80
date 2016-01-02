@@ -5641,6 +5641,12 @@ the address bus.
         z:LD("BC", 0xF000)
         z:assemble("ADC", "HL", "BC")
     end, { B=0xF0, C=0x00, H=0xFF, L=0xFF, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC HL, BC overflow test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x7FFE)
+        z:LD("BC", 0x0001)
+        z:assemble("ADC", "HL", "BC")
+    end, { B=0x00, C=0x01, H=0x80, L=0x00, F={ "S", "-Z", "H", "V", "-N", "-C" } } },
 
 
 
