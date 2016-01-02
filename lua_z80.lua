@@ -247,6 +247,7 @@ local function calc_add_overflow(oldA,op2,newA)
     end
     return 0
 end
+Z80CPU.calc_add_overflow = calc_add_overflow
 
 local function calc_sub_overflow(oldA,op2,newA)
 --if ((ra^R)&(wml^ra)&0x80 ~= 0 then V_FLAG end
@@ -255,6 +256,7 @@ local function calc_sub_overflow(oldA,op2,newA)
     end
     return 0
 end
+Z80CPU.calc_sub_overflow = calc_sub_overflow
 
 local function calc_half_carry(oldA,op2,newA)
 -- ((ra^R^wml)&H_FLAG)
@@ -1158,7 +1160,6 @@ end
 local function ADD_to_HL_string(hi, lo)
     -- basically a simple add followed by an ADC H,x.
     -- maybe we should try a 16 bit add? (but then we have to split anyway...)
-    -- or get rid of the use of CPU.carry internally?
     return string.format(
 [[  
     result=CPU.L+%s
@@ -1185,6 +1186,47 @@ decode_first_byte[0x09] = ADD_to_HL_string("CPU.B", "CPU.C")
 decode_first_byte[0x19] = ADD_to_HL_string("CPU.D", "CPU.E")
 decode_first_byte[0x29] = ADD_to_HL_string("CPU.H", "CPU.L")
 decode_first_byte[0x39] = ADD_to_HL_string("bit32.rshift(CPU.SP, 8)", "(CPU.SP%256)") -- math.floor(b / 256)
+
+
+-- ED 4A = ADC HL, BC
+-- ED 5A = ADC HL, DE
+-- ED 6A = ADC HL, HL
+-- ED 7A = ADC HL, SP
+-- ADC HL, ss ... unlikely ADD HL, ss - does affect Z and S, as well as H F3 F5 V N C
+
+local function ADC_to_HL_string(hi, lo)
+    -- basically a simple ADC followed by an ADC H,x.
+    -- maybe we should try a 16 bit add? (but then we have to split anyway...)
+    return string.format(
+[[  
+    result=CPU.L+%s+CPU.Carry
+    if result > 255 then 
+        temp=1 result=result-256
+    else
+        temp=0
+    end
+    CPU.L=result
+    
+    result = CPU.H+%s+temp
+    
+    if result > 255 then
+        CPU.Carry=1 result=result-256
+    else
+        CPU.Carry=0
+    end
+    temp = CPU.simple_flags[result] + CPU.calc_add_overflow(CPU.H, %s, result) + CPU.Carry
+    if CPU.L == 0 and CPU.H == 0 then
+        temp = temp + Z80_Z_FLAG
+    end
+    temp = temp + bit32.band(bit32.bxor(CPU.H, %s, result),Z80_H_FLAG)
+    CPU._F = temp
+    CPU.H = result ]], lo, hi, hi, hi)
+end
+decode_ED_instructions[0x4A] = ADC_to_HL_string("CPU.B", "CPU.C")
+decode_ED_instructions[0x5A] = ADC_to_HL_string("CPU.D", "CPU.E")
+decode_ED_instructions[0x6A] = ADC_to_HL_string("CPU.H", "CPU.L")
+decode_ED_instructions[0x7A] = ADC_to_HL_string("bit32.rshift(CPU.SP, 8)", "(CPU.SP%256)") -- math.floor(b / 256)
+
 
 local function SUB_to_A_string(what)
     return "result=".."CPU.A-" .. what .. [[
