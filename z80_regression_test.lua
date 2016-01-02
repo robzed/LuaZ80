@@ -5600,6 +5600,12 @@ the address bus.
         z:LD("BC", 0x1122)
         z:assemble("ADC", "HL", "BC")
     end, { B=0x11, C=0x22, H=0x23, L=0x56, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, BC carry test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x1234)
+        z:LD("BC", 0x1122)
+        z:assemble("ADC", "HL", "BC")
+    end, { B=0x11, C=0x22, H=0x23, L=0x57, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 
 
