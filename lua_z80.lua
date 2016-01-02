@@ -1215,8 +1215,8 @@ local function ADC_to_HL_string(hi, lo)
         CPU.Carry=0
     end
     temp = CPU.simple_flags[result] + CPU.calc_add_overflow(CPU.H, %s, result) + CPU.Carry
-    if CPU.L == 0 and CPU.H == 0 then
-        temp = temp + Z80_Z_FLAG
+    if result == 0 and CPU.L ~= 0 then
+        temp = temp - Z80_Z_FLAG
     end
     temp = temp + bit32.band(bit32.bxor(CPU.H, %s, result),Z80_H_FLAG)
     CPU._F = temp

@@ -5606,6 +5606,34 @@ the address bus.
         z:LD("BC", 0x1122)
         z:assemble("ADC", "HL", "BC")
     end, { B=0x11, C=0x22, H=0x23, L=0x57, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, BC zero test carry half", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0xFFFF)
+        z:LD("BC", 0x0001)
+        z:assemble("ADC", "HL", "BC")
+    end, { B=0x00, C=0x01, H=0x00, L=0x00, F={ "-S", "Z", "H", "-V", "-N", "C" } } },
+{  "ADC HL, BC not zero test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0FFF)
+        z:LD("BC", 0x0001)
+        z:assemble("ADC", "HL", "BC")
+    end, { B=0x00, C=0x01, H=0x10, L=0x00, F={ "-S", "-Z", "H", "-V", "-N", "-C" } } },
+{  "ADC HL, BC not zero test 2", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0000)
+        z:LD("BC", 0x0100)
+        z:assemble("ADC", "HL", "BC")
+    end, { B=0x01, C=0x00, H=0x01, L=0x00, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, BC sign test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0FFF)
+        z:LD("BC", 0xF000)
+        z:assemble("ADC", "HL", "BC")
+    end, { B=0xF0, C=0x00, H=0xFF, L=0xFF, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 
 
