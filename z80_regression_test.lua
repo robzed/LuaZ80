@@ -5627,6 +5627,13 @@ the address bus.
         z:LD("BC", 0x0100)
         z:assemble("ADC", "HL", "BC")
     end, { B=0x01, C=0x00, H=0x01, L=0x00, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, BC not zero test 3", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0000)
+        z:LD("BC", 0x0001)
+        z:assemble("ADC", "HL", "BC")
+    end, { B=0x00, C=0x01, H=0x00, L=0x01, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
 {  "ADC HL, BC sign test", function(z)
         z:assemble("SCF");
         z:assemble("CCF");
