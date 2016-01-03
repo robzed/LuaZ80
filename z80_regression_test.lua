@@ -5648,6 +5648,62 @@ the address bus.
         z:assemble("ADC", "HL", "BC")
     end, { B=0x00, C=0x01, H=0x80, L=0x00, F={ "S", "-Z", "H", "V", "-N", "-C" } } },
 
+-- 0xED 0x59
+{  "ADC HL, DE", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x1234)
+        z:LD("DE", 0x1122)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0x11, E=0x22, H=0x23, L=0x56, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, DE carry test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x1234)
+        z:LD("DE", 0x1122)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0x11, E=0x22, H=0x23, L=0x57, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, DE zero test carry half", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0xFFFF)
+        z:LD("DE", 0x0001)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0x00, E=0x01, H=0x00, L=0x00, F={ "-S", "Z", "H", "-V", "-N", "C" } } },
+{  "ADC HL, DE not zero test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0FFF)
+        z:LD("DE", 0x0001)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0x00, E=0x01, H=0x10, L=0x00, F={ "-S", "-Z", "H", "-V", "-N", "-C" } } },
+{  "ADC HL, DE not zero test 2", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0000)
+        z:LD("DE", 0x0100)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0x01, E=0x00, H=0x01, L=0x00, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, DE not zero test 3", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0000)
+        z:LD("DE", 0x0001)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0x00, E=0x01, H=0x00, L=0x01, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, DE sign test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0FFF)
+        z:LD("DE", 0xF000)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0xF0, E=0x00, H=0xFF, L=0xFF, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC HL, DE overflow test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x7FFE)
+        z:LD("DE", 0x0001)
+        z:assemble("ADC", "HL", "DE")
+    end, { D=0x00, E=0x01, H=0x80, L=0x00, F={ "S", "-Z", "H", "V", "-N", "-C" } } },
+
 
 
 -- 0xED 0x4B
