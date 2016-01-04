@@ -5592,7 +5592,7 @@ the address bus.
     { A = 0x02, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
 
 
--- 0xED 0x49
+-- 0xED 0x4A
 {  "ADC HL, BC", function(z)
         z:assemble("SCF");
         z:assemble("CCF");
@@ -5648,7 +5648,7 @@ the address bus.
         z:assemble("ADC", "HL", "BC")
     end, { B=0x00, C=0x01, H=0x80, L=0x00, F={ "S", "-Z", "H", "V", "-N", "-C" } } },
 
--- 0xED 0x59
+-- 0xED 0x5A
 {  "ADC HL, DE", function(z)
         z:assemble("SCF");
         z:assemble("CCF");
@@ -5703,6 +5703,62 @@ the address bus.
         z:LD("DE", 0x0001)
         z:assemble("ADC", "HL", "DE")
     end, { D=0x00, E=0x01, H=0x80, L=0x00, F={ "S", "-Z", "H", "V", "-N", "-C" } } },
+
+-- 0xED 0x7A
+{  "ADC HL, SP", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x1234)
+        z:LD("SP", 0x1122)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0x1122, H=0x23, L=0x56, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, SP carry test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x1234)
+        z:LD("SP", 0x1122)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0x1122, H=0x23, L=0x57, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, SP zero test carry half", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0xFFFF)
+        z:LD("SP", 0x0001)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0x0001, H=0x00, L=0x00, F={ "-S", "Z", "H", "-V", "-N", "C" } } },
+{  "ADC HL, SP not zero test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0FFF)
+        z:LD("SP", 0x0001)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0x0001, H=0x10, L=0x00, F={ "-S", "-Z", "H", "-V", "-N", "-C" } } },
+{  "ADC HL, SP not zero test 2", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0000)
+        z:LD("SP", 0x0100)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0x0100, H=0x01, L=0x00, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, SP not zero test 3", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0000)
+        z:LD("SP", 0x0001)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0x0001, H=0x00, L=0x01, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, SP sign test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0FFF)
+        z:LD("SP", 0xF000)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0xF000, H=0xFF, L=0xFF, F={ "S", "-Z", "-H", "-V", "-N", "-C" } } },
+{ "ADC HL, SP overflow test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x7FFE)
+        z:LD("SP", 0x0001)
+        z:assemble("ADC", "HL", "SP")
+    end, { SP=0x0001, H=0x80, L=0x00, F={ "S", "-Z", "H", "V", "-N", "-C" } } },
 
 
 
