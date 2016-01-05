@@ -5704,6 +5704,53 @@ the address bus.
         z:assemble("ADC", "HL", "DE")
     end, { D=0x00, E=0x01, H=0x80, L=0x00, F={ "S", "-Z", "H", "V", "-N", "-C" } } },
 
+-- 0xED 0x6A
+{  "ADC HL, HL", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x1234)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0x24, L=0x68, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, HL carry test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x1234)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0x24, L=0x69, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, HL zero test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x8000)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0x00, L=0x00, F={ "-S", "Z", "-H", "V", "-N", "C" } } },
+{  "ADC HL, HL not zero test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0800)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0x10, L=0x00, F={ "-S", "-Z", "H", "-V", "-N", "-C" } } },
+{  "ADC HL, HL not zero test 2", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x0080)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0x01, L=0x00, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, HL not zero test 3", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0x0000)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0x00, L=0x01, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
+{  "ADC HL, HL sign test", function(z)
+        z:assemble("SCF");
+        z:LD("HL", 0xFFFF)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0xFF, L=0xFF, F={ "S", "-Z", "H", "-V", "-N", "C" } } },
+{ "ADC HL, HL overflow test", function(z)
+        z:assemble("SCF");
+        z:assemble("CCF");
+        z:LD("HL", 0x4000)
+        z:assemble("ADC", "HL", "HL")
+    end, { H=0x80, L=0x00, F={ "S", "-Z", "-H", "V", "-N", "-C" } } },
+
 -- 0xED 0x7A
 {  "ADC HL, SP", function(z)
         z:assemble("SCF");
