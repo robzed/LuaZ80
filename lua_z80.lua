@@ -1192,7 +1192,7 @@ decode_first_byte[0x39] = ADD_to_HL_string("bit32.rshift(CPU.SP, 8)", "(CPU.SP%2
 -- ED 5A = ADC HL, DE
 -- ED 6A = ADC HL, HL
 -- ED 7A = ADC HL, SP
--- ADC HL, ss ... unlikely ADD HL, ss - does affect Z and S, as well as H F3 F5 V N C
+-- ADC HL, ss ... unlike ADD HL, ss - does affect Z and S, as well as H F3 F5 V N C
 
 local function ADC_to_HL_string(hi, lo)
     -- basically a simple ADC followed by an ADC H,x.
