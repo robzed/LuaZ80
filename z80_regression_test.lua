@@ -5557,10 +5557,13 @@ the address bus.
         end
     },
 
-
-
-
-
+-- 0xED 0x42
+{ "SBC  HL,BC", function(z)
+        z:assemble("SCF")
+        z:LD("BC", 0x1234)
+        z:LD("HL", 0x3478)
+        z:assemble("SBC", "HL", "BC")
+        end, { H = 0x22, L = 0x43, B=0x12, C=0x34, F={ "-S", "-Z", "-H", "-V", "-N", "-C" } } },
 
 
 -- 0xED 0x43

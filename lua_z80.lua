@@ -1228,6 +1228,46 @@ decode_ED_instructions[0x6A] = ADC_to_HL_string("CPU.H", "CPU.L")
 decode_ED_instructions[0x7A] = ADC_to_HL_string("bit32.rshift(CPU.SP, 8)", "(CPU.SP%256)") -- math.floor(b / 256)
 
 
+-- ED 42 = SBC HL, BC
+-- ED 52 = SBC HL, DE
+-- ED 62 = SBC HL, HL
+-- ED 72 = SBC HL, SP
+-- SBC HL, ss ... does affect Z and S, as well as H F3 F5 V N C
+
+local function SBC_to_HL_string(hi, lo)
+    -- basically a simple SBC followed by an SBC H,x.
+    -- maybe we should try a 16 bit add? (but then we have to split anyway...)
+    return string.format(
+[[  
+    result=CPU.L-%s-CPU.Carry
+    if result < 0 then 
+        temp=1 result=result+256
+    else
+        temp=0
+    end
+    CPU.L=result
+    
+    result = CPU.H-%s-temp
+    
+    if result < 0 then
+        CPU.Carry=1 result=result-256
+    else
+        CPU.Carry=0
+    end
+    temp = CPU.simple_flags[result] + CPU.calc_add_overflow(CPU.H, %s, result) + CPU.Carry
+    if result == 0 and CPU.L ~= 0 then
+        temp = temp - Z80_Z_FLAG
+    end
+    temp = temp + bit32.band(bit32.bxor(CPU.H, %s, result),Z80_H_FLAG)
+    CPU._F = temp
+    CPU.H = result ]], lo, hi, hi, hi)
+end
+decode_ED_instructions[0x42] = SBC_to_HL_string("CPU.B", "CPU.C")
+decode_ED_instructions[0x52] = SBC_to_HL_string("CPU.D", "CPU.E")
+decode_ED_instructions[0x62] = SBC_to_HL_string("CPU.H", "CPU.L")
+decode_ED_instructions[0x72] = SBC_to_HL_string("bit32.rshift(CPU.SP, 8)", "(CPU.SP%256)") -- math.floor(b / 256)
+
+
 local function SUB_to_A_string(what)
     return "result=".."CPU.A-" .. what .. [[
     if result < 0 then
