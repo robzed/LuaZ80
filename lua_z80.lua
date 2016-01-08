@@ -1250,15 +1250,15 @@ local function SBC_to_HL_string(hi, lo)
     result = CPU.H-%s-temp
     
     if result < 0 then
-        CPU.Carry=1 result=result-256
+        CPU.Carry=1 result=result+256
     else
         CPU.Carry=0
     end
-    temp = CPU.simple_flags[result] + CPU.calc_add_overflow(CPU.H, %s, result) + CPU.Carry
+    temp = CPU.simple_flags[result] + CPU.calc_sub_overflow(CPU.H, %s, result) + CPU.Carry
     if result == 0 and CPU.L ~= 0 then
         temp = temp - Z80_Z_FLAG
     end
-    temp = temp + bit32.band(bit32.bxor(CPU.H, %s, result),Z80_H_FLAG)
+    temp = temp + bit32.band(bit32.bxor(CPU.H, %s, result),Z80_H_FLAG) + Z80_N_FLAG
     CPU._F = temp
     CPU.H = result ]], lo, hi, hi, hi)
 end
