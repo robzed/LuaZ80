@@ -5617,7 +5617,7 @@ the address bus.
         z:assemble("CCF")
         z:LD("BC", 0x8000)
         z:LD("HL", 0x0000)
-        z:assemble("SBC", "HL", "BC")
+        z:assemble("SBC", "HL", "BC")   -- 0 - (-0x8000) = (0 + 0x8000) = overflow (since we can't represent 0x8000 as a *signed* number)
         end, { H = 0x80, L = 0x00, B=0x80, C=0x00, F={ "S", "-Z", "-H", "V", "N", "C" } } },
 
 
