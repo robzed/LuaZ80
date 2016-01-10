@@ -5621,6 +5621,71 @@ the address bus.
         end, { H = 0x80, L = 0x00, B=0x80, C=0x00, F={ "S", "-Z", "-H", "V", "N", "C" } } },
 
 
+-- 0xED 0x52
+{ "SBC  HL,DE", function(z)
+        z:assemble("SCF")
+        z:LD("DE", 0x1234)
+        z:LD("HL", 0x3478)
+        z:assemble("SBC", "HL", "DE")
+        end, { H = 0x22, L = 0x43, D=0x12, E=0x34, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+
+{ "SBC  HL,DE  DE=FFFF", function(z)
+        z:assemble("SCF")
+        z:LD("DE", 0xFFFF)
+        z:LD("HL", 0x0002)
+        z:assemble("SBC", "HL", "DE")
+        end, { H = 0x00, L = 0x02, D=0xFF, E=0xFF, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,DE  DE=FFFE", function(z)
+        z:assemble("SCF")
+        z:LD("DE", 0xFFFE)
+        z:LD("HL", 0x0002)
+        z:assemble("SBC", "HL", "DE")
+        end, { H = 0x00, L = 0x03, D=0xFF, E=0xFE, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,DE  DE=0000", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("DE", 0x0000)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "DE")
+        end, { H = 0x00, L = 0x00, D=0x00, E=0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+
+{ "SBC  HL,DE  DE=0001", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("DE", 0x0001)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "DE")
+        end, { H = 0xFF, L = 0xFF, D=0x00, E=0x01, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,DE  DE=4000", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("DE", 0x4000)
+        z:LD("HL", 0x8000)
+        z:assemble("SBC", "HL", "DE")
+        end, { H = 0x40, L = 0x00, D=0x40, E=0x00, F={ "-S", "-Z", "-H", "V", "N", "-C" } } },
+
+{ "SBC  HL,DE  DE=7FFF", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+
+        z:LD("DE", 0x7FFF)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "DE")
+        end, { H = 0x80, L = 0x01, D=0x7F, E=0xFF, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,DE  DE=8000", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("DE", 0x8000)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "DE")   -- 0 - (-0x8000) = (0 + 0x8000) = overflow (since we can't represent 0x8000 as a *signed* number)
+        end, { H = 0x80, L = 0x00, D=0x80, E=0x00, F={ "S", "-Z", "-H", "V", "N", "C" } } },
+
+
+
 -- 0xED 0x43
 { "LD   (xxxx),BC", function(z)
         z:LD("BC", 0x1234)
