@@ -5684,6 +5684,69 @@ the address bus.
         z:assemble("SBC", "HL", "DE")   -- 0 - (-0x8000) = (0 + 0x8000) = overflow (since we can't represent 0x8000 as a *signed* number)
         end, { H = 0x80, L = 0x00, D=0x80, E=0x00, F={ "S", "-Z", "-H", "V", "N", "C" } } },
 
+-- 0xED 0x72
+{ "SBC  HL,SP", function(z)
+        z:assemble("SCF")
+        z:LD("SP", 0x1234)
+        z:LD("HL", 0x3478)
+        z:assemble("SBC", "HL", "SP")
+        end, { H = 0x22, L = 0x43, SP=0x1234, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+
+{ "SBC  HL,SP  SP=FFFF", function(z)
+        z:assemble("SCF")
+        z:LD("SP", 0xFFFF)
+        z:LD("HL", 0x0002)
+        z:assemble("SBC", "HL", "SP")
+        end, { H = 0x00, L = 0x02, SP=0xFFFF, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,SP  SP=FFFE", function(z)
+        z:assemble("SCF")
+        z:LD("SP", 0xFFFE)
+        z:LD("HL", 0x0002)
+        z:assemble("SBC", "HL", "SP")
+        end, { H = 0x00, L = 0x03, SP=0xFFFE, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,SP  SP=0000", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("SP", 0x0000)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "SP")
+        end, { H = 0x00, L = 0x00, SP=0x0000, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+
+{ "SBC  HL,SP  SP=0001", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("SP", 0x0001)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "SP")
+        end, { H = 0xFF, L = 0xFF, SP=0x0001, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,SP  SP=4000", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("SP", 0x4000)
+        z:LD("HL", 0x8000)
+        z:assemble("SBC", "HL", "SP")
+        end, { H = 0x40, L = 0x00, SP=0x4000, F={ "-S", "-Z", "-H", "V", "N", "-C" } } },
+
+{ "SBC  HL,SP  SP=7FFF", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+
+        z:LD("SP", 0x7FFF)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "SP")
+        end, { H = 0x80, L = 0x01, SP=0x7FFF, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+
+{ "SBC  HL,SP  SP=8000", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("SP", 0x8000)
+        z:LD("HL", 0x0000)
+        z:assemble("SBC", "HL", "SP")   -- 0 - (-0x8000) = (0 + 0x8000) = overflow (since we can't represent 0x8000 as a *signed* number)
+        end, { H = 0x80, L = 0x00, SP=0x8000, F={ "S", "-Z", "-H", "V", "N", "C" } } },
+
 
 
 -- 0xED 0x43
