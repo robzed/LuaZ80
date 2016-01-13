@@ -5693,63 +5693,13 @@ the address bus.
         z:assemble("SBC", "HL", "HL")
     end, { H = 0x00, L = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
 
---[[
-
-{ "SBC  HL,HL  HL=FFFF", function(z)
+-- 0xED 0x62
+{ "SBC  HL,HL", function(z)
         z:assemble("SCF")
-        z:LD("HL", 0xFFFF)
-        z:LD("HL", 0x0002)
+        z:LD("HL", 0x1234)
         z:assemble("SBC", "HL", "HL")
-        end, { H = 0x00, L = 0x02, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
+    end, { H = 0xFF, L = 0xFF, F={ "S", "-Z", "H", "-V", "N", "C" } } },
 
-{ "SBC  HL,HL  HL=FFFE", function(z)
-        z:assemble("SCF")
-        z:LD("HL", 0xFFFE)
-        z:LD("HL", 0x0002)
-        z:assemble("SBC", "HL", "HL")
-        end, { H = 0x00, L = 0x03, F={ "-S", "-Z", "H", "-V", "N", "C" } } },
-
-{ "SBC  HL,HL  HL=0000", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("HL", 0x0000)
-        z:LD("HL", 0x0000)
-        z:assemble("SBC", "HL", "HL")
-        end, { H = 0x00, L = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
-
-{ "SBC  HL,HL  HL=0001", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("HL", 0x0001)
-        z:LD("HL", 0x0000)
-        z:assemble("SBC", "HL", "HL")
-        end, { H = 0xFF, L = 0xFF, F={ "S", "-Z", "H", "-V", "N", "C" } } },
-
-{ "SBC  HL,HL  HL=4000", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("HL", 0x4000)
-        z:LD("HL", 0x8000)
-        z:assemble("SBC", "HL", "HL")
-        end, { H = 0x40, L = 0x00, F={ "-S", "-Z", "-H", "V", "N", "-C" } } },
-
-{ "SBC  HL,HL  HL=7FFF", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-
-        z:LD("HL", 0x7FFF)
-        z:LD("HL", 0x0000)
-        z:assemble("SBC", "HL", "HL")
-        end, { H = 0x80, L = 0x01, F={ "S", "-Z", "H", "-V", "N", "C" } } },
-
-{ "SBC  HL,HL  HL=8000", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("HL", 0x8000)
-        z:LD("HL", 0x0000)
-        z:assemble("SBC", "HL", "HL")   -- 0 - (-0x8000) = (0 + 0x8000) = overflow (since we can't represent 0x8000 as a *signed* number)
-        end, { H = 0x80, L = 0x00, F={ "S", "-Z", "-H", "V", "N", "C" } } },
---]]
 
 
 -- 0xED 0x72
