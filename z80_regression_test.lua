@@ -5686,7 +5686,7 @@ the address bus.
 
 
 -- 0xED 0x62
-{ "SBC  HL,HL", function(z)
+{ "SBC  HL,HL RCF", function(z)
         z:assemble("SCF")
         z:assemble("CCF")
         z:LD("HL", 0x1234)
@@ -5694,9 +5694,16 @@ the address bus.
     end, { H = 0x00, L = 0x00, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
 
 -- 0xED 0x62
-{ "SBC  HL,HL", function(z)
+{ "SBC  HL,HL SCF", function(z)
         z:assemble("SCF")
         z:LD("HL", 0x1234)
+        z:assemble("SBC", "HL", "HL")
+    end, { H = 0xFF, L = 0xFF, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+
+-- 0xED 0x62
+{ "SBC  HL,HL 01", function(z)
+        z:assemble("SCF")
+        z:LD("HL", 0xFFFF)
         z:assemble("SBC", "HL", "HL")
     end, { H = 0xFF, L = 0xFF, F={ "S", "-Z", "H", "-V", "N", "C" } } },
 
