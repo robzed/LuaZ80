@@ -1450,6 +1450,12 @@ decode_first_byte[0xfe] = function (memory, iaddr)
             return CP_to_A_string(byte1), iaddr
         end
 
+
+
+decode_DD_instructions[0x84] = ADD_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
+decode_DD_instructions[0x85] = ADD_to_A_string("CPU.IX%256")
+
+
 -- flags
 local flag_index = {
     [0]="not bit32.btest(CPU:get_F(), Z80_Z_FLAG)",    -- NZ = Not Zero (Z_FLAG)

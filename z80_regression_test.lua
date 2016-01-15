@@ -8686,6 +8686,15 @@ DD_instruction_tests = {
             z:LD("A", 0x99)
             z:LD("IXL", "A")
         end, { A=0x99, IX=0x1299 } },
+    
+    
+    -- 0x84
+    { "ADD A,IXH", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADD", "A", "IXH")
+            end, { A = 0x12, IX = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
 
 }
 
