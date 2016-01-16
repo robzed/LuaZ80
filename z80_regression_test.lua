@@ -8695,6 +8695,16 @@ DD_instruction_tests = {
             z:assemble("ADD", "A", "IXH")
             end, { A = 0x12, IX = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
 
+ { "ADD A, IXH", function(z) z:LD("A", 1) z:LD("IX", 0x200) z:assemble("ADD", "A", "IXH") end,
+     { A = 3, IX = 0x200, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ { "ADD A, IXH", function(z) z:LD("A", 0x0F) z:LD("IX", 0x100) z:assemble("ADD", "A", "IXH") end,
+     { A = 0x10, IX = 0x100, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+ { "ADD A, IXH", function(z) z:LD("A", 0x80) z:LD("IX", 0x8000) z:assemble("ADD", "A", "IXH") end,
+     { A = 0, IX = 0x8000, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+ { "ADD A, IXH", function(z) z:LD("A", 0x7F) z:LD("IX", 0x100) z:assemble("ADD", "A", "IXH") end,
+     { A = 0x80, IX = 0x100, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+ { "ADD A, IXH", function(z) z:LD("A", 0xFF) z:LD("IX", 0x200) z:assemble("ADD", "A", "IXH") end,
+     { A = 1, IX = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
 }
 
@@ -8855,7 +8865,7 @@ FD_instruction_tests = {
 --run_batch("0xnn", basic_instruction_tests)
 --run_batch("temp", temp_test)
 --run_batch("0xCBnn", CB_instruction_tests)
-run_batch("0xEDnn", ED_instruction_tests)
+--run_batch("0xEDnn", ED_instruction_tests)
 run_batch("0xDDnn", DD_instruction_tests)
 run_batch("0xFFnn", FD_instruction_tests)
 --run_batch("0xDDCBnn", DDCB_instruction_tests)
