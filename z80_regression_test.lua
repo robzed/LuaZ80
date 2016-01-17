@@ -8706,6 +8706,26 @@ DD_instruction_tests = {
  { "ADD A, IXH", function(z) z:LD("A", 0xFF) z:LD("IX", 0x200) z:assemble("ADD", "A", "IXH") end,
      { A = 1, IX = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
+
+    -- 0x85
+    { "ADD A,IXL", function(z)
+            z:LD("IX", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADD", "A", "IXL")
+            end, { A = 0x34, IX = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
+ { "ADD A, IXL", function(z) z:LD("A", 1) z:LD("IX", 0x2) z:assemble("ADD", "A", "IXL") end,
+     { A = 3, IX = 0x2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ { "ADD A, IXL", function(z) z:LD("A", 0x0F) z:LD("IX", 0x1) z:assemble("ADD", "A", "IXL") end,
+     { A = 0x10, IX = 0x1, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+ { "ADD A, IXL", function(z) z:LD("A", 0x80) z:LD("IX", 0x80) z:assemble("ADD", "A", "IXL") end,
+     { A = 0, IX = 0x80, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+ { "ADD A, IXL", function(z) z:LD("A", 0x7F) z:LD("IX", 0x1) z:assemble("ADD", "A", "IXL") end,
+     { A = 0x80, IX = 0x1, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+ { "ADD A, IXL", function(z) z:LD("A", 0xFF) z:LD("IX", 0x2) z:assemble("ADD", "A", "IXL") end,
+     { A = 1, IX = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+ 
+ 
 }
 
 FD_instruction_tests = {
