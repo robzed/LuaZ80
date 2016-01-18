@@ -1454,6 +1454,8 @@ decode_first_byte[0xfe] = function (memory, iaddr)
 
 decode_DD_instructions[0x84] = ADD_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
 decode_DD_instructions[0x85] = ADD_to_A_string("CPU.IX%256")
+decode_FD_instructions[0x84] = ADD_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
+decode_FD_instructions[0x85] = ADD_to_A_string("CPU.IY%256")
 
 
 -- flags

@@ -8875,6 +8875,43 @@ FD_instruction_tests = {
             z:LD("IYL", "A")
         end, { A=0x99, IY=0x1299 } },
 
+    -- 0x84
+    { "ADD A,IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADD", "A", "IYH")
+            end, { A = 0x12, IY = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
+ { "ADD A, IYH", function(z) z:LD("A", 1) z:LD("IY", 0x200) z:assemble("ADD", "A", "IYH") end,
+     { A = 3, IY = 0x200, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ { "ADD A, IYH", function(z) z:LD("A", 0x0F) z:LD("IY", 0x100) z:assemble("ADD", "A", "IYH") end,
+     { A = 0x10, IY = 0x100, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+ { "ADD A, IYH", function(z) z:LD("A", 0x80) z:LD("IY", 0x8000) z:assemble("ADD", "A", "IYH") end,
+     { A = 0, IY = 0x8000, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+ { "ADD A, IYH", function(z) z:LD("A", 0x7F) z:LD("IY", 0x100) z:assemble("ADD", "A", "IYH") end,
+     { A = 0x80, IY = 0x100, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+ { "ADD A, IYH", function(z) z:LD("A", 0xFF) z:LD("IY", 0x200) z:assemble("ADD", "A", "IYH") end,
+     { A = 1, IY = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+
+
+    -- 0x85
+    { "ADD A,IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADD", "A", "IYL")
+            end, { A = 0x34, IY = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
+ { "ADD A, IYL", function(z) z:LD("A", 1) z:LD("IY", 0x2) z:assemble("ADD", "A", "IYL") end,
+     { A = 3, IY = 0x2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ { "ADD A, IYL", function(z) z:LD("A", 0x0F) z:LD("IY", 0x1) z:assemble("ADD", "A", "IYL") end,
+     { A = 0x10, IY = 0x1, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+ { "ADD A, IYL", function(z) z:LD("A", 0x80) z:LD("IY", 0x80) z:assemble("ADD", "A", "IYL") end,
+     { A = 0, IY = 0x80, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+ { "ADD A, IYL", function(z) z:LD("A", 0x7F) z:LD("IY", 0x1) z:assemble("ADD", "A", "IYL") end,
+     { A = 0x80, IY = 0x1, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+ { "ADD A, IYL", function(z) z:LD("A", 0xFF) z:LD("IY", 0x2) z:assemble("ADD", "A", "IYL") end,
+     { A = 1, IY = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+
 }   
 
 ----------------------------------------------------------------------------
