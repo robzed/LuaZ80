@@ -8726,6 +8726,23 @@ DD_instruction_tests = {
      { A = 1, IX = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
  
  
+     -- 0x8C
+    { "ADC A,IXH", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("IX", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADC", "A", "IXH")
+            end, { A = 0x12, IX = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
+     -- 0x8C
+    { "ADC A,IXH", function(z)
+            z:assemble("SCF")
+            z:LD("IX", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADC", "A", "IXH")
+            end, { A = 0x13, IX = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
 }
 
 FD_instruction_tests = {
