@@ -8769,6 +8769,49 @@ DD_instruction_tests = {
         z:LD("A", 0xFF) z:LD("IX", 0x200) z:assemble("ADC", "A", "IXH") end,
      { A = 1, IX = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
+    -- 0x8D
+    { "ADC A,IXL", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("IX", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADC", "A", "IXL")
+            end, { A = 0x34, IX = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
+    { "ADC A,IXL", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("IX", 0x1234)
+            z:LD("A", 0x00)
+            z:assemble("ADC", "A", "IXL")
+            end, { A = 0x34, IX = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
+
+ { "ADC A, IXL", function(z)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("A", 1) z:LD("IX", 0x2) z:assemble("ADC", "A", "IXL") end,
+     { A = 3, IX = 0x2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+ { "ADC A, IXL", function(z) z:LD("A", 0x0F)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("IX", 0x1) z:assemble("ADC", "A", "IXL") end,
+     { A = 0x10, IX = 0x1, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+ { "ADC A, IXL", function(z) z:LD("A", 0x80)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("IX", 0x80) z:assemble("ADC", "A", "IXL") end,
+     { A = 0, IX = 0x80, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+ { "ADC A, IXL", function(z) z:LD("A", 0x7F)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("IX", 0x1) z:assemble("ADC", "A", "IXL") end,
+     { A = 0x80, IX = 0x1, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+ { "ADC A, IXL", function(z) z:LD("A", 0xFF)
+        z:assemble("SCF")
+        z:assemble("CCF")
+        z:LD("IX", 0x2) z:assemble("ADC", "A", "IXL") end,
+     { A = 1, IX = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+
 
 }
 
