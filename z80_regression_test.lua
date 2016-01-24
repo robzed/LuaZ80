@@ -9119,6 +9119,38 @@ FD_instruction_tests = {
      { A = 1, IY = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
 
+-- 0x90
+{ "SUB A,IYH", function(z)
+        z:LD("A", 0x26)
+        z:LD("IY", 0x0201)
+        z:assemble("SUB", "A", "IYH")
+    end,
+    { A = 0x024, IY=0x201, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,IYH zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("IY", 0x2602)
+        z:assemble("SUB", "A", "IYH")
+    end,
+    { A = 0x00, IY=0x2602, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,IYH half", function(z)
+        z:LD("A", 0x10)
+        z:LD("IY", 0x0203)
+        z:assemble("SUB", "A", "IYH")
+    end,
+    { A = 0x0E, IY=0x203, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,IYH carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("IY", 0x0204)
+        z:assemble("SUB", "A", "IYH")
+    end,
+    { A = 0xFE, IY=0x204, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,IYH overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("IY", 0x0205)
+        z:assemble("SUB", "A", "IYH")
+    end,
+    { A = 0x7E, IY=0x205, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
 }   
 
 ----------------------------------------------------------------------------

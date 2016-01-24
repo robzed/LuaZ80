@@ -1464,8 +1464,8 @@ decode_FD_instructions[0x8D] = ADC_to_A_string("CPU.IY%256")
 
 decode_DD_instructions[0x94] = SUB_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
 decode_DD_instructions[0x95] = SUB_to_A_string("CPU.IX%256")
-decode_FD_instructions[0x94] = SUB_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
-decode_FD_instructions[0x95] = SUB_to_A_string("CPU.IX%256")
+decode_FD_instructions[0x94] = SUB_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
+decode_FD_instructions[0x95] = SUB_to_A_string("CPU.IY%256")
 
 
 -- flags
