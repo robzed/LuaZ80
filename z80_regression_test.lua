@@ -8813,7 +8813,7 @@ DD_instruction_tests = {
      { A = 1, IX = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
 
--- 0x90
+-- 0x94
 { "SUB A,IXH", function(z)
         z:LD("A", 0x26)
         z:LD("IX", 0x0201)
@@ -8844,6 +8844,39 @@ DD_instruction_tests = {
         z:assemble("SUB", "A", "IXH")
     end,
     { A = 0x7E, IX=0x205, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+-- 0x95
+{ "SUB A,IXL", function(z)
+        z:LD("A", 0x26)
+        z:LD("IX", 0x9902)
+        z:assemble("SUB", "A", "IXL")
+    end,
+    { A = 0x024, IX=0x9902, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,IXL zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("IX", 0x8826)
+        z:assemble("SUB", "A", "IXL")
+    end,
+    { A = 0x00, IX=0x8826, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SUB A,IXL half", function(z)
+        z:LD("A", 0x10)
+        z:LD("IX", 0x7702)
+        z:assemble("SUB", "A", "IXL")
+    end,
+    { A = 0x0E, IX=0x7702, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "SUB A,IXL carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("IX", 0x6602)
+        z:assemble("SUB", "A", "IXL")
+    end,
+    { A = 0xFE, IX=0x6602, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "SUB A,IXL overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("IX", 0x5502)
+        z:assemble("SUB", "A", "IXL")
+    end,
+    { A = 0x7E, IX=0x5502, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
 
 
 }
