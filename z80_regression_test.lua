@@ -8877,6 +8877,51 @@ DD_instruction_tests = {
     end,
     { A = 0x7E, IX=0x5502, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
 
+-- 0x9C
+{ "SBC A,IXH zero", function(z)
+        z:LD("A", 0x00) z:LD("IX", 0x0111) z:assemble("SUB", "A", "IXH")
+        z:LD("A", 0x02)
+        z:LD("IXH", 0x01)
+        z:assemble("SBC", "A", "IXH")
+    end,
+    { A = 0x00, IX = 0x0111, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,IXH not zero", function(z)
+        z:LD("A", 0x01) z:LD("IX", 0x0022) z:assemble("SUB", "A", "IXH")
+        z:LD("A", 0x02)
+        z:LD("IXH", 0x01)
+        z:assemble("SBC", "A", "IXH")
+    end,
+    { A = 0x01, IX = 0x0122, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,IXH underflow", function(z)
+        z:LD("A", 0x00) z:LD("IX", 0x0133) z:assemble("SUB", "A", "IXH")
+        z:LD("A", 0x02)
+        z:LD("IXH", 0x01)
+        z:assemble("SBC", "A", "IXH")
+    end,
+    { A = 0x00, IX = 0x0133, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+-- 0x9D
+{ "SBC A,IXL zero", function(z)
+        z:LD("A", 0x00) z:LD("IX", 0x1101) z:assemble("SUB", "A", "IXL")
+        z:LD("A", 0x02)
+        z:LD("IXL", 0x01)
+        z:assemble("SBC", "A", "IXL")
+    end,
+    { A = 0x00, IX = 0x1101, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,IXL not zero", function(z)
+        z:LD("A", 0x01) z:LD("IX", 0x2200) z:assemble("SUB", "A", "IXL")
+        z:LD("A", 0x02)
+        z:LD("IXL", 0x01)
+        z:assemble("SBC", "A", "IXL")
+    end,
+    { A = 0x01, IX = 0x2201, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,IXL underflow", function(z)
+        z:LD("A", 0x00) z:LD("IX", 0x3301) z:assemble("SUB", "A", "IXL")
+        z:LD("A", 0x02)
+        z:LD("IXL", 0x01)
+        z:assemble("SBC", "A", "IXL")
+    end,
+    { A = 0x00, IX = 0x3301, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
 
 
 }
