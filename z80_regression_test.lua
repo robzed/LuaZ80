@@ -9261,6 +9261,54 @@ FD_instruction_tests = {
     end,
     { A = 0x7E, IY=0x5502, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
 
+
+-- 0x9C
+{ "SBC A,IYH zero", function(z)
+        z:LD("A", 0x00) z:LD("IY", 0x0111) z:assemble("SUB", "A", "IYH")
+        z:LD("A", 0x02)
+        z:LD("IYH", 0x01)
+        z:assemble("SBC", "A", "IYH")
+    end,
+    { A = 0x00, IY = 0x0111, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,IYH not zero", function(z)
+        z:LD("A", 0x01) z:LD("IY", 0x0022) z:assemble("SUB", "A", "IYH")
+        z:LD("A", 0x02)
+        z:LD("IYH", 0x01)
+        z:assemble("SBC", "A", "IYH")
+    end,
+    { A = 0x01, IY = 0x0122, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,IYH underflow", function(z)
+        z:LD("A", 0x00) z:LD("IY", 0x0133) z:assemble("SUB", "A", "IYH")
+        z:LD("A", 0x02)
+        z:LD("IYH", 0x01)
+        z:assemble("SBC", "A", "IYH")
+    end,
+    { A = 0x00, IY = 0x0133, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+-- 0x9D
+{ "SBC A,IYL zero", function(z)
+        z:LD("A", 0x00) z:LD("IY", 0x1101) z:assemble("SUB", "A", "IYL")
+        z:LD("A", 0x02)
+        z:LD("IYL", 0x01)
+        z:assemble("SBC", "A", "IYL")
+    end,
+    { A = 0x00, IY = 0x1101, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "SBC A,IYL not zero", function(z)
+        z:LD("A", 0x01) z:LD("IY", 0x2200) z:assemble("SUB", "A", "IYL")
+        z:LD("A", 0x02)
+        z:LD("IYL", 0x01)
+        z:assemble("SBC", "A", "IYL")
+    end,
+    { A = 0x01, IY = 0x2201, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+ { "SBC A,IYL underflow", function(z)
+        z:LD("A", 0x00) z:LD("IY", 0x3301) z:assemble("SUB", "A", "IYL")
+        z:LD("A", 0x02)
+        z:LD("IYL", 0x01)
+        z:assemble("SBC", "A", "IYL")
+    end,
+    { A = 0x00, IY = 0x3301, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
+
+
 }   
 
 ----------------------------------------------------------------------------
