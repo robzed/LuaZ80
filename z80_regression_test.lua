@@ -8923,6 +8923,13 @@ DD_instruction_tests = {
     end,
     { A = 0x00, IX = 0x3301, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
 
+    -- 0xA4
+    { "AND IXH", function(z) z:LD("A", 0x8F) z:LD("IX", 0x01EE) z:AND("IXH") end, { A=0x01, IX=0x01EE, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND IXH zero", function(z) z:LD("A", 0x80) z:LD("IX", 0x01EE) z:AND("IXH") end, { A=0x00, IX=0x01EE, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+    
+    -- 0xA5
+    { "AND IXL", function(z) z:LD("A", 0x8F) z:LD("IX", 0xAA01) z:AND("IXL") end, { A=0x01, IX=0xAA01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND IXL zero", function(z) z:LD("A", 0x80) z:LD("IX", 0xAA01) z:AND("IXL") end, { A=0x00, IX=0xAA01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
 
 }
 

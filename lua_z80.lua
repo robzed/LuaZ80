@@ -1472,6 +1472,30 @@ decode_DD_instructions[0x9D] = SBC_to_A_string("CPU.IX%256")
 decode_FD_instructions[0x9C] = SBC_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
 decode_FD_instructions[0x9D] = SBC_to_A_string("CPU.IY%256")
 
+-- IXH
+decode_DD_instructions[0xA4] = AND_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
+decode_DD_instructions[0xAC] = XOR_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
+decode_DD_instructions[0xB4] = OR_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
+decode_DD_instructions[0xBC] = CP_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
+
+-- IXL
+decode_DD_instructions[0xA5] = AND_to_A_string("CPU.IX%256")
+decode_DD_instructions[0xAD] = XOR_to_A_string("CPU.IX%256")
+decode_DD_instructions[0xB5] = OR_to_A_string("CPU.IX%256")
+decode_DD_instructions[0xBD] = CP_to_A_string("CPU.IX%256")
+
+-- IYH
+decode_FD_instructions[0xA4] = AND_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
+decode_FD_instructions[0xAC] = XOR_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
+decode_FD_instructions[0xB4] = OR_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
+decode_FD_instructions[0xBC] = CP_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
+
+-- IYL
+decode_FD_instructions[0xA5] = AND_to_A_string("CPU.IY%256")
+decode_FD_instructions[0xAD] = XOR_to_A_string("CPU.IY%256")
+decode_FD_instructions[0xB5] = OR_to_A_string("CPU.IY%256")
+decode_FD_instructions[0xBD] = CP_to_A_string("CPU.IY%256")
+
 
 -- flags
 local flag_index = {
