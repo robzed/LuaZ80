@@ -9315,6 +9315,13 @@ FD_instruction_tests = {
     end,
     { A = 0x00, IY = 0x3301, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },   
 
+    -- 0xA4
+    { "AND IYH", function(z) z:LD("A", 0x8F) z:LD("IY", 0x01EE) z:AND("IYH") end, { A=0x01, IY=0x01EE, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND IYH zero", function(z) z:LD("A", 0x80) z:LD("IY", 0x01EE) z:AND("IYH") end, { A=0x00, IY=0x01EE, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+    
+    -- 0xA5
+    { "AND IYL", function(z) z:LD("A", 0x8F) z:LD("IY", 0xAA01) z:AND("IYL") end, { A=0x01, IY=0xAA01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
+    { "AND IYL zero", function(z) z:LD("A", 0x80) z:LD("IY", 0xAA01) z:AND("IYL") end, { A=0x00, IY=0xAA01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
 
 }   
 
