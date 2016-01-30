@@ -9323,6 +9323,13 @@ FD_instruction_tests = {
     { "AND IYL", function(z) z:LD("A", 0x8F) z:LD("IY", 0xAA01) z:AND("IYL") end, { A=0x01, IY=0xAA01, F={"-Z", "-N", "H", "-P", "-S", "-C"} } },   -- odd number of bits = Parity clear
     { "AND IYL zero", function(z) z:LD("A", 0x80) z:LD("IY", 0xAA01) z:AND("IYL") end, { A=0x00, IY=0xAA01, F={"Z", "-N", "H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
 
+        -- 0xAC
+    { "XOR IYH", function(z) z:LD("A", 0x8F) z:LD("IY", 0x0133) z:XOR("IYH") end, { A=0x8E, IY=0x0133, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- odd number of bits = Parity clear
+    { "XOR IYH zero", function(z) z:LD("A", 0x01) z:LD("IY", 0x0144) z:XOR("IYH") end, { A=0x00, IY=0x0144, F={"Z", "-N", "-H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+        -- 0xAD
+    { "XOR IYL", function(z) z:LD("A", 0x8F) z:LD("IY", 0x5501) z:XOR("IYL") end, { A=0x8E, IY=0x5501, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- odd number of bits = Parity clear
+    { "XOR IYL zero", function(z) z:LD("A", 0x01) z:LD("IY", 0x6601) z:XOR("IYL") end, { A=0x00, IY=0x6601, F={"Z", "-N", "-H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
+
 }   
 
 ----------------------------------------------------------------------------
