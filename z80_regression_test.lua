@@ -8938,6 +8938,11 @@ DD_instruction_tests = {
     { "XOR IXL", function(z) z:LD("A", 0x8F) z:LD("IX", 0x5501) z:XOR("IXL") end, { A=0x8E, IX=0x5501, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- odd number of bits = Parity clear
     { "XOR IXL zero", function(z) z:LD("A", 0x01) z:LD("IX", 0x6601) z:XOR("IXL") end, { A=0x00, IX=0x6601, F={"Z", "-N", "-H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
 
+    -- 0xB4
+    { "OR IXH", function(z) z:LD("A", 0x80) z:LD("IX", 0x0155) z:OR("IXH") end, { A=0x81, IX=0x0155, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB6
+    { "OR IXL", function(z) z:LD("A", 0x80) z:LD("IX", 0x6601) z:OR("IXL") end, { A=0x81, IX=0x6601, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+
 }
 
 FD_instruction_tests = {
