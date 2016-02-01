@@ -9342,6 +9342,11 @@ FD_instruction_tests = {
     { "XOR IYL", function(z) z:LD("A", 0x8F) z:LD("IY", 0x5501) z:XOR("IYL") end, { A=0x8E, IY=0x5501, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- odd number of bits = Parity clear
     { "XOR IYL zero", function(z) z:LD("A", 0x01) z:LD("IY", 0x6601) z:XOR("IYL") end, { A=0x00, IY=0x6601, F={"Z", "-N", "-H", "P", "-S", "-C"} } },   -- even number of bits = Parity set
 
+   -- 0xB4
+    { "OR IYH", function(z) z:LD("A", 0x80) z:LD("IY", 0x0155) z:OR("IYH") end, { A=0x81, IY=0x0155, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+    -- 0xB6
+    { "OR IYL", function(z) z:LD("A", 0x80) z:LD("IY", 0x6601) z:OR("IYL") end, { A=0x81, IY=0x6601, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
+
 }   
 
 ----------------------------------------------------------------------------
