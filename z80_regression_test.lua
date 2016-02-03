@@ -8975,6 +8975,37 @@ DD_instruction_tests = {
     end,
     { A = 0x80, IX=0x277, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
 
+-- 0xBD
+{ "CP IXL", function(z)
+        z:LD("A", 0x26)
+        z:LD("IX", 0x2202)
+        z:assemble("CP", "IXL")
+    end,
+    { A = 0x026, IX=0x2202, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP IXL zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("IX", 0x3326)
+        z:assemble("CP", "IXL")
+    end,
+    { A = 0x26, IX=0x3326, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP IXL half", function(z)
+        z:LD("A", 0x10)
+        z:LD("IX", 0x4402)
+        z:assemble("CP", "IXL")
+    end,
+    { A = 0x10, IX=0x4402, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP IXL carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("IX", 0x5502)
+        z:assemble("CP", "IXL")
+    end,
+    { A = 0x00, IX=0x5502, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP IXL overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("IX", 0x6602)
+        z:assemble("CP", "IXL")
+    end,
+    { A = 0x80, IX=0x6602, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
 
 
 }
