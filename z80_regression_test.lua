@@ -9412,6 +9412,70 @@ FD_instruction_tests = {
     -- 0xB6
     { "OR IYL", function(z) z:LD("A", 0x80) z:LD("IY", 0x6601) z:OR("IYL") end, { A=0x81, IY=0x6601, F={"-Z", "-N", "-H", "P", "S", "-C"} } },   -- even number of bits = Parity set
 
+-- 0xBC
+{ "CP IYH", function(z)
+        z:LD("A", 0x26)
+        z:LD("IY", 0x0233)
+        z:assemble("CP", "IYH")
+    end,
+    { A = 0x026, IY=0x233, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP IYH zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("IY", 0x2644)
+        z:assemble("CP", "IYH")
+    end,
+    { A = 0x26, IY=0x2644, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP IYH half", function(z)
+        z:LD("A", 0x10)
+        z:LD("IY", 0x0255)
+        z:assemble("CP", "IYH")
+    end,
+    { A = 0x10, IY=0x255, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP IYH carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("IY", 0x0266)
+        z:assemble("CP", "IYH")
+    end,
+    { A = 0x00, IY=0x266, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP IYH overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("IY", 0x0277)
+        z:assemble("CP", "IYH")
+    end,
+    { A = 0x80, IY=0x277, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
+-- 0xBD
+{ "CP IYL", function(z)
+        z:LD("A", 0x26)
+        z:LD("IY", 0x2202)
+        z:assemble("CP", "IYL")
+    end,
+    { A = 0x026, IY=0x2202, F={ "-S", "-Z", "-H", "-V", "N", "-C" } } },
+{ "CP IYL zero", function(z)
+        z:LD("A", 0x26)
+        z:LD("IY", 0x3326)
+        z:assemble("CP", "IYL")
+    end,
+    { A = 0x26, IY=0x3326, F={ "-S", "Z", "-H", "-V", "N", "-C" } } },
+{ "CP IYL half", function(z)
+        z:LD("A", 0x10)
+        z:LD("IY", 0x4402)
+        z:assemble("CP", "IYL")
+    end,
+    { A = 0x10, IY=0x4402, F={ "-S", "-Z", "H", "-V", "N", "-C" } } },
+{ "CP IYL carry", function(z)
+        z:LD("A", 0x00)
+        z:LD("IY", 0x5502)
+        z:assemble("CP", "IYL")
+    end,
+    { A = 0x00, IY=0x5502, F={ "S", "-Z", "H", "-V", "N", "C" } } },
+{ "CP IYL overflow", function(z)
+        z:LD("A", 0x80)
+        z:LD("IY", 0x6602)
+        z:assemble("CP", "IYL")
+    end,
+    { A = 0x80, IY=0x6602, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
+
 }   
 
 ----------------------------------------------------------------------------
