@@ -500,6 +500,7 @@ local decode_DD_instructions = {
     [0x6F] = "CPU.IX=bit32.band(CPU.IX, 0xFF00)+CPU.A", -- LD IXL, A
     [0x7C] = "CPU.A=bit32.band(CPU.IX, 0xFF00)/256",
     [0x7D] = "CPU.A=CPU.IX%256",
+    [0xE1] = "CPU.IX = memory[CPU.SP] + 256*memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536",
 }
 
 -- FD = IY register
