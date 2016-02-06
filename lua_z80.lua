@@ -500,7 +500,7 @@ local decode_DD_instructions = {
     [0x6F] = "CPU.IX=bit32.band(CPU.IX, 0xFF00)+CPU.A", -- LD IXL, A
     [0x7C] = "CPU.A=bit32.band(CPU.IX, 0xFF00)/256",
     [0x7D] = "CPU.A=CPU.IX%256",
-    [0xE1] = "CPU.IX = memory[CPU.SP] + 256*memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536",
+    [0xE1] = "CPU.IX = memory[CPU.SP] + 256*memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536", -- POP IX
 }
 
 -- FD = IY register
@@ -535,6 +535,7 @@ local decode_FD_instructions = {
     [0x6F] = "CPU.IY=bit32.band(CPU.IY, 0xFF00)+CPU.A", -- LD IYL, A
     [0x7C] = "CPU.A=bit32.band(CPU.IY, 0xFF00)/256",
     [0x7D] = "CPU.A=CPU.IY%256",
+    [0xE1] = "CPU.IY = memory[CPU.SP] + 256*memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536", -- POP IY
 }
 
 local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc, pre_code)

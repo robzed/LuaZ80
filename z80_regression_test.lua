@@ -9489,6 +9489,20 @@ FD_instruction_tests = {
     end,
     { A = 0x80, IY=0x6602, F={ "-S", "-Z", "H", "V", "N", "-C" } } },
 
+      -- 0xE1
+    { "POP IY", function(z)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("LD", "BC", 0x1234)
+            z:assemble("PUSH", "BC")
+            z:assemble("POP", "IY")
+        end, {SP=0x6000, IY=0x1234, B=0x12, C=0x34, [0x5FFE]=0x34, [0x5FFF]=0x12 } },
+    { "POP IY (wrap)", function(z)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("LD", "BC", 0x1234)
+            z:assemble("PUSH", "BC")
+            z:assemble("POP", "IY")
+        end, {SP=0x1, IY=0x1234, B=0x12, C=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
+
 }   
 
 ----------------------------------------------------------------------------
