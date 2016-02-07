@@ -9021,6 +9021,24 @@ DD_instruction_tests = {
             z:assemble("POP", "IX")
         end, {SP=0x1, IX=0x1234, B=0x12, C=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
 
+    -- 0xE5
+    { "PUSH IX", function(z) 
+            z:assemble("LD", "IX", 0x4321)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("PUSH", "IX")
+            end, { IX=0x4321, SP=0x5FFE, [0x5FFE]=0x21, [0x5FFF]=0x43 } },
+    { "PUSH IX wrap0", function(z) 
+            z:assemble("LD", "IX", 0x4321)
+            z:assemble("LD", "SP", 0x0000)
+            z:assemble("PUSH", "IX")
+            end, { IX=0x4321, SP=0xFFFE, [0xFFFE]=0x21, [0xFFFF]=0x43 } },
+    { "PUSH IX wrap1", function(z) 
+            z:assemble("NOP")       -- this will get overwritten
+            z:assemble("LD", "IX", 0x4321)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("PUSH", "IX")
+            end, { IX=0x4321, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
+
 }
 
 FD_instruction_tests = {

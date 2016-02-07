@@ -468,6 +468,19 @@ for reg = 0, 7 do
 end
 
 
+local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc, pre_code)
+    pre_code = pre_code or ""
+    return string.format(
+    -- we only do write_checks for invalid if the write was allowed. 
+    -- we return after both writes have been attempted.
+    [[%s addr=%s if jit.write_allowed[addr] then memory[addr]=%s
+    if jit:code_write_check(addr) then addr = nil end end
+    addr2=%s if jit.write_allowed[addr2] then memory[addr2]=%s
+    if jit:code_write_check(addr2) then addr = nil end end
+    if addr == nil then CPU.PC = 0x%x return 'invalidate' end ]], 
+    pre_code, dest_address1, source1, dest_address2, source2, next_pc)
+end
+
 -- DD = IX register
 local decode_DD_instructions = {
     [0x21] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=%s", memory[iaddr]*256+byte1), inc_address(iaddr) end,
@@ -501,6 +514,9 @@ local decode_DD_instructions = {
     [0x7C] = "CPU.A=bit32.band(CPU.IX, 0xFF00)/256",
     [0x7D] = "CPU.A=CPU.IX%256",
     [0xE1] = "CPU.IX = memory[CPU.SP] + 256*memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536", -- POP IX
+    [0xE5] = function(memory, iaddr)    -- push IX
+            return write_2bytes_to_address_command_string("CPU.IX%256", "bit32.band(CPU.IX, 0xFF00)/256", "CPU.SP", "(CPU.SP+1)%65536", iaddr, "CPU.SP=(CPU.SP-2)%65536"), iaddr
+        end,
 }
 
 -- FD = IY register
@@ -538,18 +554,7 @@ local decode_FD_instructions = {
     [0xE1] = "CPU.IY = memory[CPU.SP] + 256*memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536", -- POP IY
 }
 
-local function write_2bytes_to_address_command_string(source1, source2, dest_address1, dest_address2, next_pc, pre_code)
-    pre_code = pre_code or ""
-    return string.format(
-    -- we only do write_checks for invalid if the write was allowed. 
-    -- we return after both writes have been attempted.
-    [[%s addr=%s if jit.write_allowed[addr] then memory[addr]=%s
-    if jit:code_write_check(addr) then addr = nil end end
-    addr2=%s if jit.write_allowed[addr2] then memory[addr2]=%s
-    if jit:code_write_check(addr2) then addr = nil end end
-    if addr == nil then CPU.PC = 0x%x return 'invalidate' end ]], 
-    pre_code, dest_address1, source1, dest_address2, source2, next_pc)
-end
+
 
 local function port_output_string(addr_hi, addr_lo, data)
     return string.format(
