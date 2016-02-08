@@ -9521,6 +9521,24 @@ FD_instruction_tests = {
             z:assemble("POP", "IY")
         end, {SP=0x1, IY=0x1234, B=0x12, C=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
 
+    -- 0xE5
+    { "PUSH IY", function(z) 
+            z:assemble("LD", "IY", 0x4321)
+            z:assemble("LD", "SP", 0x6000)
+            z:assemble("PUSH", "IY")
+            end, { IY=0x4321, SP=0x5FFE, [0x5FFE]=0x21, [0x5FFF]=0x43 } },
+    { "PUSH IY wrap0", function(z) 
+            z:assemble("LD", "IY", 0x4321)
+            z:assemble("LD", "SP", 0x0000)
+            z:assemble("PUSH", "IY")
+            end, { IY=0x4321, SP=0xFFFE, [0xFFFE]=0x21, [0xFFFF]=0x43 } },
+    { "PUSH IY wrap1", function(z) 
+            z:assemble("NOP")       -- this will get overwritten
+            z:assemble("LD", "IY", 0x4321)
+            z:assemble("LD", "SP", 0x0001)
+            z:assemble("PUSH", "IY")
+            end, { IY=0x4321, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
+
 }   
 
 ----------------------------------------------------------------------------
