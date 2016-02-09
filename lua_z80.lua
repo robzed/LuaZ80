@@ -517,6 +517,8 @@ local decode_DD_instructions = {
     [0xE5] = function(memory, iaddr)    -- push IX
             return write_2bytes_to_address_command_string("CPU.IX%256", "bit32.band(CPU.IX, 0xFF00)/256", "CPU.SP", "(CPU.SP+1)%65536", iaddr, "CPU.SP=(CPU.SP-2)%65536"), iaddr
         end,
+    -- E9 = JP (IX)   (see JP (HL) for notes)
+    [0xE9] = "do CPU.PC = CPU.IX; return 'ok' end",
 }
 
 -- FD = IY register
