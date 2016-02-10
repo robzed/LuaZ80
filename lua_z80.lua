@@ -557,6 +557,8 @@ local decode_FD_instructions = {
     [0xE5] = function(memory, iaddr)    -- push IY
         return write_2bytes_to_address_command_string("CPU.IY%256", "bit32.band(CPU.IY, 0xFF00)/256", "CPU.SP", "(CPU.SP+1)%65536", iaddr, "CPU.SP=(CPU.SP-2)%65536"), iaddr
     end,
+    -- E9 = JP (IY)   (see JP (HL) for notes)
+    [0xE9] = "do CPU.PC = CPU.IY; return 'ok' end",
 
 }
 

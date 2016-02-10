@@ -9553,6 +9553,20 @@ FD_instruction_tests = {
             z:assemble("PUSH", "IY")
             end, { IY=0x4321, SP=0xFFFF, [0xFFFF]=0x21, [0x0000]=0x43 } },
 
+-- 0xE9
+{ "JP (IY)", function(z)
+        z:LD("IY", 12)      -- 0
+        z:LD("A", 0x01)         -- 4
+        z:OR("A")               -- 6
+        z:assemble("JP", "(IY)")     -- 7
+        z:LD("A", 0x20)         -- 9
+        z:assemble("INC", "A")   -- 11
+        z:assemble("INC", "A")   -- 12
+        z:assemble("INC", "A")   -- 13
+        z:assemble("INC", "A")   -- 14
+        end,
+        { A = 0x04, IY=12, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } },
+
 }   
 
 ----------------------------------------------------------------------------
