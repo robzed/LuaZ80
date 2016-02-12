@@ -9555,6 +9555,26 @@ FD_instruction_tests = {
             z:assemble("POP", "IY")
         end, {SP=0x1, IY=0x1234, B=0x12, C=0x34, [0xFFFF]=0x34, [0x0000]=0x12 } },
 
+    -- 0xE3
+    { "EX (SP), IY", function(z) 
+            z:LD("SP", 0x6000)
+            z:LD("IY", 0x1234)
+            z:LD("A", 0xCD)
+            z:LD("(0x6000)", "A")
+            z:LD("A", 0xAB)
+            z:LD("(0x6001)", "A")
+            z:assemble("EX", "(SP)", "IY")
+        end, { SP=0x6000, IY=0xABCD, A=0xAB, [0x6000]=0x34, [0x6001]=0x12 } },
+    { "EX (SP), IY  rollover", function(z) 
+            z:LD("SP", 0xFFFF)
+            z:LD("IY", 0x1234)
+            z:LD("A", 0xCD)
+            z:LD("(0xFFFF)", "A")
+            z:LD("A", 0xAB)
+            z:LD("(0x0000)", "A")
+            z:assemble("EX", "(SP)", "IY")
+        end, { SP=0xFFFF, IY=0xABCD, A=0xAB, [0xFFFF]=0x34, [0x0000]=0x12 } },
+
     -- 0xE5
     { "PUSH IY", function(z) 
             z:assemble("LD", "IY", 0x4321)
