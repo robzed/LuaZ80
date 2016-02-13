@@ -1482,6 +1482,9 @@ decode_first_byte[0xfe] = function (memory, iaddr)
         end
 
 
+-- inc IXH
+decode_DD_instructions[0x24] = "CPU.IX=(CPU.IX+256)%65536 temp=bit32.band(CPU.IX, 0xFF00)/256 " .. 
+            string.format(inc_flag_calc, "temp", "temp", "temp")
 
 decode_DD_instructions[0x84] = ADD_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
 decode_DD_instructions[0x85] = ADD_to_A_string("CPU.IX%256")

@@ -8562,6 +8562,25 @@ DD_instruction_tests = {
         z:LD("IXH", 0x56)
         end, { IX = 0x5634 } },
 
+    -- 0x24
+     { "INC  IXH", function(z) z:assemble("LD", "IX", 0x1155)  
+            z:assemble("INC", "IXH") end, { IX=0x1255, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+
+     { "INC  IXH rollover", function(z) z:assemble("LD", "IX", 0xFF66)  
+             -- S is set if result is negative; reset otherwise
+            -- Z is set if result is zero; reset otherwise
+            -- H is set if carry from bit 3; reset otherwise
+            -- P/V is set if r was 7FH before operation; reset otherwise
+            -- N is reset
+            -- C is not affected
+            z:assemble("INC", "IXH") end, { IX=0x0066, F={"-S", "Z", "H", "-V", "-N", "C", "oldF=0xFF"} } },  
+
+     { "INC  IXH half carry", function(z) z:assemble("LD", "IX", 0x0F77)  
+            z:assemble("INC", "IXH") end, { IX=0x1077, F={"-S", "-Z", "H", "-V", "-N", "C", "oldF=0x0F"} } },  
+
+     { "INC  IXH Flags P/V Sign", function(z) z:assemble("LD", "IX", 0x7F88)  
+            z:assemble("INC", "IXH") end, { IX=0x8088, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
+
     -- 0x2B
     { "DEC IX", function(z)
             z:LD("IX", 0x1234)
