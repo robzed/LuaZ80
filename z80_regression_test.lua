@@ -9137,6 +9137,25 @@ FD_instruction_tests = {
         z:LD("IYH", 0x56)
         end, { IY = 0x5634 } },
 
+    -- 0x24
+     { "INC  IYH", function(z) z:assemble("LD", "IY", 0x1155)  
+            z:assemble("INC", "IYH") end, { IY=0x1255, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+
+     { "INC  IYH rollover", function(z) z:assemble("LD", "IY", 0xFF66)  
+             -- S is set if result is negative; reset otherwise
+            -- Z is set if result is zero; reset otherwise
+            -- H is set if carry from bit 3; reset otherwise
+            -- P/V is set if r was 7FH before operation; reset otherwise
+            -- N is reset
+            -- C is not affected
+            z:assemble("INC", "IYH") end, { IY=0x0066, F={"-S", "Z", "H", "-V", "-N", "C", "oldF=0xFF"} } },  
+
+     { "INC  IYH half carry", function(z) z:assemble("LD", "IY", 0x0F77)  
+            z:assemble("INC", "IYH") end, { IY=0x1077, F={"-S", "-Z", "H", "-V", "-N", "C", "oldF=0x0F"} } },  
+
+     { "INC  IYH Flags P/V Sign", function(z) z:assemble("LD", "IY", 0x7F88)  
+            z:assemble("INC", "IYH") end, { IY=0x8088, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
+
     -- 0x2B
     { "DEC IY", function(z)
             z:LD("IY", 0x1234)
