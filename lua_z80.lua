@@ -1238,6 +1238,25 @@ decode_DD_instructions[0x09] = ADD_to_IX_string("CPU.B", "CPU.B*256+CPU.C")
 decode_DD_instructions[0x19] = ADD_to_IX_string("CPU.D", "CPU.D*256+CPU.E")
 decode_DD_instructions[0x29] = ADD_to_IX_string("bit32.rshift(CPU.IX, 8)", "CPU.IX")
 decode_DD_instructions[0x39] = ADD_to_IX_string("bit32.rshift(CPU.SP, 8)", "CPU.SP") -- math.floor(b / 256)
+local function ADD_to_IY_string(hi, reg32)
+    -- basically a simple add followed by an ADC H,x.
+    -- maybe we should try a 16 bit add? (but then we have to split anyway...)
+    return string.format(
+[[  
+    result=CPU.IY+(%s)
+    if result > 65535 then 
+        CPU.Carry=1 result=result-65536
+    else
+        CPU.Carry=0
+    end
+    
+    CPU._F = CPU.Carry + CPU:get_F_only_SZV() + bit32.band(bit32.bxor(bit32.rshift(result, 8), %s, bit32.rshift(CPU.IY, 8)),Z80_H_FLAG)
+    CPU.IY = result ]], reg32, hi)
+end
+decode_FD_instructions[0x09] = ADD_to_IY_string("CPU.B", "CPU.B*256+CPU.C")
+decode_FD_instructions[0x19] = ADD_to_IY_string("CPU.D", "CPU.D*256+CPU.E")
+decode_FD_instructions[0x29] = ADD_to_IY_string("bit32.rshift(CPU.IY, 8)", "CPU.IY")
+decode_FD_instructions[0x39] = ADD_to_IY_string("bit32.rshift(CPU.SP, 8)", "CPU.SP") -- math.floor(b / 256)
 
 
 -- ED 4A = ADC HL, BC
