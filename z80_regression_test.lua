@@ -8583,6 +8583,48 @@ DD_instruction_tests = {
                                 z:ADD("IX", "BC") end,
                                 { IX = 0x0000, B = 0xFF, C = 0xFF, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, SP=0x6000, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
 
+    -- 0x19
+    -- ADD IX, ss ... doesn't affect Z or S or V
+    { "ADD IX, DE", function(z) z:LD("IX", 0x1234)
+                                z:LD("DE", 0x4320)
+                                z:ADD("IX", "DE") end,
+                                { IX = 0x5554, D = 0x43, E = 0x20, F = { "-N", "-H", "-C" } } },
+    
+    { "ADD IX, DE no half-carry", function(z) z:LD("IX", 0x003F)
+                                z:LD("DE", 0x003F)
+                                    z:ADD("IX", "DE") end,
+                                { IX = 0x007E, D = 0x00, E = 0x3F, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IX, DE half-carry", function(z) z:LD("IX", 0x3F00)
+                                z:LD("DE", 0x0100)
+                                z:ADD("IX", "DE") end,
+                                { IX = 0x4000, D = 0x01, E = 0x00, F = { "-N", "H", "-C" } } },
+    
+    { "ADD IX, DE overflow", function(z) z:LD("IX", 0x8000)
+                                z:LD("DE", 0x8000)
+                                z:ADD("IX", "DE") end,
+                                { IX = 0x0000, D = 0x80, E = 0x00, F = { "-N", "-H", "C" } } },
+
+    { "ADD IX, DE overflow2", function(z) z:LD("IX", 0x1000)
+                                z:LD("DE", 0x7000)
+                                z:ADD("IX", "DE") end,
+                                { IX = 0x8000, D = 0x70, E = 0x00, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IX, DE half and overflow", function(z) z:LD("IX", 0x0001)
+                                z:LD("DE", 0xFFFF)
+                                z:ADD("IX", "DE") end,
+                                { IX = 0x0000, D = 0xFF, E = 0xFF, F = { "-N", "H", "C" } } },
+    
+    { "ADD IX, DE check no S Z flags", function(z)
+                                z:LD("SP", 0x6000)
+                                z:LD("IX", 0x0001)
+                                z:PUSH("IX")
+                                z:POP("AF")
+                                z:LD("DE", 0xFFFF)
+                                z:ADD("IX", "DE") end,
+                                { IX = 0x0000, D = 0xFF, E = 0xFF, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, SP=0x6000, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
+
+
     -- 0x21
     { "LD IX, nn", function(z)
             z:LD("IX", 0x1234)
