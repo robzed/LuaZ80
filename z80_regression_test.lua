@@ -8630,6 +8630,15 @@ DD_instruction_tests = {
             z:LD("IX", 0x1234)
         end, { IX = 0x1234 } },
     
+    
+    -- 0x22
+    {"LD   (nn),IX", function(z) z:assemble("LD", "IX", 0x4321) 
+            z:assemble("LD", "(0x5555)", "IX") 
+            end, { IX=0x4321, [0x5555]=0x21, [0x5556]=0x43 }},
+    {"LD   (nn),IX wrap", function(z) z:assemble("LD", "IX", 0x4321) 
+            z:assemble("LD", "(0xFFFF)", "IX") 
+            end, { IX=0x4321, [0xFFFF]=0x21, [0x0000]=0x43 }},
+
     -- 0x23
     { "INC IX", function(z)
             z:LD("IX", 0x1234)
