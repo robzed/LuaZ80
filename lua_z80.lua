@@ -538,6 +538,12 @@ local decode_DD_instructions = {
 -- FD = IY register
 local decode_FD_instructions = {
     [0x21] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=%s", memory[iaddr]*256+byte1), inc_address(iaddr) end,
+    -- 22 = LD (xxxx), IY
+    [0x22] = function(memory, iaddr)
+            local addr = memory[iaddr]; iaddr = inc_address(iaddr);
+            addr = addr+256*memory[iaddr]; iaddr = inc_address(iaddr); 
+            return write_2bytes_to_address_command_string("CPU.IY%256", "bit32.band(CPU.IY, 0xFF00)/256", string.format("0x%x", addr), string.format("0x%x", (addr+1)%65536), iaddr), iaddr
+        end,
     -- "INC  IY"
     [0x23] = "CPU.IY = (CPU.IY+1) % 65536",
     [0x26] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=(CPU.IY%%256)+%s", 256*byte1), iaddr end,

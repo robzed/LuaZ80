@@ -9296,6 +9296,14 @@ FD_instruction_tests = {
             z:LD("IY", 0x1234)
         end, { IY = 0x1234 } },
     
+    -- 0x22
+    {"LD   (nn),IY", function(z) z:assemble("LD", "IY", 0x4321) 
+            z:assemble("LD", "(0x5555)", "IY") 
+            end, { IY=0x4321, [0x5555]=0x21, [0x5556]=0x43 }},
+    {"LD   (nn),IY wrap", function(z) z:assemble("LD", "IY", 0x4321) 
+            z:assemble("LD", "(0xFFFF)", "IY") 
+            end, { IY=0x4321, [0xFFFF]=0x21, [0x0000]=0x43 }},
+
     -- 0x23
     { "INC IY", function(z)
             z:LD("IY", 0x1234)
