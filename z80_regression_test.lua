@@ -8702,6 +8702,41 @@ DD_instruction_tests = {
      { "LD  IXH,n", function(z) z:assemble("LD", "IX", 0xA5A5) z:assemble("LD", "IXH", 0xFF) end, { IX=0xFFA5 } }, 
 
 
+    -- 0x29
+    -- ADD IX, ss ... doesn't affect Z or S or V
+    { "ADD IX, IX", function(z) z:LD("IX", 0x1234)
+                                z:ADD("IX", "IX") end,
+                                { IX = 0x2468, F = { "-N", "-H", "-C" } } },
+    
+    { "ADD IX, IX no half-carry", function(z) z:LD("IX", 0x003F)
+                                    z:ADD("IX", "IX") end,
+                                { IX = 0x007E, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IX, IX half-carry", function(z) z:LD("IX", 0x3F00)
+                                z:ADD("IX", "IX") end,
+                                { IX = 0x7E00, F = { "-N", "H", "-C" } } },
+    
+    { "ADD IX, IX overflow", function(z) z:LD("IX", 0x8000)
+                                z:ADD("IX", "IX") end,
+                                { IX = 0x0000, F = { "-N", "-H", "C" } } },
+
+    { "ADD IX, IX overflow2", function(z) z:LD("IX", 0x4000)
+                                z:ADD("IX", "IX") end,
+                                { IX = 0x8000, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IX, IX half and overflow", function(z) z:LD("IX", 0x8888)
+                                z:ADD("IX", "IX") end,
+                                { IX = 0x1110, F = { "-N", "H", "C" } } },
+    
+    { "ADD IX, IX check no S Z flags", function(z)
+                                z:LD("SP", 0x6000)
+                                z:LD("IX", 0x0001)
+                                z:PUSH("IX")
+                                z:POP("AF")
+                                z:LD("IX", 0x8888)
+                                z:ADD("IX", "IX") end,
+                                { IX = 0x1110, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, SP=0x6000, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
+
     -- 0x2B
     { "DEC IX", function(z)
             z:LD("IX", 0x1234)
