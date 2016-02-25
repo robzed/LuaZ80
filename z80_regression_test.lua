@@ -8650,11 +8650,6 @@ DD_instruction_tests = {
             z:assemble("INC", "IX")
         end, { IX = 0 } },
 
-    { "LD IXH, n", function(z)
-        z:LD("IX", 0x1234)
-        z:LD("IXH", 0x56)
-        end, { IX = 0x5634 } },
-
     -- 0x24
      { "INC  IXH", function(z) z:assemble("LD", "IX", 0x1155)  
             z:assemble("INC", "IXH") end, { IX=0x1255, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
@@ -8695,6 +8690,17 @@ DD_instruction_tests = {
 
      { "DEC  IXH Flags P/V Sign", function(z) z:assemble("LD", "IX", 0x8077)  
             z:assemble("DEC", "IXH") end, { IX=0x7F77, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"} } },  
+
+
+    -- 0x26
+    { "LD IXH, n", function(z)
+        z:LD("IX", 0x1234)
+        z:LD("IXH", 0x56)
+        end, { IX = 0x5634 } },
+     { "LD  IXH,n", function(z) z:assemble("LD", "IX", 0xFFFF) z:assemble("LD", "IXH", 0xe1) end, { IX=0xE1FF } }, 
+     { "LD  IXH,n", function(z) z:assemble("LD", "IX", 0xFFFF) z:assemble("LD", "IXH", 0x00) end, { IX=0x00FF } }, 
+     { "LD  IXH,n", function(z) z:assemble("LD", "IX", 0xA5A5) z:assemble("LD", "IXH", 0xFF) end, { IX=0xFFA5 } }, 
+
 
     -- 0x2B
     { "DEC IX", function(z)
