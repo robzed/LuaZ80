@@ -9378,10 +9378,6 @@ FD_instruction_tests = {
             z:assemble("INC", "IY")
         end, { IY = 0 } },
 
-    { "LD IYH, n", function(z)
-        z:LD("IY", 0x1234)
-        z:LD("IYH", 0x56)
-        end, { IY = 0x5634 } },
 
     -- 0x24
      { "INC  IYH", function(z) z:assemble("LD", "IY", 0x1155)  
@@ -9423,6 +9419,48 @@ FD_instruction_tests = {
 
      { "DEC  IYH Flags P/V Sign", function(z) z:assemble("LD", "IY", 0x8077)  
             z:assemble("DEC", "IYH") end, { IY=0x7F77, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"} } },  
+
+    -- 0x26
+    { "LD IYH, n", function(z)
+        z:LD("IY", 0x1234)
+        z:LD("IYH", 0x56)
+        end, { IY = 0x5634 } },
+
+    -- 0x29
+    -- ADD IY, ss ... doesn't affect Z or S or V
+    { "ADD IY, IY", function(z) z:LD("IY", 0x1234)
+                                z:ADD("IY", "IY") end,
+                                { IY = 0x2468, F = { "-N", "-H", "-C" } } },
+    
+    { "ADD IY, IY no half-carry", function(z) z:LD("IY", 0x003F)
+                                    z:ADD("IY", "IY") end,
+                                { IY = 0x007E, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IY, IY half-carry", function(z) z:LD("IY", 0x3F00)
+                                z:ADD("IY", "IY") end,
+                                { IY = 0x7E00, F = { "-N", "H", "-C" } } },
+    
+    { "ADD IY, IY overflow", function(z) z:LD("IY", 0x8000)
+                                z:ADD("IY", "IY") end,
+                                { IY = 0x0000, F = { "-N", "-H", "C" } } },
+
+    { "ADD IY, IY overflow2", function(z) z:LD("IY", 0x4000)
+                                z:ADD("IY", "IY") end,
+                                { IY = 0x8000, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IY, IY half and overflow", function(z) z:LD("IY", 0x8888)
+                                z:ADD("IY", "IY") end,
+                                { IY = 0x1110, F = { "-N", "H", "C" } } },
+    
+    { "ADD IY, IY check no S Z flags", function(z)
+                                z:LD("SP", 0x6000)
+                                z:LD("IY", 0x0001)
+                                z:PUSH("IY")
+                                z:POP("AF")
+                                z:LD("IY", 0x8888)
+                                z:ADD("IY", "IY") end,
+                                { IY = 0x1110, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, SP=0x6000, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
+
 
     -- 0x2B
     { "DEC IY", function(z)
