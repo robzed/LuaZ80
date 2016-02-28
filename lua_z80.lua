@@ -555,6 +555,14 @@ local decode_FD_instructions = {
     -- "INC  IY"
     [0x23] = "CPU.IY = (CPU.IY+1) % 65536",
     [0x26] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=(CPU.IY%%256)+%s", 256*byte1), iaddr end,
+    -- 2A = LD IY,(xxxx)
+    [0x2A] = function(memory, iaddr) 
+            -- safe to pre-read because a lump write in this returns immediately invalidates lump
+            local byte1 = memory[iaddr]; iaddr = inc_address(iaddr); local byte2 = memory[iaddr]; iaddr = inc_address(iaddr)
+            local target = byte1 + 256*byte2
+            return string.format(
+            "CPU.IY = memory[0x%x]+256*memory[0x%x]", target, (target+1)%65536 ), iaddr
+        end,
     --"DEC  IY"
     [0x2B] = "CPU.IY = (CPU.IY-1) % 65536",
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=bit32.band(0xFF00, CPU.IY)+%s", byte1), iaddr end,
