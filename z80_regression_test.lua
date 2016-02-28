@@ -8737,6 +8737,27 @@ DD_instruction_tests = {
                                 z:ADD("IX", "IX") end,
                                 { IX = 0x1110, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, SP=0x6000, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
 
+
+
+    -- 0x2A
+    { "LD IX,(nn)", function(z)
+            z:LD("A", 0x22) 
+            z:LD("(0x6000)", "A") 
+            z:LD("A", 0x11) 
+            z:LD("(0x6001)", "A")
+            z:LD("IX", "(0x6000)")
+            end,
+        { [0x6000] = 0x22, [0x6001] = 0x11, A = 0x11, IX = 0x1122 } },
+    { "LD IX,(nn) rollover", function(z)
+            z:LD("A", 0x44) 
+            z:LD("(0xFFFF)", "A") 
+            z:LD("A", 0x33) 
+            z:LD("(0x0000)", "A")
+            z:LD("IX", "(0xFFFF)") 
+            z:LD("A", 99)
+            end,
+        { [0xFFFF] = 0x44, [0x0000] = 0x33, A = 99, IX = 0x3344 } },
+
     -- 0x2B
     { "DEC IX", function(z)
             z:LD("IX", 0x1234)

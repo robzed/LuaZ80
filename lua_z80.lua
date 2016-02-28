@@ -493,6 +493,14 @@ local decode_DD_instructions = {
     -- "INC  IX"
     [0x23] = "CPU.IX = (CPU.IX+1) % 65536",
     [0x26] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=(CPU.IX%%256)+%s", 256*byte1), iaddr end,
+    -- 2A = LD IX,(xxxx)
+    [0x2A] = function(memory, iaddr) 
+            -- safe to pre-read because a lump write in this returns immediately invalidates lump
+            local byte1 = memory[iaddr]; iaddr = inc_address(iaddr); local byte2 = memory[iaddr]; iaddr = inc_address(iaddr)
+            local target = byte1 + 256*byte2
+            return string.format(
+            "CPU.IX = memory[0x%x]+256*memory[0x%x]", target, (target+1)%65536 ), iaddr
+        end,
     --"DEC  IX"
     [0x2B] = "CPU.IX = (CPU.IX-1) % 65536",
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=bit32.band(0xFF00, CPU.IX)+%s", byte1), iaddr end,
