@@ -8769,11 +8769,6 @@ DD_instruction_tests = {
             z:assemble("DEC", "IX")
         end, { IX = 0xFFFF } },
     
-    { "LD IXL, n", function(z)
-            z:LD("IX", 0x1111)
-            z:LD("IXL", 0x22)
-            end, { IX = 0x1122 } },
-    
     
     -- 0x2C
      { "INC  IXL", function(z) z:assemble("LD", "IX", 0xAA11)  
@@ -8793,6 +8788,34 @@ DD_instruction_tests = {
 
      { "INC  IXL Flags P/V Sign", function(z) z:assemble("LD", "IX", 0xDD7F)  
             z:assemble("INC", "IXL") end, { IX=0xDD80, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
+
+    -- 0x2D
+    { "DEC  IXL", function(z) z:LD("IX", 0x9911)  
+            z:assemble("DEC", "IXL") end, { IX=0x9910, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"} } },  
+
+    { "DEC  IXL to zero", function(z) z:LD("IX", 0x9901)  
+            z:assemble("DEC", "IXL") end, { IX=0x9900, F={"-S", "Z", "-H", "-V", "N", "oldF=0xFF"} } },  
+
+     { "DEC  IXL rollover", function(z) z:assemble("LD", "IX", 0x9900)  
+             -- S is set if result is negative; reset otherwise
+            -- Z is set if result is zero; reset otherwise
+            -- H is set if borrow from bit 4, reset otherwise
+            -- P/V is set if m was 80H before operation; reset otherwise
+            -- N is set
+            -- C is not affected
+            z:assemble("DEC", "IXL") end, { IX=0x99FF, F={"S", "-Z", "H", "-V", "N", "oldF=0xFF"} } },  
+
+     { "DEC  IXL half carry", function(z) z:assemble("LD", "IX", 0x9910)  
+            z:assemble("DEC", "IXL") end, { IX=0x990F, F={"-S", "-Z", "H", "-V", "N", "oldF=0xFF"} } },  
+
+     { "DEC  IXL Flags P/V Sign", function(z) z:assemble("LD", "IX", 0x9980)  
+            z:assemble("DEC", "IXL") end, { IX=0x997F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"} } },  
+    
+    -- 0x2E
+    { "LD IXL, n", function(z)
+            z:LD("IX", 0x1111)
+            z:LD("IXL", 0x22)
+            end, { IX = 0x1122 } },
 
     -- 0x44
     { "LD B, IXH", function(z)
@@ -9535,11 +9558,13 @@ FD_instruction_tests = {
      { "INC  IYL Flags P/V Sign", function(z) z:assemble("LD", "IY", 0xDD7F)  
             z:assemble("INC", "IYL") end, { IY=0xDD80, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
 
+    -- 0x2E
     { "LD IYL, n", function(z)
             z:LD("IY", 0x1111)
             z:LD("IYL", 0x22)
             end, { IY = 0x1122 } },
 
+    -- 0x45
     { "LD B, IYH", function(z)
             z:LD("IY", 0x1234)
             z:LD("B", "IYH")

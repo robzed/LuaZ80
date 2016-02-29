@@ -1574,6 +1574,14 @@ decode_DD_instructions[0x25] = "CPU.IX=(CPU.IX-256)%65536 temp=bit32.band(CPU.IX
 decode_FD_instructions[0x25] = "CPU.IY=(CPU.IY-256)%65536 temp=bit32.band(CPU.IY, 0xFF00)/256 " .. 
             string.format(dec_flag_calc, "temp", "temp", "temp")
 
+-- dec IXL
+decode_DD_instructions[0x2D] = "temp=(CPU.IX-1)%256 CPU.IX=bit32.band(CPU.IX, 0xFF00)+temp " .. 
+            string.format(dec_flag_calc, "temp", "temp", "temp")
+
+-- dec IYL
+decode_FD_instructions[0x2D] = "temp=(CPU.IY-1)%256 CPU.IY=bit32.band(CPU.IY, 0xFF00)+temp " .. 
+            string.format(dec_flag_calc, "temp", "temp", "temp")
+
 decode_DD_instructions[0x84] = ADD_to_A_string("bit32.band(CPU.IX, 0xFF00)/256")
 decode_DD_instructions[0x85] = ADD_to_A_string("CPU.IX%256")
 decode_FD_instructions[0x84] = ADD_to_A_string("bit32.band(CPU.IY, 0xFF00)/256")
