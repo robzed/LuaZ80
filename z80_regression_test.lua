@@ -9558,6 +9558,28 @@ FD_instruction_tests = {
      { "INC  IYL Flags P/V Sign", function(z) z:assemble("LD", "IY", 0xDD7F)  
             z:assemble("INC", "IYL") end, { IY=0xDD80, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
 
+    -- 0x2D
+    { "DEC  IYL", function(z) z:LD("IY", 0x9911)  
+            z:assemble("DEC", "IYL") end, { IY=0x9910, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"} } },  
+
+    { "DEC  IYL to zero", function(z) z:LD("IY", 0x9901)  
+            z:assemble("DEC", "IYL") end, { IY=0x9900, F={"-S", "Z", "-H", "-V", "N", "oldF=0xFF"} } },  
+
+     { "DEC  IYL rollover", function(z) z:assemble("LD", "IY", 0x9900)  
+             -- S is set if result is negative; reset otherwise
+            -- Z is set if result is zero; reset otherwise
+            -- H is set if borrow from bit 4, reset otherwise
+            -- P/V is set if m was 80H before operation; reset otherwise
+            -- N is set
+            -- C is not affected
+            z:assemble("DEC", "IYL") end, { IY=0x99FF, F={"S", "-Z", "H", "-V", "N", "oldF=0xFF"} } },  
+
+     { "DEC  IYL half carry", function(z) z:assemble("LD", "IY", 0x9910)  
+            z:assemble("DEC", "IYL") end, { IY=0x990F, F={"-S", "-Z", "H", "-V", "N", "oldF=0xFF"} } },  
+
+     { "DEC  IYL Flags P/V Sign", function(z) z:assemble("LD", "IY", 0x9980)  
+            z:assemble("DEC", "IYL") end, { IY=0x997F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"} } },  
+    
     -- 0x2E
     { "LD IYL, n", function(z)
             z:LD("IY", 0x1111)
