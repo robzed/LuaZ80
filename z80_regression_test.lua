@@ -9627,7 +9627,48 @@ FD_instruction_tests = {
             z:LD("IYL", 0x22)
             end, { IY = 0x1122 } },
 
-    -- 0x45
+    -- 0x39
+    -- ADD IY, ss ... doesn't affect Z or S or V
+    { "ADD IY, SP", function(z) z:LD("IY", 0x1234)
+                                z:LD("SP", 0x4320)
+                                z:ADD("IY", "SP") end,
+                                { IY = 0x5554, SP = 0x4320, F = { "-N", "-H", "-C" } } },
+    
+    { "ADD IY, SP no half-carry", function(z) z:LD("IY", 0x003F)
+                                z:LD("SP", 0x003F)
+                                z:ADD("IY", "SP") end,
+                                { IY = 0x007E, SP = 0x003F, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IY, SP half-carry", function(z) z:LD("IY", 0x3F00)
+                                z:LD("SP", 0x0100)
+                                z:ADD("IY", "SP") end,
+                                { IY = 0x4000, SP = 0x0100, F = { "-N", "H", "-C" } } },
+    
+    { "ADD IY, SP overflow", function(z) z:LD("IY", 0x8000)
+                                z:LD("SP", 0x8000)
+                                z:ADD("IY", "SP") end,
+                                { IY = 0x0000, SP = 0x8000, F = { "-N", "-H", "C" } } },
+
+    { "ADD IY, SP overflow2", function(z) z:LD("IY", 0x1000)
+                                z:LD("SP", 0x7000)
+                                z:ADD("IY", "SP") end,
+                                { IY = 0x8000, SP = 0x7000, F = { "-N", "-H", "-C" } } },
+
+    { "ADD IY, SP half and overflow", function(z) z:LD("IY", 0x0001)
+                                z:LD("SP", 0xFFFF)
+                                z:ADD("IY", "SP") end,
+                                { IY = 0x0000, SP = 0xFFFF, F = { "-N", "H", "C" } } },
+    
+    { "ADD IY, SP check no S Z flags", function(z)
+                                z:LD("SP", 0x6000)
+                                z:LD("IY", 0x0001)
+                                z:PUSH("IY")
+                                z:POP("AF")
+                                z:LD("SP", 0xFFFF)
+                                z:ADD("IY", "SP") end,
+                                { IY = 0x0000, SP = 0xFFFF, A = 0x00, [0x5FFE]=1, [0x5FFF]=0, F = { "-S", "-Z", "-V", "-N", "H", "C" } } },
+
+    -- 0x44
     { "LD B, IYH", function(z)
             z:LD("IY", 0x1234)
             z:LD("B", "IYH")
