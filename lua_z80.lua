@@ -597,7 +597,7 @@ local decode_FD_instructions = {
     [0x34] = function(memory, iaddr)
                 local byte1 = memory[iaddr]; iaddr = inc_address(iaddr)
                 if byte1 > 127 then byte1 = byte1-256 end
-                return write_to_address_command_string("result", string.format("(CPU.IY+%s)%65536", byte1), 
+                return write_to_address_command_string("result", string.format("(CPU.IY+%s)%%65536", byte1), 
                 iaddr,
                 "result = (memory[addr]+1)%256 " .. 
                 string.format(inc_flag_calc, "result", "result", "result")), iaddr
