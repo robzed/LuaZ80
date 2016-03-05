@@ -481,6 +481,23 @@ local function write_2bytes_to_address_command_string(source1, source2, dest_add
     pre_code, dest_address1, source1, dest_address2, source2, next_pc)
 end
 
+local function write_to_address_command_string(source, dest_address, next_pc, optional_flag_check_code)
+    -- e.g. dest_address = CPU.H*256+CPU.L
+    -- e.g. source = CPU.A
+    optional_flag_check_code = optional_flag_check_code or ""
+    return string.format(
+    [[ addr=%s %sif jit.write_allowed[addr] then memory[addr]=%s  
+    if jit:code_write_check(addr) then CPU.PC = 0x%x return 'invalidate' end end]], 
+    dest_address, optional_flag_check_code, source, next_pc)
+end
+
+local inc_flag_calc = [[ CPU._F = CPU.simple_flags[%s]+CPU.Carry
+        if %s %% 0x10 == 0 then CPU._F = CPU._F + Z80_H_FLAG end
+        if %s == 0x80 then CPU._F = CPU._F + Z80_V_FLAG end ]]
+local dec_flag_calc = [[ CPU._F = CPU.simple_flags[%s] + CPU.Carry + Z80_N_FLAG
+        if %s %% 0x10 == 0x0F then CPU._F = CPU._F + Z80_H_FLAG end
+        if %s == 0x7F then CPU._F = CPU._F + Z80_V_FLAG end ]]
+
 -- DD = IX register
 local decode_DD_instructions = {
     [0x21] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=%s", memory[iaddr]*256+byte1), inc_address(iaddr) end,
@@ -504,6 +521,16 @@ local decode_DD_instructions = {
     --"DEC  IX"
     [0x2B] = "CPU.IX = (CPU.IX-1) % 65536",
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=bit32.band(0xFF00, CPU.IX)+%s", byte1), iaddr end,
+    
+    [0x34] = function(memory, iaddr)
+            local byte1 = memory[iaddr]; iaddr = inc_address(iaddr)
+            if byte1 > 127 then byte1 = byte1-256 end
+            return write_to_address_command_string("result", string.format("(CPU.IX+%s)%%65536", byte1), 
+            iaddr,
+            "result = (memory[addr]+1)%256 " .. 
+            string.format(inc_flag_calc, "result", "result", "result")), iaddr
+        end,
+
     [0x44] = "CPU.B=bit32.band(CPU.IX, 0xFF00)/256",
     [0x45] = "CPU.B=CPU.IX%256",
     [0x4C] = "CPU.C=bit32.band(CPU.IX, 0xFF00)/256",
@@ -566,6 +593,17 @@ local decode_FD_instructions = {
     --"DEC  IY"
     [0x2B] = "CPU.IY = (CPU.IY-1) % 65536",
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IY=bit32.band(0xFF00, CPU.IY)+%s", byte1), iaddr end,
+    
+    [0x34] = function(memory, iaddr)
+                local byte1 = memory[iaddr]; iaddr = inc_address(iaddr)
+                if byte1 > 127 then byte1 = byte1-256 end
+                return write_to_address_command_string("result", string.format("(CPU.IY+%s)%65536", byte1), 
+                iaddr,
+                "result = (memory[addr]+1)%256 " .. 
+                string.format(inc_flag_calc, "result", "result", "result")), iaddr
+            end,
+
+
     [0x44] = "CPU.B=bit32.band(CPU.IY, 0xFF00)/256",
     [0x45] = "CPU.B=CPU.IY%256",
     [0x4C] = "CPU.C=bit32.band(CPU.IY, 0xFF00)/256",
@@ -793,16 +831,6 @@ local function call_code_string(return_addr, target)
 end
 
 
-
-local function write_to_address_command_string(source, dest_address, next_pc, optional_flag_check_code)
-    -- e.g. dest_address = CPU.H*256+CPU.L
-    -- e.g. source = CPU.A
-    optional_flag_check_code = optional_flag_check_code or ""
-    return string.format(
-    [[ addr=%s %sif jit.write_allowed[addr] then memory[addr]=%s  
-    if jit:code_write_check(addr) then CPU.PC = 0x%x return 'invalidate' end end]], 
-    dest_address, optional_flag_check_code, source, next_pc)
-end
 
 
 local decode_instruction
@@ -1426,12 +1454,7 @@ local function CP_to_A_string(what)
     ]]    -- no CPU-A set at the end, otherwise same as SUBend
 end
 
-local inc_flag_calc = [[ CPU._F = CPU.simple_flags[%s]+CPU.Carry
-        if %s %% 0x10 == 0 then CPU._F = CPU._F + Z80_H_FLAG end
-        if %s == 0x80 then CPU._F = CPU._F + Z80_V_FLAG end ]]
-local dec_flag_calc = [[ CPU._F = CPU.simple_flags[%s] + CPU.Carry + Z80_N_FLAG
-        if %s %% 0x10 == 0x0F then CPU._F = CPU._F + Z80_H_FLAG end
-        if %s == 0x7F then CPU._F = CPU._F + Z80_V_FLAG end ]]
+
 
 -- inc 'r', op-code=4*(8*i)        e.g    3C = INC A    [0x3C] = "CPU.A = (CPU.A + 1)%256",    -- inc A        
 -- dec 'r'    -- 3E = LD A,XX [0x3E] = function(memory, iaddr) return "CPU.A="..tostring(memory[iaddr]), inc_address(iaddr) end ,
