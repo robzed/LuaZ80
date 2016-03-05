@@ -8541,7 +8541,7 @@ CB_instruction_tests = { ---[[
 
 
 DD_instruction_tests = {
-    
+    --[[
         -- 0x09
     -- ADD IX, ss ... doesn't affect Z or S or V
     { "ADD IX, BC", function(z) z:LD("IX", 0x1234)
@@ -8816,6 +8816,51 @@ DD_instruction_tests = {
             z:LD("IX", 0x1111)
             z:LD("IXL", 0x22)
             end, { IX = 0x1122 } },
+--]]
+-- 0x34
+ { "INC  (IX+0)", function(z) z:assemble("LD", "IX", 0x6000)
+    z:LD("A", 0x11)
+    z:LD("(0x6000)", "A")
+    z:assemble("INC", "(IX+0)") end, { A=0x11, [0x6000]=0x12, IX=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+
+ { "INC  (IX+0) rollover", function(z) z:assemble("LD", "IX", 0x6000)  
+    z:LD("A", 0xFF)
+    z:LD("(0x6000)", "A")
+         -- S is set if result is negative; reset otherwise
+        -- Z is set if result is zero; reset otherwise
+        -- H is set if carry from bit 3; reset otherwise
+        -- P/V is set if r was 7FH before operation; reset otherwise
+        -- N is reset
+        -- C is not affected
+    z:assemble("INC", "(IX+0)") end, { A=0xFF, [0x6000]=0x00, IX=0x6000, F={"-S", "Z", "H", "-V", "-N", "C", "oldF=0xFF"} } },  
+
+ { "INC  (IX+0) half carry", function(z) z:assemble("LD", "IX", 0x6000)  
+    z:LD("A", 0x0F)
+    z:LD("(0x6000)", "A")
+    z:assemble("INC", "(IX+0)") end, { A=0x0F, [0x6000]=0x10, IX=0x6000, F={"-S", "-Z", "H", "-V", "-N", "C", "oldF=0x0F"} } },  
+
+ { "INC  (IX+0) Flags P/V Sign", function(z) z:assemble("LD", "IX", 0x6000)  
+    z:LD("A", 0x7F)
+    z:LD("(0x6000)", "A")
+    z:assemble("INC", "(IX+0)") end, { A=0x7F, [0x6000]=0x80, IX=0x6000, F={"S", "-Z", "H", "V", "-N", "C", "oldF=0x7F"} } },  
+
+ { "INC  (IX-1)", function(z) z:assemble("LD", "IX", 0x6000)
+    z:LD("A", 0x11)
+    z:LD("(0x5FFF)", "A")
+    z:assemble("INC", "(IX-1)") end, { A=0x11, [0x5FFF]=0x12, IX=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+ { "INC  (IX+2) addr rollover", function(z) z:assemble("LD", "IX", 0xFFFE)
+    z:LD("A", 0x11)
+    z:LD("(0)", "A")
+    z:assemble("INC", "(IX+2)") end, { A=0x11, [0x0000]=0x12, IX=0xFFFE, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+ { "INC  (IX+127) addr rollover", function(z) z:assemble("LD", "IX", 0x6000)
+    z:LD("A", 0x11)
+    z:LD("(0x607F)", "A")
+    z:assemble("INC", "(IX+127)") end, { A=0x11, [0x607F]=0x12, IX=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+ { "INC  (IX-128) addr rollover", function(z) z:assemble("LD", "IX", 0x6000)
+    z:LD("A", 0x11)
+    z:LD("(0x5F80)", "A")
+    z:assemble("INC", "(IX-128)") end, { A=0x11, [0x5F80]=0x12, IX=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
+
 
     -- 0x39
     -- ADD IX, ss ... doesn't affect Z or S or V
