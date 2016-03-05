@@ -958,6 +958,12 @@ function Z80_Assembler:assemble(instruction, dest, source)
     elseif dest:sub(1,1) == "(" and dest:sub(#dest) ==")" and tonumber(dest:sub(2,#dest-1)) then
         dest_op = "(!n!)"
         dest = tonumber(dest:sub(2,#dest-1))
+    elseif dest:sub(1,3) == "(IX" and dest:sub(#dest) ==")" and tonumber(dest:sub(4,#dest-1)) then
+        dest_op = "(IX!d!)"
+        dest = tonumber(dest:sub(4,#dest-1))
+    elseif dest:sub(1,3) == "(IY" and dest:sub(#dest) ==")" and tonumber(dest:sub(4,#dest-1)) then
+        dest_op = "(IY!d!)"
+        dest = tonumber(dest:sub(4,#dest-1))
     else
         dest_op = dest:upper()
     end
@@ -998,7 +1004,7 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 self:_save_opcode(opcode)
                 self:DB(dest)
                 
-            elseif dest_op == "!r!" then
+            elseif dest_op == "!r!" or dest_op == "(IX!d!)" or dest_op == "(IY!d!)" then
                 dest = self:_byte_check_signed_only(dest, instruction)
                 self:_save_opcode(opcode)
                 self:DB(dest)
