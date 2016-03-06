@@ -8862,6 +8862,40 @@ DD_instruction_tests = {
     z:assemble("INC", "(IX-128)") end, { A=0x11, [0x5F80]=0x12, IX=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
 
 
+    -- 0x35
+    { "DEC  (IX+0)", function(z) z:LD("IX", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IX+0)") end, { A=0x11, [0x6000]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+    { "DEC  (IX+0) to zero", function(z) z:LD("IX", 0x6000)
+            z:LD("A", 0x01)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IX+0)") end, { A=0x01, [0x6000]=0x00, F={"-S", "Z", "-H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+     { "DEC  (IX+0) rollover", function(z) z:LD("IX", 0x6000)
+            z:LD("A", 0x00)
+            z:LD("(0x6000)", "A")
+             -- S is set if result is negative; reset otherwise
+            -- Z is set if result is zero; reset otherwise
+            -- H is set if borrow from bit 4, reset otherwise
+            -- P/V is set if m was 80H before operation; reset otherwise
+            -- N is set
+            -- C is not affected
+            z:assemble("DEC", "(IX+0)") end, { A=0x00, [0x6000]=0xFF, F={"S", "-Z", "H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+     { "DEC  (IX+0) half carry", function(z) z:LD("IX", 0x6000)
+            z:LD("A", 0x10)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IX+0)") end, { A=0x10, [0x6000]=0x0F, F={"-S", "-Z", "H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+     { "DEC  (IX+0) Flags P/V Sign", function(z) z:LD("IX", 0x6000)
+            z:LD("A", 0x80)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IX+0)") end, { A=0x80, [0x6000]=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+
+
     -- 0x39
     -- ADD IX, ss ... doesn't affect Z or S or V
     { "ADD IX, SP", function(z) z:LD("IX", 0x1234)

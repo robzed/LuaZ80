@@ -522,7 +522,7 @@ local decode_DD_instructions = {
     [0x2B] = "CPU.IX = (CPU.IX-1) % 65536",
     [0x2E] = function(memory, iaddr) local byte1 = memory[iaddr];iaddr = inc_address(iaddr);return string.format("CPU.IX=bit32.band(0xFF00, CPU.IX)+%s", byte1), iaddr end,
     
-    [0x34] = function(memory, iaddr)
+    [0x34] = function(memory, iaddr)    -- inc(IX+d)
             local byte1 = memory[iaddr]; iaddr = inc_address(iaddr)
             if byte1 > 127 then byte1 = byte1-256 end
             return write_to_address_command_string("result", string.format("(CPU.IX+%s)%%65536", byte1), 
@@ -530,6 +530,16 @@ local decode_DD_instructions = {
             "result = (memory[addr]+1)%256 " .. 
             string.format(inc_flag_calc, "result", "result", "result")), iaddr
         end,
+        
+    [0x35] = function(memory, iaddr)    -- dec(IX+d)
+            local byte1 = memory[iaddr]; iaddr = inc_address(iaddr)
+            if byte1 > 127 then byte1 = byte1-256 end
+            return write_to_address_command_string("result", string.format("(CPU.IX+%s)%%65536", byte1), 
+            iaddr, 
+            "result = (memory[addr]-1)%256" .. 
+            string.format(dec_flag_calc, "result", "result", "result")), iaddr
+        end,
+
 
     [0x44] = "CPU.B=bit32.band(CPU.IX, 0xFF00)/256",
     [0x45] = "CPU.B=CPU.IX%256",
