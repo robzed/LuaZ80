@@ -8894,6 +8894,25 @@ DD_instruction_tests = {
             z:LD("(0x6000)", "A")
             z:assemble("DEC", "(IX+0)") end, { A=0x80, [0x6000]=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"}, IX=0x6000 } },  
 
+    { "DEC  (IX-1)", function(z) z:LD("IX", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x5FFF)", "A")
+            z:assemble("DEC", "(IX-1)") end, { A=0x11, [0x5FFF]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+    { "DEC  (IX+2)", function(z) z:LD("IX", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x6002)", "A")
+            z:assemble("DEC", "(IX+2)") end, { A=0x11, [0x6002]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+    { "DEC  (IX+127)", function(z) z:LD("IX", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x607F)", "A")
+            z:assemble("DEC", "(IX+127)") end, { A=0x11, [0x607F]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
+
+    { "DEC  (IX-128)", function(z) z:LD("IX", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x5F80)", "A")
+            z:assemble("DEC", "(IX-128)") end, { A=0x11, [0x5F80]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
 
 
     -- 0x39
