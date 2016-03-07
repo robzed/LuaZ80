@@ -9769,6 +9769,60 @@ FD_instruction_tests = {
         z:LD("(0x5F80)", "A")
         z:assemble("INC", "(IY-128)") end, { A=0x11, [0x5F80]=0x12, IY=0x6000, F={"-S", "-Z", "-H", "-V", "-N", "C", "oldF=0x11"} } },  
 
+    -- 0x35
+    { "DEC  (IY+0)", function(z) z:LD("IY", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IY+0)") end, { A=0x11, [0x6000]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+    { "DEC  (IY+0) to zero", function(z) z:LD("IY", 0x6000)
+            z:LD("A", 0x01)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IY+0)") end, { A=0x01, [0x6000]=0x00, F={"-S", "Z", "-H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+     { "DEC  (IY+0) rollover", function(z) z:LD("IY", 0x6000)
+            z:LD("A", 0x00)
+            z:LD("(0x6000)", "A")
+             -- S is set if result is negative; reset otherwise
+            -- Z is set if result is zero; reset otherwise
+            -- H is set if borrow from bit 4, reset otherwise
+            -- P/V is set if m was 80H before operation; reset otherwise
+            -- N is set
+            -- C is not affected
+            z:assemble("DEC", "(IY+0)") end, { A=0x00, [0x6000]=0xFF, F={"S", "-Z", "H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+     { "DEC  (IY+0) half carry", function(z) z:LD("IY", 0x6000)
+            z:LD("A", 0x10)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IY+0)") end, { A=0x10, [0x6000]=0x0F, F={"-S", "-Z", "H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+     { "DEC  (IY+0) Flags P/V Sign", function(z) z:LD("IY", 0x6000)
+            z:LD("A", 0x80)
+            z:LD("(0x6000)", "A")
+            z:assemble("DEC", "(IY+0)") end, { A=0x80, [0x6000]=0x7F, F={"-S", "-Z", "H", "V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+    { "DEC  (IY-1)", function(z) z:LD("IY", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x5FFF)", "A")
+            z:assemble("DEC", "(IY-1)") end, { A=0x11, [0x5FFF]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+    { "DEC  (IY+2)", function(z) z:LD("IY", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x6002)", "A")
+            z:assemble("DEC", "(IY+2)") end, { A=0x11, [0x6002]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+    { "DEC  (IY+127)", function(z) z:LD("IY", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x607F)", "A")
+            z:assemble("DEC", "(IY+127)") end, { A=0x11, [0x607F]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+    { "DEC  (IY-128)", function(z) z:LD("IY", 0x6000) 
+            z:LD("A", 0x11)
+            z:LD("(0x5F80)", "A")
+            z:assemble("DEC", "(IY-128)") end, { A=0x11, [0x5F80]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
+
+
+
     -- 0x39
     -- ADD IY, ss ... doesn't affect Z or S or V
     { "ADD IY, SP", function(z) z:LD("IY", 0x1234)

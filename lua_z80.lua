@@ -613,6 +613,14 @@ local decode_FD_instructions = {
                 string.format(inc_flag_calc, "result", "result", "result")), iaddr
             end,
 
+    [0x35] = function(memory, iaddr)    -- dec(IY+d)
+            local byte1 = memory[iaddr]; iaddr = inc_address(iaddr)
+            if byte1 > 127 then byte1 = byte1-256 end
+            return write_to_address_command_string("result", string.format("(CPU.IY+%s)%%65536", byte1), 
+            iaddr, 
+            "result = (memory[addr]-1)%256" .. 
+            string.format(dec_flag_calc, "result", "result", "result")), iaddr
+        end,
 
     [0x44] = "CPU.B=bit32.band(CPU.IY, 0xFF00)/256",
     [0x45] = "CPU.B=CPU.IY%256",
