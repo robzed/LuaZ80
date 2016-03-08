@@ -539,6 +539,14 @@ local decode_DD_instructions = {
             "result = (memory[addr]-1)%256" .. 
             string.format(dec_flag_calc, "result", "result", "result")), iaddr
         end,
+        
+    [0x36] =  --ld (IX+d), &00
+        function(memory, iaddr)
+            local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+            local data_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            return write_to_address_command_string(data_byte, string.format("(CPU.IX+%s)%%65536", displacement_byte), iaddr), iaddr
+        end,
 
 
     [0x44] = "CPU.B=bit32.band(CPU.IX, 0xFF00)/256",

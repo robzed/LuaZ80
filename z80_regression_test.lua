@@ -8913,8 +8913,22 @@ DD_instruction_tests = {
             z:LD("A", 0x11)
             z:LD("(0x5F80)", "A")
             z:assemble("DEC", "(IX-128)") end, { A=0x11, [0x5F80]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IX=0x6000 } },  
-
-
+    
+    -- 0x36
+    { "LD (IX+0), n", function(z)
+         z:LD("IX", 0x5DEF)
+         z:LD("(IX+0)", 0x11)
+     end, { IX=0x5DEF, [0x5DEF] = 0x11 } },
+    { "LD (IX+127), n", function(z)
+         z:LD("IX", 0x6000)
+         z:LD("(IX+127)", 0x11)
+     end, { IX=0x6000, [0x607F] = 0x11 } },
+    { "LD (IX-128), n", function(z)
+         z:LD("IX", 0x6000)
+         z:LD("(IX-128)", 0x11)
+     end, { IX=0x6000, [0x5F80] = 0x11 } },
+ 
+ 
     -- 0x39
     -- ADD IX, ss ... doesn't affect Z or S or V
     { "ADD IX, SP", function(z) z:LD("IX", 0x1234)
