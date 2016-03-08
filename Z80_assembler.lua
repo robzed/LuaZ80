@@ -972,7 +972,7 @@ function Z80_Assembler:assemble(instruction, dest, source)
     if source == nil then
         src_op = nil
     elseif type(source) == "number" then
-        if type(dest) == "number" then
+        if type(dest) == "number" and dest_op ~= "(IX!d!)" and dest_op ~= "(IY!d!)" then
             self:set_error("both operands numeric in "..instruction)
             return
         end
@@ -1004,10 +1004,23 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 self:_save_opcode(opcode)
                 self:DB(dest)
                 
-            elseif dest_op == "!r!" or dest_op == "(IX!d!)" or dest_op == "(IY!d!)" then
+            elseif dest_op == "!r!" then
                 dest = self:_byte_check_signed_only(dest, instruction)
                 self:_save_opcode(opcode)
                 self:DB(dest)
+                
+            elseif dest_op == "(IX!d!)" or dest_op == "(IY!d!)" then
+                dest = self:_byte_check_signed_only(dest, instruction)
+                self:_save_opcode(opcode)
+                self:DB(dest)           -- displacement
+                
+                if src_op == "!n!" then
+                    source = self:_byte_check(source, instruction .. " byte truncated")
+                    self:DB(source)
+                elseif src_op ~= nil then
+                    self:set_error("Invalid source operand with destination (IX+d) or (IY+d) in "..instruction)
+                    return
+                end
 
             elseif dest_op == "!nn!" or dest_op == "(!nn!)" then
                 local high = math.floor(dest / 256)
