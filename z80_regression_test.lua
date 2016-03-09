@@ -9835,7 +9835,19 @@ FD_instruction_tests = {
             z:LD("(0x5F80)", "A")
             z:assemble("DEC", "(IY-128)") end, { A=0x11, [0x5F80]=0x10, F={"-S", "-Z", "-H", "-V", "N", "oldF=0xFF"}, IY=0x6000 } },  
 
-
+    -- 0x36
+    { "LD (IY+0), n", function(z)
+         z:LD("IY", 0x5DEF)
+         z:LD("(IY+0)", 0x11)
+     end, { IY=0x5DEF, [0x5DEF] = 0x11 } },
+    { "LD (IY+127), n", function(z)
+         z:LD("IY", 0x6000)
+         z:LD("(IY+127)", 0x11)
+     end, { IY=0x6000, [0x607F] = 0x11 } },
+    { "LD (IY-128), n", function(z)
+         z:LD("IY", 0x6000)
+         z:LD("(IY-128)", 0x11)
+     end, { IY=0x6000, [0x5F80] = 0x11 } },
 
     -- 0x39
     -- ADD IY, ss ... doesn't affect Z or S or V

@@ -630,6 +630,14 @@ local decode_FD_instructions = {
             string.format(dec_flag_calc, "result", "result", "result")), iaddr
         end,
 
+    [0x36] =  --ld (IY+d), &00
+        function(memory, iaddr)
+            local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+            local data_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            return write_to_address_command_string(data_byte, string.format("(CPU.IY+%s)%%65536", displacement_byte), iaddr), iaddr
+        end,
+
     [0x44] = "CPU.B=bit32.band(CPU.IY, 0xFF00)/256",
     [0x45] = "CPU.B=CPU.IY%256",
     [0x4C] = "CPU.C=bit32.band(CPU.IY, 0xFF00)/256",
