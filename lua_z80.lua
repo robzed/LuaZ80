@@ -551,6 +551,12 @@ local decode_DD_instructions = {
 
     [0x44] = "CPU.B=bit32.band(CPU.IX, 0xFF00)/256",
     [0x45] = "CPU.B=CPU.IX%256",
+    [0x46] = function(memory, iaddr)    -- LD B,(IX+d)
+            local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+            return string.format("CPU.B=memory[(CPU.IX+%s)%%65536]", displacement_byte), iaddr
+        end,
+    
     [0x4C] = "CPU.C=bit32.band(CPU.IX, 0xFF00)/256",
     [0x4D] = "CPU.C=CPU.IX%256",
     [0x54] = "CPU.D=bit32.band(CPU.IX, 0xFF00)/256",

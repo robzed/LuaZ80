@@ -8975,11 +8975,43 @@ DD_instruction_tests = {
             z:LD("IX", 0x1234)
             z:LD("B", "IXH")
         end, { B = 0x12, IX=0x1234 } },
-    
+    -- 0x45
     { "LD B, IXL", function(z)
             z:LD("IX", 0x1234)
             z:LD("B", "IXL")
         end, { B = 0x34, IX=0x1234 } },
+    
+    -- 0x46
+    { "LD B,(IX+0)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7001)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("B", "(IX+0)")  
+            end, { A=0x7E, IX=0x7001, B=0x7E, [0x7001]=0x7E } },
+    { "LD B,(IX-1)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7000)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("B", "(IX-1)")  
+            end, { A=0x7E, IX=0x7001, B=0x7E, [0x7000]=0x7E } },
+    { "LD B,(IX+1)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7002)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("B", "(IX+1)")  
+            end, { A=0x7E, IX=0x7001, B=0x7E, [0x7002]=0x7E } },
+    { "LD B,(IX+127)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7080)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("B", "(IX+127)")  
+            end, { A=0x7E, IX=0x7001, B=0x7E, [0x7080]=0x7E } },
+    { "LD B,(IX-128)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x6F81)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("B", "(IX-128)")  
+            end, { A=0x7E, IX=0x7001, B=0x7E, [0x6F81]=0x7E } },
 
     { "LD C, IXH", function(z)
             z:LD("IX", 0x1234)
@@ -9895,12 +9927,12 @@ FD_instruction_tests = {
             z:LD("IY", 0x1234)
             z:LD("B", "IYH")
         end, { B = 0x12, IY=0x1234 } },
-    
+    -- 0x45
     { "LD B, IYL", function(z)
             z:LD("IY", 0x1234)
             z:LD("B", "IYL")
         end, { B = 0x34, IY=0x1234 } },
-
+    -- 0x4C
     { "LD C, IYH", function(z)
             z:LD("IY", 0x1234)
             z:LD("C", "IYH")
