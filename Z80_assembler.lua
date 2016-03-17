@@ -980,6 +980,12 @@ function Z80_Assembler:assemble(instruction, dest, source)
     elseif source:sub(1,1) == "(" and source:sub(#source) ==")" and tonumber(source:sub(2,#source-1)) then
         src_op = "(!n!)"
         source = tonumber(source:sub(2,#source-1))
+    elseif source:sub(1,3) == "(IX" and source:sub(#source) ==")" and tonumber(source:sub(4,#source-1)) then
+        src_op = "(IX!d!)"
+        source = tonumber(source:sub(4,#source-1))
+    elseif source:sub(1,3) == "(IY" and source:sub(#source) ==")" and tonumber(source:sub(4,#source-1)) then
+        src_op = "(IY!d!)"
+        source = tonumber(source:sub(4,#source-1))
     else
         src_op = source:upper()
     end
@@ -1047,6 +1053,11 @@ function Z80_Assembler:assemble(instruction, dest, source)
                 low = self:_byte_check(low, instruction .. " low byte truncated")
                 self:_save_opcode(opcode)
                 self:DB(low, high)
+
+            elseif src_op == "(IX!d!)" or src_op == "(IY!d!)" then
+                source = self:_byte_check_signed_only(source, instruction)
+                self:_save_opcode(opcode)
+                self:DB(source)           -- displacement
             else
                 self:_save_opcode(opcode)
             end
