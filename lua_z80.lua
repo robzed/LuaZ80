@@ -559,11 +559,26 @@ local decode_DD_instructions = {
     
     [0x4C] = "CPU.C=bit32.band(CPU.IX, 0xFF00)/256",
     [0x4D] = "CPU.C=CPU.IX%256",
+    [0x4E] = function(memory, iaddr)    -- LD C,(IX+d)
+            local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+            return string.format("CPU.C=memory[(CPU.IX+%s)%%65536]", displacement_byte), iaddr
+        end,
     [0x54] = "CPU.D=bit32.band(CPU.IX, 0xFF00)/256",
     [0x55] = "CPU.D=CPU.IX%256",
+    [0x56] = function(memory, iaddr)    -- LD D,(IX+d)
+            local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+            return string.format("CPU.D=memory[(CPU.IX+%s)%%65536]", displacement_byte), iaddr
+        end,
     [0x5C] = "CPU.E=bit32.band(CPU.IX, 0xFF00)/256",
     [0x5D] = "CPU.E=CPU.IX%256",
-    
+    [0x5E] = function(memory, iaddr)    -- LD E,(IX+d)
+        local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+        if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+        return string.format("CPU.E=memory[(CPU.IX+%s)%%65536]", displacement_byte), iaddr
+    end,
+
     [0x60] = "CPU.IX=CPU.IX%256+CPU.B*256", -- LD IXH, B
     [0x61] = "CPU.IX=CPU.IX%256+CPU.C*256", -- LD IXH, C
     [0x62] = "CPU.IX=CPU.IX%256+CPU.D*256", -- LD IXH, D
@@ -571,13 +586,28 @@ local decode_DD_instructions = {
     
     [0x64] = "", -- LD IXH, IXH
     [0x65] = "CPU.IX=(CPU.IX%256)*0x101",
+    [0x66] = function(memory, iaddr)    -- LD H,(IX+d)
+            local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+            return string.format("CPU.H=memory[(CPU.IX+%s)%%65536]", displacement_byte), iaddr
+        end,
     
     [0x67] = "CPU.IX=CPU.IX%256+CPU.A*256", -- LD IXH, A
     [0x6C] = "temp=bit32.band(CPU.IX, 0xFF00) CPU.IX=temp/256+temp",
     [0x6D] = "", -- LD IXL, IXL
+    [0x6E] = function(memory, iaddr)    -- LD L,(IX+d)
+        local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+        if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+        return string.format("CPU.L=memory[(CPU.IX+%s)%%65536]", displacement_byte), iaddr
+    end,
     [0x6F] = "CPU.IX=bit32.band(CPU.IX, 0xFF00)+CPU.A", -- LD IXL, A
     [0x7C] = "CPU.A=bit32.band(CPU.IX, 0xFF00)/256",
     [0x7D] = "CPU.A=CPU.IX%256",
+    [0x7E] = function(memory, iaddr)    -- LD A,(IX+d)
+        local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+        if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+        return string.format("CPU.A=memory[(CPU.IX+%s)%%65536]", displacement_byte), iaddr
+    end,
     [0xE1] = "CPU.IX = memory[CPU.SP] + 256*memory[(CPU.SP+1)%65536] CPU.SP = (CPU.SP+2)%65536", -- POP IX
     
         -- E3 = EX (SP), IX
