@@ -9069,6 +9069,38 @@ DD_instruction_tests = {
             z:LD("D", "IXL")
         end, { D = 0x34, IX=0x1234 } },
 
+    -- 0x56
+    { "LD D,(IX+0)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7001)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("D", "(IX+0)")  
+            end, { A=0x7E, IX=0x7001, D=0x7E, [0x7001]=0x7E } },
+    { "LD D,(IX-1)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7000)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("D", "(IX-1)")  
+            end, { A=0x7E, IX=0x7001, D=0x7E, [0x7000]=0x7E } },
+    { "LD D,(IX+1)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7002)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("D", "(IX+1)")  
+            end, { A=0x7E, IX=0x7001, D=0x7E, [0x7002]=0x7E } },
+    { "LD D,(IX+127)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7080)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("D", "(IX+127)")  
+            end, { A=0x7E, IX=0x7001, D=0x7E, [0x7080]=0x7E } },
+    { "LD D,(IX-128)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x6F81)", "A") 
+            z:assemble("LD", "IX", 0x7001) 
+            z:LD("D", "(IX-128)")  
+            end, { A=0x7E, IX=0x7001, D=0x7E, [0x6F81]=0x7E } },
+
     { "LD E, IXH", function(z)
             z:LD("IX", 0x1234)
             z:LD("E", "IXH")
