@@ -916,6 +916,7 @@ local _DD_Z80_table = {
 [0xE3] = "EX   (SP),IX",  
 [0xE5] = "PUSH IX",       
 [0xE9] = "JP   (IX)",     
+[0xF9] = "LD   SP,IX"
 }
 
 -- add in the DD or FD values to the basic_Z80_table
