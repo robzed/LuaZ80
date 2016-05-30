@@ -10116,55 +10116,29 @@ FD_instruction_tests = {
             end, { A=0x7E, IY=0x7001, C=0x7E, [0x6F81]=0x7E } },
     --]]
     
+    -- 0x54
     { "LD D, IYH", function(z)
             z:LD("IY", 0x1234)
             z:LD("D", "IYH")
         end, { D = 0x12, IY=0x1234 } },
     
+    -- 0x55
     { "LD D, IYL", function(z)
             z:LD("IY", 0x1234)
             z:LD("D", "IYL")
         end, { D = 0x34, IY=0x1234 } },
 
+    -- 0x5C
     { "LD E, IYH", function(z)
             z:LD("IY", 0x1234)
             z:LD("E", "IYH")
         end, { E = 0x12, IY=0x1234 } },
     
+    -- 0x5D
     { "LD E, IYL", function(z)
             z:LD("IY", 0x1234)
             z:LD("E", "IYL")
         end, { E = 0x34, IY=0x1234 } },
-
-    { "LD IYH, IYH", function(z)
-            z:LD("IY", 0x1234)
-            z:LD("IYH", "IYH")
-        end, { IY=0x1234 } },
-    
-    { "LD IYL, IYL", function(z)
-            z:LD("IY", 0x1234)
-            z:LD("IYL", "IYL")
-        end, { IY=0x1234 } },
-
-    { "LD A, IYH", function(z)
-            z:LD("IY", 0x1234)
-            z:LD("A", "IYH")
-        end, { A = 0x12, IY=0x1234 } },
-    
-    { "LD A, IYL", function(z)
-            z:LD("IY", 0x1234)
-            z:LD("A", "IYL")
-        end, { A = 0x34, IY=0x1234 } },
-
-    { "LD IYH, IYL", function(z)
-            z:LD("IY", 0x1234)
-            z:LD("IYH", "IYL")
-        end, { IY=0x3434 } },
-
-    { "LD IYL, IYH", function(z)
-            z:LD("IY", 0x1234)
-            z:LD("IYL", "IYH")
-        end, { IY=0x1212 } },
     
         -- 0x60
     { "LD IYH, B", function(z)
@@ -10178,6 +10152,7 @@ FD_instruction_tests = {
             z:LD("C", 0x99)
             z:LD("IYH", "C")
         end, { C=0x99, IY=0x9934 } },
+    
     -- 0x62
     { "LD IYH, D", function(z)
             z:LD("IY", 0x1234)
@@ -10191,12 +10166,36 @@ FD_instruction_tests = {
             z:LD("IYH", "E")
         end, { E=0x99, IY=0x9934 } },
 
+    -- 0x64
+    { "LD IYH, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("IYH", "IYH")
+        end, { IY=0x1234 } },
+    
+    -- 0x65
+    { "LD IYH, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("IYH", "IYL")
+        end, { IY=0x3434 } },
+
     -- 0x67
     { "LD IYH, A", function(z)
             z:LD("IY", 0x1234)
             z:LD("A", 0x99)
             z:LD("IYH", "A")
         end, { A=0x99, IY=0x9934 } },
+
+    -- 0x6C
+    { "LD IYL, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("IYL", "IYH")
+        end, { IY=0x1212 } },
+
+    -- 0x6D
+    { "LD IYL, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("IYL", "IYL")
+        end, { IY=0x1234 } },
     
     -- 0x6F
     { "LD IYL, A", function(z)
@@ -10205,6 +10204,18 @@ FD_instruction_tests = {
             z:LD("IYL", "A")
         end, { A=0x99, IY=0x1299 } },
 
+    -- 0x7C
+    { "LD A, IYH", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("A", "IYH")
+        end, { A = 0x12, IY=0x1234 } },
+    
+    -- 0x7D
+    { "LD A, IYL", function(z)
+            z:LD("IY", 0x1234)
+            z:LD("A", "IYL")
+        end, { A = 0x34, IY=0x1234 } },
+
     -- 0x84
     { "ADD A,IYH", function(z)
             z:LD("IY", 0x1234)
@@ -10212,16 +10223,16 @@ FD_instruction_tests = {
             z:assemble("ADD", "A", "IYH")
             end, { A = 0x12, IY = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
 
- { "ADD A, IYH", function(z) z:LD("A", 1) z:LD("IY", 0x200) z:assemble("ADD", "A", "IYH") end,
-     { A = 3, IY = 0x200, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
- { "ADD A, IYH", function(z) z:LD("A", 0x0F) z:LD("IY", 0x100) z:assemble("ADD", "A", "IYH") end,
-     { A = 0x10, IY = 0x100, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
- { "ADD A, IYH", function(z) z:LD("A", 0x80) z:LD("IY", 0x8000) z:assemble("ADD", "A", "IYH") end,
-     { A = 0, IY = 0x8000, F={"-S", "Z", "-H", "V", "-N", "C"}} },
- { "ADD A, IYH", function(z) z:LD("A", 0x7F) z:LD("IY", 0x100) z:assemble("ADD", "A", "IYH") end,
-     { A = 0x80, IY = 0x100, F={"S", "-Z", "H", "V", "-N", "-C"}} },
- { "ADD A, IYH", function(z) z:LD("A", 0xFF) z:LD("IY", 0x200) z:assemble("ADD", "A", "IYH") end,
-     { A = 1, IY = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+     { "ADD A, IYH", function(z) z:LD("A", 1) z:LD("IY", 0x200) z:assemble("ADD", "A", "IYH") end,
+         { A = 3, IY = 0x200, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+     { "ADD A, IYH", function(z) z:LD("A", 0x0F) z:LD("IY", 0x100) z:assemble("ADD", "A", "IYH") end,
+         { A = 0x10, IY = 0x100, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+     { "ADD A, IYH", function(z) z:LD("A", 0x80) z:LD("IY", 0x8000) z:assemble("ADD", "A", "IYH") end,
+         { A = 0, IY = 0x8000, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+     { "ADD A, IYH", function(z) z:LD("A", 0x7F) z:LD("IY", 0x100) z:assemble("ADD", "A", "IYH") end,
+         { A = 0x80, IY = 0x100, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+     { "ADD A, IYH", function(z) z:LD("A", 0xFF) z:LD("IY", 0x200) z:assemble("ADD", "A", "IYH") end,
+         { A = 1, IY = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
 
     -- 0x85
@@ -10231,16 +10242,16 @@ FD_instruction_tests = {
             z:assemble("ADD", "A", "IYL")
             end, { A = 0x34, IY = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
 
- { "ADD A, IYL", function(z) z:LD("A", 1) z:LD("IY", 0x2) z:assemble("ADD", "A", "IYL") end,
-     { A = 3, IY = 0x2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
- { "ADD A, IYL", function(z) z:LD("A", 0x0F) z:LD("IY", 0x1) z:assemble("ADD", "A", "IYL") end,
-     { A = 0x10, IY = 0x1, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
- { "ADD A, IYL", function(z) z:LD("A", 0x80) z:LD("IY", 0x80) z:assemble("ADD", "A", "IYL") end,
-     { A = 0, IY = 0x80, F={"-S", "Z", "-H", "V", "-N", "C"}} },
- { "ADD A, IYL", function(z) z:LD("A", 0x7F) z:LD("IY", 0x1) z:assemble("ADD", "A", "IYL") end,
-     { A = 0x80, IY = 0x1, F={"S", "-Z", "H", "V", "-N", "-C"}} },
- { "ADD A, IYL", function(z) z:LD("A", 0xFF) z:LD("IY", 0x2) z:assemble("ADD", "A", "IYL") end,
-     { A = 1, IY = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+     { "ADD A, IYL", function(z) z:LD("A", 1) z:LD("IY", 0x2) z:assemble("ADD", "A", "IYL") end,
+         { A = 3, IY = 0x2, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+     { "ADD A, IYL", function(z) z:LD("A", 0x0F) z:LD("IY", 0x1) z:assemble("ADD", "A", "IYL") end,
+         { A = 0x10, IY = 0x1, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+     { "ADD A, IYL", function(z) z:LD("A", 0x80) z:LD("IY", 0x80) z:assemble("ADD", "A", "IYL") end,
+         { A = 0, IY = 0x80, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+     { "ADD A, IYL", function(z) z:LD("A", 0x7F) z:LD("IY", 0x1) z:assemble("ADD", "A", "IYL") end,
+         { A = 0x80, IY = 0x1, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+     { "ADD A, IYL", function(z) z:LD("A", 0xFF) z:LD("IY", 0x2) z:assemble("ADD", "A", "IYL") end,
+         { A = 1, IY = 0x2, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
      -- 0x8C
     { "ADC A,IYH", function(z)
@@ -10259,31 +10270,31 @@ FD_instruction_tests = {
             z:assemble("ADC", "A", "IYH")
             end, { A = 0x13, IY = 0x1234, F={"-S", "-Z", "-H", "-V", "-N", "-C"} } }, 
 
- { "ADC A, IYH", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("A", 1) z:LD("IY", 0x200) z:assemble("ADC", "A", "IYH") end,
-     { A = 3, IY = 0x200, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
- { "ADC A, IYH", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("A", 0x0F) z:LD("IY", 0x100) z:assemble("ADC", "A", "IYH") end,
-     { A = 0x10, IY = 0x100, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
- { "ADC A, IYH", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("A", 0x80) z:LD("IY", 0x8000) z:assemble("ADC", "A", "IYH") end,
-     { A = 0, IY = 0x8000, F={"-S", "Z", "-H", "V", "-N", "C"}} },
- { "ADC A, IYH", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("A", 0x7F) z:LD("IY", 0x100) z:assemble("ADC", "A", "IYH") end,
-     { A = 0x80, IY = 0x100, F={"S", "-Z", "H", "V", "-N", "-C"}} },
- { "ADC A, IYH", function(z)
-        z:assemble("SCF")
-        z:assemble("CCF")
-        z:LD("A", 0xFF) z:LD("IY", 0x200) z:assemble("ADC", "A", "IYH") end,
-     { A = 1, IY = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
+     { "ADC A, IYH", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("A", 1) z:LD("IY", 0x200) z:assemble("ADC", "A", "IYH") end,
+         { A = 3, IY = 0x200, F={"-S", "-Z", "-H", "-V", "-N", "-C"}} },
+     { "ADC A, IYH", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("A", 0x0F) z:LD("IY", 0x100) z:assemble("ADC", "A", "IYH") end,
+         { A = 0x10, IY = 0x100, F={"-S", "-Z", "H", "-V", "-N", "-C"}} },
+     { "ADC A, IYH", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("A", 0x80) z:LD("IY", 0x8000) z:assemble("ADC", "A", "IYH") end,
+         { A = 0, IY = 0x8000, F={"-S", "Z", "-H", "V", "-N", "C"}} },
+     { "ADC A, IYH", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("A", 0x7F) z:LD("IY", 0x100) z:assemble("ADC", "A", "IYH") end,
+         { A = 0x80, IY = 0x100, F={"S", "-Z", "H", "V", "-N", "-C"}} },
+     { "ADC A, IYH", function(z)
+            z:assemble("SCF")
+            z:assemble("CCF")
+            z:LD("A", 0xFF) z:LD("IY", 0x200) z:assemble("ADC", "A", "IYH") end,
+         { A = 1, IY = 0x200, F={"-S", "-Z", "H", "-V", "-N", "C"}} },
 
     -- 0x8D
     { "ADC A,IYL", function(z)
