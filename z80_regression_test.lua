@@ -10125,6 +10125,38 @@ FD_instruction_tests = {
             z:LD("IY", 0x1234)
             z:LD("D", "IYL")
         end, { D = 0x34, IY=0x1234 } },
+    
+    -- 0x56
+    { "LD D,(IY+0)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7001)", "A") 
+            z:assemble("LD", "IY", 0x7001) 
+            z:LD("D", "(IY+0)")  
+            end, { A=0x7E, IY=0x7001, D=0x7E, [0x7001]=0x7E } },
+    { "LD D,(IY-1)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7000)", "A") 
+            z:assemble("LD", "IY", 0x7001) 
+            z:LD("D", "(IY-1)")  
+            end, { A=0x7E, IY=0x7001, D=0x7E, [0x7000]=0x7E } },
+    { "LD D,(IY+1)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7002)", "A") 
+            z:assemble("LD", "IY", 0x7001) 
+            z:LD("D", "(IY+1)")  
+            end, { A=0x7E, IY=0x7001, D=0x7E, [0x7002]=0x7E } },
+    { "LD D,(IY+127)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x7080)", "A") 
+            z:assemble("LD", "IY", 0x7001) 
+            z:LD("D", "(IY+127)")  
+            end, { A=0x7E, IY=0x7001, D=0x7E, [0x7080]=0x7E } },
+    { "LD D,(IY-128)", function(z) 
+            z:assemble("LD", "A", 0x7E)
+            z:assemble("LD", "(0x6F81)", "A") 
+            z:assemble("LD", "IY", 0x7001) 
+            z:LD("D", "(IY-128)")  
+            end, { A=0x7E, IY=0x7001, D=0x7E, [0x6F81]=0x7E } },
 
     -- 0x5C
     { "LD E, IYH", function(z)

@@ -691,8 +691,18 @@ local decode_FD_instructions = {
         end,
     [0x54] = "CPU.D=bit32.band(CPU.IY, 0xFF00)/256",
     [0x55] = "CPU.D=CPU.IY%256",
+    [0x56] = function(memory, iaddr)    -- LD D,(IY+d)
+            local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+            if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+            return string.format("CPU.D=memory[(CPU.IY+%s)%%65536]", displacement_byte), iaddr
+        end,
     [0x5C] = "CPU.E=bit32.band(CPU.IY, 0xFF00)/256",
     [0x5D] = "CPU.E=CPU.IY%256",
+    [0x5E] = function(memory, iaddr)    -- LD E,(IY+d)
+        local displacement_byte = memory[iaddr]; iaddr = inc_address(iaddr);
+        if displacement_byte > 127 then displacement_byte = displacement_byte-256 end
+        return string.format("CPU.E=memory[(CPU.IY+%s)%%65536]", displacement_byte), iaddr
+    end,
     
     [0x60] = "CPU.IY=CPU.IY%256+CPU.B*256", -- LD IYH, B
     [0x61] = "CPU.IY=CPU.IY%256+CPU.C*256", -- LD IYH, C
