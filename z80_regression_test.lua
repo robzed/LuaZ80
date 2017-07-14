@@ -10803,11 +10803,13 @@ function Collecting_Assembler:_mark_expected_instructions()
         self.instructions_completed[0xFDCB00+i] = 1
     end
     for i = 0, 0x0f0, 0x10 do
-        self.instructions_completed[0xDDCB60+i] = false
-        self.instructions_completed[0xFDCBE0+i] = false
+        self.instructions_completed[0xDDCB06+i] = false
+        self.instructions_completed[0xDDCB0E+i] = false
+        self.instructions_completed[0xFDCB06+i] = false
+        self.instructions_completed[0xFDCB0E+i] = false
     end
-    self.instructions_completed[0xDDCB63] = 1
-    self.instructions_completed[0xFDCB63] = 1
+    self.instructions_completed[0xDDCB36] = 1
+    self.instructions_completed[0xFDCB36] = 1
 
 
     -- count up number to test
@@ -10844,21 +10846,55 @@ function Collecting_Assembler:print_detailed_stats()
     lookup[1] = "n"
     lookup[2] = "y"
     
-    print("00 to FF")
-    print("========")
-    print("  0 1 2 3 4 5 6 7 8 9 A B C D E F")
-    for line = 0, 15 do
-        local line_str = ""
-        for column = 0, 15 do
-            local address = 16 * line + column
-            local c = lookup[self.instructions_completed[address]]
-            if c == nil then c = "." end
-            line_str = line_str .. " " .. c
+    local print_graphic_map
+    function print_graphic_map(offset)
+        print("  0 1 2 3 4 5 6 7 8 9 A B C D E F")
+        for line = 0, 15 do
+            local line_str = ""
+            for column = 0, 15 do
+                local address = offset + 16 * line + column
+                local c = lookup[self.instructions_completed[address]]
+                if c == nil then c = "." end
+                line_str = line_str .. " " .. c
+            end
+            print(string.format("%X%s", line, line_str))
         end
-        print(string.format("%X%s", line, line_str))
     end
     
+    print("00 to FF")
+    print("========")
+    print_graphic_map(0)
     
+    print()
+    print("ED00 to EDFF")
+    print("========")
+    print_graphic_map(0xED00)
+    
+    print()
+    print("CB00 to CBFF")
+    print("========")
+    print_graphic_map(0xCB00)
+
+    print()
+    print("DD00 to DDFF")
+    print("========")
+    print_graphic_map(0xDD00)
+
+    print()
+    print("FD00 to FDFF")
+    print("========")
+    print_graphic_map(0xFD00)
+
+    print()
+    print("DDCB00 to DDCBFF")
+    print("========")
+    print_graphic_map(0xDDCB00)
+
+    print()
+    print("FDCB00 to FDCBFF")
+    print("========")
+    print_graphic_map(0xFDCB00)
+
 end
 
 --function FindExpectedInstructions
