@@ -166,8 +166,9 @@ end
 
 
 
-local function assemble_code(code_in)
-    local z = Z80_Assembler:new()
+local function assemble_code(assembler, code_in)
+    assembler:reset_environment()
+    local z = assembler
     z:set_compile_address(0)    -- compile for zero address
 
     code_in(z)
@@ -391,13 +392,13 @@ local function compare_state(old_state, new_state)
 end
 
 
-local function test(code, checks, post_setup)
+local function test(assembler, code, checks, post_setup)
     local time_start = os.clock()
     local initial_mem = block_of_halts(2048)
     local time_end = os.clock()
     if TIMING_ON then print("Halt table Took", time_end - time_start) end
     
-    local binary, end_addr = assemble_code(code)
+    local binary, end_addr = assemble_code(assembler, code)
     if not checks.PC then
         checks.PC = end_addr + 1 -- +1 for halt instruction
     end
@@ -411,12 +412,12 @@ local function test(code, checks, post_setup)
 end
 
 
-local function run_batch(test_name, tests)
+local function run_batch(assembler, test_name, tests)
     local num_tests = #tests
     for i, one_test in pairs(tests) do
         print(string.format("Running test %s - %i of %i - %s", test_name, i, num_tests, one_test[1]))
         local time_start = os.clock()
-        test(one_test[2], one_test[3], one_test[4])
+        test(assembler, one_test[2], one_test[3], one_test[4])
         local time_end = os.clock()
         if TIMING_ON then print("Took", time_end - time_start) end
         
@@ -10666,21 +10667,200 @@ FD_instruction_tests = {
 
 }   
 
+
+----------------------------------------------------------------------------
+--
+--
+-- Specialise Z80 assembler to collect metrics
+
+local Collecting_Assembler = class("collecting_assembler", Z80_Assembler)
+
+function Collecting_Assembler:initialize()
+  Z80_Assembler.initialize(self) -- invoking the superclass' initializer
+  self.instructions_completed = {}
+  
+  self.tested_official = 0
+  self.untested_official = 0
+  self.tested_undoc = 0
+  self.untested_undoc = 0    
+  self.tested_unrecognised = 0
+
+  self:_mark_expected_instructions()
+end
+
+function Collecting_Assembler:_save_opcode(opcode, ...)
+    local old = self.instructions_completed[opcode]
+    if old == nil then
+        self.tested_unrecognised = self.tested_unrecognised + 1
+        self.instructions_completed[opcode] = true
+    elseif old == 1 then
+        self.tested_undoc = self.tested_undoc + 1
+        self.untested_undoc = self.untested_undoc - 1
+        self.instructions_completed[opcode] = 2
+    elseif old == false then
+        --print(string.format("%x", opcode))
+        self.tested_official = self.tested_official + 1
+        self.untested_official = self.untested_official - 1
+        self.instructions_completed[opcode] = true
+    end -- old == 2 and old == true don't count
+
+    Z80_Assembler._save_opcode(self, opcode, ...)
+end
+
+function Collecting_Assembler:_mark_expected_instructions()
+    
+    -- deal with single byte plus CBxx instructions
+    for i = 0, 255 do
+        self.instructions_completed[i] = false
+        self.instructions_completed[0xCB00+i] = false
+    end
+    
+    -- these instrrctions don't appear as single bytes
+    self.instructions_completed[0xCB] = nil
+    self.instructions_completed[0xDD] = nil
+    self.instructions_completed[0xED] = nil
+    self.instructions_completed[0xFD] = nil
+    
+    -- these CBxx instructions are not official
+    for i = 0, 7 do
+        self.instructions_completed[0xCB30+i] = 1
+    end
+    
+    -- 0xEDnn instructions
+    for i = 0, 0x0f do
+        self.instructions_completed[0xED40+i] = false
+        self.instructions_completed[0xED50+i] = false
+        self.instructions_completed[0xED60+i] = false
+        self.instructions_completed[0xED70+i] = false
+    end
+    self.instructions_completed[0xED4C] = 1
+    self.instructions_completed[0xED4E] = 1
+    self.instructions_completed[0xED54] = 1
+    self.instructions_completed[0xED5C] = 1
+    self.instructions_completed[0xED63] = 1
+    self.instructions_completed[0xED64] = 1
+    self.instructions_completed[0xED6B] = 1
+    self.instructions_completed[0xED6C] = 1
+    self.instructions_completed[0xED6E] = 1
+    self.instructions_completed[0xED70] = 1
+    self.instructions_completed[0xED71] = 1
+    self.instructions_completed[0xED74] = 1
+    self.instructions_completed[0xED7C] = 1
+    self.instructions_completed[0xED77] = nil
+    self.instructions_completed[0xED7F] = nil
+    
+    for i = 0, 3 do
+        self.instructions_completed[0xEDA0+i] = false
+        self.instructions_completed[0xEDB0+i] = false
+    end
+    for i = 8, 0x0b do
+        self.instructions_completed[0xEDA0+i] = false
+        self.instructions_completed[0xEDB0+i] = false
+    end
+    
+    -- need to check against WoS_z80undoc.htm, not just http://clrhome.org/table/
+    -- DDxx and FDxx instructions
+    --
+    -- this ones complex so let's do a 'map'
+    local map = {
+    --   0123456789abcdef
+        '         y      ',
+        '         y      ',
+        '.yyy???..yyy??? ',
+        '....yyy..y      ',
+        '    ??y     ??y ',
+        '    ??y     ??y ',
+        '??????y???????y?',
+        'yyyyyy y    ??y ',
+        '    ??y     ??y ',
+        '    ??y     ??y ',
+        '    ??y     ??y ',
+        '    ??y     ??y ',
+        '                ',
+        '                ',
+        ' y y y...y      ',
+        '         y      ',
+        }
+    for line, str in ipairs(map) do
+        local column = 0
+        for c in str:gmatch"." do
+            if c == 'y' then
+                c = false
+            elseif c == '?' then
+                c = 1
+            else
+                c = nil
+            end
+            self.instructions_completed[0xFD00+(line-1)*16+column] = c
+            self.instructions_completed[0xDD00+(line-1)*16+column] = c
+            column = column + 1
+        end
+    end
+    
+    -- DDCBxx and FDCBxx instructions
+    for i = 0, 255 do
+        self.instructions_completed[0xDDCB00+i] = 1
+        self.instructions_completed[0xFDCB00+i] = 1
+    end
+    for i = 0, 0x0f0, 0x10 do
+        self.instructions_completed[0xDDCB60+i] = false
+        self.instructions_completed[0xFDCBE0+i] = false
+    end
+    self.instructions_completed[0xDDCB63] = 1
+    self.instructions_completed[0xFDCB63] = 1
+
+
+    -- count up number to test
+    for _, v in pairs(self.instructions_completed) do
+        if v == 1 then
+            self.untested_undoc = self.untested_undoc + 1
+        elseif v == false then
+            self.untested_official = self.untested_official + 1
+        else
+            print("Unrecognised value")
+            os.exit(1)
+        end
+    end
+
+end
+
+
+
+function Collecting_Assembler:print_stats()
+    print("Tested official instructions", self.tested_official)
+    print("Not tested official instructions", self.untested_official)
+    print("Tested undocumented instructions", self.tested_undoc)
+    print("Not tested undocumented instructions", self.untested_undoc)    
+    print("Tested unrecognised instructions", self.tested_unrecognised)
+end
+
+function Collecting_Assembler:print_detailed_stats()
+    self:print_stats()
+end
+
+--function FindExpectedInstructions
+
 ----------------------------------------------------------------------------
 --
 -- These lines select the tests to run
 --
 
---run_batch("0xnn", basic_instruction_tests)
---run_batch("temp", temp_test)
---run_batch("0xCBnn", CB_instruction_tests)
---run_batch("0xEDnn", ED_instruction_tests)
-run_batch("0xDDnn", DD_instruction_tests)
-run_batch("0xFFnn", FD_instruction_tests)
---run_batch("0xDDCBnn", DDCB_instruction_tests)
---run_batch("0xFDCBnn", FDCB_instruction_tests)
---run_batch("", memory_invalidation_tests)
---run_batch("", more_advanced_tests)
---run_batch("", interrupt_test)
---run_batch("", R_reg_test)
---run_batch("", Carry_Flag_seperate_from_F_flag_interactions_test)
+
+--our_assembler = Z80_Assembler:new()
+our_assembler = Collecting_Assembler:new()
+
+run_batch(our_assembler, "0xnn", basic_instruction_tests)
+--run_batch(our_assembler, "temp", temp_test)
+run_batch(our_assembler, "0xCBnn", CB_instruction_tests)
+run_batch(our_assembler, "0xEDnn", ED_instruction_tests)
+run_batch(our_assembler, "0xDDnn", DD_instruction_tests)
+run_batch(our_assembler, "0xFFnn", FD_instruction_tests)
+--run_batch(our_assembler, "0xDDCBnn", DDCB_instruction_tests)
+--run_batch(our_assembler, "0xFDCBnn", FDCB_instruction_tests)
+--run_batch(our_assembler, "", memory_invalidation_tests)
+--run_batch(our_assembler, "", more_advanced_tests)
+--run_batch(our_assembler, "", interrupt_test)
+--run_batch(our_assembler, "", R_reg_test)
+--run_batch(our_assembler, "", Carry_Flag_seperate_from_F_flag_interactions_test)
+
+our_assembler:print_stats()

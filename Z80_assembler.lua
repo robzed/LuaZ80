@@ -45,6 +45,10 @@ require("third_party/middleclass")
 Z80_Assembler = class("Z80_Assembler")
 
 function Z80_Assembler:initialize()
+    self:reset_environment()
+end
+
+function Z80_Assembler:reset_environment()
     self._errors = false
     self._pc = 0
     self.memory = {}
@@ -151,17 +155,31 @@ function Z80_Assembler:DB(...)
 end
 
 
+function Z80_Assembler:_save_opcode(opcode, ...)
+    if opcode < 256 then
+        self:DB(opcode)
+    elseif opcode < 65536 then
+        self:DB(math.floor(opcode/256), opcode%256)
+    elseif opcode <= 0xFFFFFF then
+        self:DB(math.floor(opcode/65536), (math.floor(opcode/256))%256, opcode%256)
+    else
+        self:set_error("opcode too long")
+    end
+    self:DB(...)
+end
+
+
 function Z80_Assembler:LD_A(value)
     value = self:_byte_check(value, "LD A byte truncated")
-    self:DB(0x3e,value)
+    self:_save_opcode(0x3e,value)
 end
 
 function Z80_Assembler:HALT()
-    self:DB(0x76)
+    self:_save_opcode(0x76)
 end
 
 function Z80_Assembler:INC_indirect_HL()
-    self:DB(0x34)
+    self:_save_opcode(0x34)
 end
 
 function Z80_Assembler:LD_HL(value)
@@ -169,7 +187,7 @@ function Z80_Assembler:LD_HL(value)
     local low = value % 256
     high = self:_byte_check(high, "LD HL high byte truncated")
     low = self:_byte_check(low, "LD HL low byte truncated")
-    self:DB(0x21, low, high)
+    self:_save_opcode(0x21, low, high)
 end
 
 function Z80_Assembler:write_int16(address, value)
@@ -930,19 +948,6 @@ for k,v in pairs(_DD_Z80_table) do
     v = v:gsub("IX", "IY")
     if not basic_Z80_table[v] then
         basic_Z80_table[v] = 0xFD00 + k
-    end
-end
-
-
-function Z80_Assembler:_save_opcode(opcode)
-    if opcode < 256 then
-        self:DB(opcode)
-    elseif opcode < 65536 then
-        self:DB(math.floor(opcode/256), opcode%256)
-    elseif opcode <= 0xFFFFFF then
-        self:DB(math.floor(opcode/65536), (math.floor(opcode/256))%256, opcode%256)
-    else
-        self:set_error("opcode too long")
     end
 end
 
