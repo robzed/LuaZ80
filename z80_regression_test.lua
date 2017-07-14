@@ -10692,7 +10692,7 @@ function Collecting_Assembler:_save_opcode(opcode, ...)
     local old = self.instructions_completed[opcode]
     if old == nil then
         self.tested_unrecognised = self.tested_unrecognised + 1
-        self.instructions_completed[opcode] = true
+        self.instructions_completed[opcode] = 0
     elseif old == 1 then
         self.tested_undoc = self.tested_undoc + 1
         self.untested_undoc = self.untested_undoc - 1
@@ -10702,7 +10702,7 @@ function Collecting_Assembler:_save_opcode(opcode, ...)
         self.tested_official = self.tested_official + 1
         self.untested_official = self.untested_official - 1
         self.instructions_completed[opcode] = true
-    end -- old == 2 and old == true don't count
+    end -- old == 2 and old == true and old == 0 don't count
 
     Z80_Assembler._save_opcode(self, opcode, ...)
 end
@@ -10836,6 +10836,29 @@ end
 
 function Collecting_Assembler:print_detailed_stats()
     self:print_stats()
+    
+    local lookup = { }
+    lookup[true] = "Y"
+    lookup[false]= "N"
+    lookup[0] = "x"
+    lookup[1] = "n"
+    lookup[2] = "y"
+    
+    print("00 to FF")
+    print("========")
+    print("  0 1 2 3 4 5 6 7 8 9 A B C D E F")
+    for line = 0, 15 do
+        local line_str = ""
+        for column = 0, 15 do
+            local address = 16 * line + column
+            local c = lookup[self.instructions_completed[address]]
+            if c == nil then c = "." end
+            line_str = line_str .. " " .. c
+        end
+        print(string.format("%X%s", line, line_str))
+    end
+    
+    
 end
 
 --function FindExpectedInstructions
@@ -10849,12 +10872,12 @@ end
 --our_assembler = Z80_Assembler:new()
 our_assembler = Collecting_Assembler:new()
 
-run_batch(our_assembler, "0xnn", basic_instruction_tests)
+--run_batch(our_assembler, "0xnn", basic_instruction_tests)
 --run_batch(our_assembler, "temp", temp_test)
-run_batch(our_assembler, "0xCBnn", CB_instruction_tests)
-run_batch(our_assembler, "0xEDnn", ED_instruction_tests)
-run_batch(our_assembler, "0xDDnn", DD_instruction_tests)
-run_batch(our_assembler, "0xFFnn", FD_instruction_tests)
+--run_batch(our_assembler, "0xCBnn", CB_instruction_tests)
+--run_batch(our_assembler, "0xEDnn", ED_instruction_tests)
+--run_batch(our_assembler, "0xDDnn", DD_instruction_tests)
+--run_batch(our_assembler, "0xFFnn", FD_instruction_tests)
 --run_batch(our_assembler, "0xDDCBnn", DDCB_instruction_tests)
 --run_batch(our_assembler, "0xFDCBnn", FDCB_instruction_tests)
 --run_batch(our_assembler, "", memory_invalidation_tests)
@@ -10863,4 +10886,4 @@ run_batch(our_assembler, "0xFFnn", FD_instruction_tests)
 --run_batch(our_assembler, "", R_reg_test)
 --run_batch(our_assembler, "", Carry_Flag_seperate_from_F_flag_interactions_test)
 
-our_assembler:print_stats()
+our_assembler:print_detailed_stats()
