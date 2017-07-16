@@ -1,5 +1,5 @@
--- Z80 Single Step Debugger/Monitor
--- (c) Copyright 2015 Rob Probin.
+-- Z80 Regression Tests
+-- (c) Copyright 2015-2017 Rob Probin.
 -- 
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@
 -- =====
 -- 
 -- This file is not built for speed, it is intended to be simple & fast to write
--- and run only occasionlly.
+-- and run only occasionally.
 -- 
 -- It checks 'user visible' changes to the CPU, e.g. registers and 
 -- There are interactions that it doesn't test. One big example is that
