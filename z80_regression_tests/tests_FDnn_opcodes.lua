@@ -191,6 +191,9 @@ local FD_instruction_tests = {
         z:LD("IY", 0x1234)
         z:LD("IYH", 0x56)
         end, { IY = 0x5634 } },
+     { "LD  IYH,n", function(z) z:assemble("LD", "IY", 0xFFFF) z:assemble("LD", "IYH", 0xe1) end, { IY=0xE1FF } }, 
+     { "LD  IYH,n", function(z) z:assemble("LD", "IY", 0xFFFF) z:assemble("LD", "IYH", 0x00) end, { IY=0x00FF } }, 
+     { "LD  IYH,n", function(z) z:assemble("LD", "IY", 0xA5A5) z:assemble("LD", "IYH", 0xFF) end, { IY=0xFFA5 } }, 
 
     -- 0x29
     -- ADD IY, ss ... doesn't affect Z or S or V
