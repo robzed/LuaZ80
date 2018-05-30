@@ -17,6 +17,10 @@ Lua is a popular scripting language that where the standard interpreter is one o
 
 A dynamic translator means that it could be as fast as Lua, at least in theory, rather than an Z80 interpreter running on top of a Lua interpreter (or compiler). However, see [docs/technical.txt][3] for current limiting factors on the speed.
 
+There are a couple of places that Lua has been used to make Z80-style emulators:
+- A Z80/Spectrum emulator written in Lua: https://github.com/ignacio/luagleck
+- Also see the emulator in [3]
+
 [3]: https://github.com/robzed/LuaZ80/blob/master/docs/technical.txt
 
 Main Files

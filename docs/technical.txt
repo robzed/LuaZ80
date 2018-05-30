@@ -61,6 +61,8 @@ But very little using Lua for emulators (that I could find) although several peo
 
 The only Lua processor emulator I could find was inside Garryboy which is a Game Boy processor emulator inside Garryboy. Garryboy is a Game Boy emulator for Garry's Mod. The Game Boy processor isn't a Z80, but an 8080-derived processor with some Z80 instructions added (CB prefix) as well as unique auto-increment/decrement addressing modes (wikipedia). Garryboy is a traditional read-decode-execute emulator.
 
+UPDATE: 30May2018 - Another Z80 Emulator is here https://github.com/ignacio/luagleck
+
 Most Python, Perl and C emulators are traditional read-decode-execute emulators.
 
 The only non-traditional high-level language emulators I'm aware of are jsLinux and LuaZ80. LuaZ80 doesn't share any code with jsLinux, and I haven't studied jsLinux, so I'm not aware if there are any techniques in common. I could probably learn a few things :-)
