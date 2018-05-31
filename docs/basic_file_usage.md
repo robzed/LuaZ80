@@ -2,7 +2,8 @@ Basic File Usage for LuaZ80 Files
 ==============================
 Last updated by Rob Probin
 
-
+NOTE: LuaZ80 requires Lua 5.2 for the goto statement and bit32 libraries. 
+We use the goto statement when compiling the Z80 to Lua.
 
 lua_z80_test.lua
 ================

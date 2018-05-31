@@ -86,7 +86,15 @@ Apart from the 'because it hadn't been done' reasons, there are reasonable techn
 Why Lua 5.2, Doesn't the world use 5.1 and 5.2 is evil, etc., etc.
 ==================================================================
 
-I like 5.2. It's built in bitwise operators made me use it on an ARM7 project I was working on. Also hex escape sequences in strings. And GC fixes. 
+I like 5.2. It's built in bitwise operators made me use it on an ARM7 project I was working on. Also hex escape sequences in strings. 
+
+Additionally - and more importantly - the compilation/translation process uses goto to translate branches into Lua. 
+
+This is difficult fix for Lua 5.1. I think you have:
+- To mapping arbitary control structures to higher level control structures. 
+- It might be able to think of alternatives (e.g. functions, if-statements).
+
+I'd enough anyone interested to look into this, and fork the repo to try.
 
 
 Early thoughts on Self Modifying Code

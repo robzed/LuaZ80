@@ -3,6 +3,8 @@ LuaZ80
 
 A Lua Z80 dynamic (binary) translator (similar to a JIT compiler) which translates Z80 to Lua and runs the result.
 
+NOTE: LuaZ80 requires Lua 5.2 for the goto statement and bit32 libraries. We use the goto statement when compiling the Z80 to Lua. It has not been tested on Lua 5.3 or LuaJIT yet.
+
 **WARNING** This software is not complete, but is a work-in-progress proof of concept. Not all op-codes are implemented and it will not work properly. 
 However some are working (e.g. those used in lua_z80_test.lua). 
 For a more complete list see z80_regression_test.lua. 
