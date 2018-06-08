@@ -479,7 +479,7 @@ function Collecting_Assembler:_mark_expected_instructions()
         self.instructions_completed[0xCB00+i] = false
     end
     
-    -- these instrrctions don't appear as single bytes
+    -- these instructions don't appear as single bytes
     self.instructions_completed[0xCB] = nil
     self.instructions_completed[0xDD] = nil
     self.instructions_completed[0xED] = nil
@@ -609,7 +609,7 @@ function Collecting_Assembler:print_detailed_stats()
     lookup[0] = "x"
     lookup[1] = "n"
     lookup[2] = "y"
-    
+    print("not/tested: N/Y=offical n/y=official ./x=unknown")
     local print_graphic_map
     function print_graphic_map(offset)
         print("  0 1 2 3 4 5 6 7 8 9 A B C D E F")
